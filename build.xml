@@ -74,6 +74,8 @@
 
     <!-- Put everything in ${build} into the jar file -->
     <jar jarfile="${dist}/lib/clojuratica.jar" basedir="${build}"/>
+
+    <echo>JAR written to ${dist}/lib/clojuratica.jar</echo>
   </target>
 
   <target name="jarcopy" depends="check_hasjartarget,dist"
@@ -83,6 +85,7 @@
 
     <!-- Put everything in ${build} into the jar file -->
     <jar jarfile="${jartarget}/clojuratica.jar" basedir="${build}"/>
+    <echo>JAR written to ${jartarget}/clojuratica.jar</echo>
   </target>
 
   <target name="clean"
