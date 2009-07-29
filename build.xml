@@ -69,12 +69,9 @@
 
   <target name="dist" depends="compile"
         description="generate the distribution" >
-    <!-- Create the distribution directory -->
-    <mkdir dir="${dist}/lib"/>
-
     <!-- Put everything in ${build} into the jar file -->
-    <jar jarfile="${dist}/lib/clojuratica.jar" basedir="${build}"/>
-    <echo>JAR written to ${dist}/lib/clojuratica.jar</echo>
+    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${build}"/>
+    <echo>JAR written to ${basedir}${file.separator}clojuratica.jar</echo>
   </target>
 
   <target name="jarcopy" depends="check_hasjartarget,dist"
@@ -83,14 +80,13 @@
     <mkdir dir="${jartarget}"/>
 
     <!-- Put everything in ${build} into the jar file -->
-    <jar jarfile="${jartarget}/clojuratica.jar" basedir="${build}"/>
-    <echo>JAR written to ${jartarget}/clojuratica.jar</echo>
+    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${build}"/>
+    <echo>JAR written to ${basedir}${file.separator}clojuratica.jar</echo>
   </target>
 
   <target name="clean"
         description="clean up" >
     <!-- Delete the ${build} and ${dist} directory trees -->
     <delete dir="${build}"/>
-    <delete dir="${dist}"/>
   </target>
 </project>
