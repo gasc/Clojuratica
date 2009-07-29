@@ -1,0 +1,94 @@
+<project name="Clojuratica" default="dist" basedir=".">
+    <description>
+        Clojuratica is an Interface Between Clojure and Wolfram Mathematica.
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist"  location="dist"/>
+
+  <available property="hasclojure" file="${clojure.jar}"/>
+  <available property="hasjlink" file="${jlink.jar}"/>
+    
+  <target name="check_hasclojure"
+          description="Print a warning message if clojure.jar is undefined"
+          unless="hasclojure">
+    <fail message="You have not defined a path to clojure.jar so I can't compile files. To enable compiling, run 'ant -Dclojure.jar=&lt;...path to clojure.jar..&gt;'"/>
+  </target>
+
+  <target name="check_hasjlink"
+          description="Print a warning message if jlink.jar is undefined"
+          unless="hasjlink">
+    <fail message="You have not defined a path to jlink.jar so I can't compile files. To enable compiling, run 'ant -Djlink.jar=&lt;...path to jlink.jar..&gt;'"/>
+  </target>
+
+  <target name="check_hasjartarget"
+          description="Print a warning message if jartarget is undefined"
+          unless="jartarget">
+    <fail message="You have not defined a directory to copy the final jar to. Use 'ant -Djartarget=&lt;...directory path..&gt;'"/>
+  </target>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init,compile_classes,compile_clojure"
+        description="compile the source " >
+  </target>
+
+  <target name="compile_classes" depends="init,check_hasclojure,check_hasjlink"
+          description="Compile the clojure files that have gen-class.">
+    <java classname="clojure.lang.Compile">
+      <classpath>
+        <path location="${build}"/>
+        <path location="${src}"/>
+        <path location="${clojure.jar}"/>
+        <path location="${jlink.jar}"/>
+      </classpath>
+      <sysproperty key="clojure.compile.path" value="${build}"/>
+      <arg value="clojuratica.CExpr"/>
+    </java>
+  </target>
+
+  <target name="compile_clojure" depends="init,check_hasclojure,check_hasjlink"
+          description="Compile Clojure sources.">
+    <java classname="clojure.lang.Compile">
+      <classpath>
+        <path location="${build}"/>
+        <path location="${src}"/>
+        <path location="${clojure.jar}"/>
+        <path location="${jlink.jar}"/>
+      </classpath>
+      <sysproperty key="clojure.compile.path" value="${build}"/>
+      <arg value="clojuratica.clojuratica"/>
+    </java>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+
+    <!-- Put everything in ${build} into the jar file -->
+    <jar jarfile="${dist}/lib/clojuratica.jar" basedir="${build}"/>
+  </target>
+
+  <target name="jarcopy" depends="check_hasjartarget,dist"
+        description="copy jar to jartarget" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${jartarget}"/>
+
+    <!-- Put everything in ${build} into the jar file -->
+    <jar jarfile="${jartarget}/clojuratica.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean"
+        description="clean up" >
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
