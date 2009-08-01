@@ -101,6 +101,7 @@
                       (instance? BigDecimal n)         n
                       (instance? Integer n)            (long n)
                       (instance? Short n)              (long n)
+                      (instance? Long n)               n
                       (instance? Byte n)               (long n)
                       (instance? Double n)             n
                       (instance? Float n)              (double n)

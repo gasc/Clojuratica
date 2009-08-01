@@ -50,6 +50,7 @@
       </classpath>
       <sysproperty key="clojure.compile.path" value="${build}"/>
       <arg value="clojuratica.CExpr"/>
+      <arg value="clojuratica.CLink"/>
     </java>
   </target>
 
@@ -80,8 +81,8 @@
     <mkdir dir="${jartarget}"/>
 
     <!-- Put everything in ${build} into the jar file -->
-    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${build}"/>
-    <echo>JAR written to ${basedir}${file.separator}clojuratica.jar</echo>
+    <jar jarfile="${jartarget}${file.separator}clojuratica.jar" basedir="${build}"/>
+    <echo>JAR written to ${jartarget}${file.separator}clojuratica.jar</echo>
   </target>
 
   <target name="clean"

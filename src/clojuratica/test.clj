@@ -61,6 +61,14 @@
           "-linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
 (.discardAnswer kernel-link)
 
+(comment
+(import '[com.wolfram.jlink MathLinkFactory])
+(def kernel-link (MathLinkFactory/createKernelLink
+          "javaw com.wolfram.jlink.LinkSnooper -linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
+(.discardAnswer kernel-link)
+
+(def ls (LinkSnooper. (into-array (list "-linkmode" "launch" "-linkname" "c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe"))))
+)
 ; Assuming the above code did not throw a MathLinkException, we now have an active kernel.
 ; Note that only one master kernel can be active at once under most Mathematica licenses (master
 ; kernels are difference from parallel kernels, discussed later). A common cause of a MathLinkException
