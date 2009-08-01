@@ -60,6 +60,8 @@
 (def kernel-link (MathLinkFactory/createKernelLink
           "-linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
 (.discardAnswer kernel-link)
+(.enableObjectReferences kernel-link)
+
 
 (comment
 (import '[com.wolfram.jlink MathLinkFactory])

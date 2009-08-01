@@ -57,12 +57,7 @@
 
 (defn get-global-setter
   [kernel-link]
-  ;(let [flags (flags args [[:parallel :serial]])
-        ;args  (remove-flags args [[:parallel :serial]])
-        ;kernel-link (first args)]
-    ;(if (some #{:parallel} flags)
-      (fn [lhs rhs] (clojuratica.parallel/global-set lhs rhs kernel-link)))
-      ;(fn [lhs rhs] (clojuratica.serial/global-set lhs rhs kernel-link)))))
+    (fn [lhs rhs] (clojuratica.parallel/global-set lhs rhs kernel-link)))
 
 
 
