@@ -44,8 +44,8 @@
    :constructors {[Object] []
                   [Object Object] []}
    :state state)
-  (:import [com.wolfram.jlink])
-  (:require [clojuratica.core] [clojuratica.lib]))
+  (:import [com.wolfram.jlink Expr MathLinkFactory])
+  (:require [clojuratica.lib :as lib] [clojuratica.low-level :as low-level]))
 
 (defn -first [this]
   (let [cexpr (clojuratica.CExpr. (.. this getExpr (part (int-array (list (.getPos this))))))]
@@ -65,24 +65,25 @@
   (:expr (.state this)))
 
 (defn -parse [this]
-  (let [expr (.getExpr this)]
-    (cond (.bigIntegerQ expr)         (.asBigInteger expr)
-          (.bigDecimalQ expr)         (.asBigDecimal expr)
-          (.integerQ expr)            (.asLong expr)
-          (.realQ expr)               (.asDouble expr)
-          (.stringQ expr)             (.asString expr)
-          (.listQ expr)               (lazy-seq (next this))
-          (= "Null" (.toString expr)) nil
-          true                        expr)))
+    (let [expr (.getExpr this)]
+      (cond (.bigIntegerQ expr)         (.asBigInteger expr)
+            (.bigDecimalQ expr)         (.asBigDecimal expr)
+            (.integerQ expr)            (.asLong expr)
+            (.realQ expr)               (.asDouble expr)
+            (.stringQ expr)             (.asString expr)
+            (.listQ expr)               (lazy-seq (next this))
+            (= "Null" (.toString expr)) nil
+            true                        expr)))
 
 (defn constructor-dispatch [& args]
-  (letfn [(class-match? [classes] (clojuratica.lib/instances? classes args))]
-    (cond (class-match? [com.wolfram.jlink.Expr])              :expr
-          (class-match? [com.wolfram.jlink.Expr Integer])      :expr+integer
+  (letfn [(class-match? [classes] (lib/instances? classes args))]
+    (cond (class-match? [Expr])                                :expr
+          (class-match? [Expr Integer])                        :expr+integer
           (class-match? [String])                              :string
           (class-match? [Number])                              :number
-          (class-match? [clojure.lang.Seqable])                :seqable
+          (class-match? [clojure.lang.IPersistentCollection])  :coll
           (class-match? [Object])                              :object
+          (nil? (first args))                                  :nil
           true (throw (Exception. "Argument of invalid class passed to CExpr constructor: ")))))
 
 (defmulti construct constructor-dispatch)
@@ -94,7 +95,7 @@
   {:expr expr :pos pos})
 
 (defmethod construct :string [s]
-  {:expr (com.wolfram.jlink.Expr. s) :pos 0})
+  {:expr (Expr. s) :pos 0})
 
 (defmethod construct :number [n]
   (let [typed-n (cond (instance? BigInteger n)         n
@@ -107,20 +108,26 @@
                       (instance? Float n)              (double n)
                       (instance? clojure.lang.Ratio n) (double n)
                       true (throw (Exception. (str "CExpr constructor does not know how to handle number of class " (class n)))))]
-    {:expr (com.wolfram.jlink.Expr. typed-n) :pos 0}))
+    {:expr (Expr. typed-n) :pos 0}))
 
-(defmethod construct :seqable [expression-seq]
-  (let [loop (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)]
-    (.putFunction loop "List" (count expression-seq))
-    (dorun (for [expression expression-seq] (.put loop (.getExpr (clojuratica.CExpr. expression)))))
+(defmethod construct :coll [expression-coll]
+  (let [loop (MathLinkFactory/createLoopbackLink)]
+    (.putFunction loop "List" (count expression-coll))
+    (dorun (for [expression expression-coll] (.put loop (.getExpr (clojuratica.CExpr. expression)))))
     (.endPacket loop)
     {:expr (.getExpr loop) :pos 0}))
 
 (defmethod construct :object [obj]
-  (let [loop (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)]
+  (let [loop (MathLinkFactory/createLoopbackLink)]
     (.put loop obj)
     (.endPacket loop)
     {:expr (.getExpr loop) :pos 0}))
 
-(defn -init
-  ([& args] [[] (apply construct args)]))
+(defmethod construct :nil [obj]
+  (let [loop (MathLinkFactory/createLoopbackLink)]
+    (.putSymbol loop "Null")
+    (.endPacket loop)
+    {:expr (.getExpr loop) :pos 0}))
+
+(defn -init [& args] 
+  [[] (apply construct args)])

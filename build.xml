@@ -51,6 +51,7 @@
       <sysproperty key="clojure.compile.path" value="${build}"/>
       <arg value="clojuratica.CExpr"/>
       <arg value="clojuratica.CLink"/>
+      <arg value="clojuratica.test.SimpleClass"/>
     </java>
   </target>
 

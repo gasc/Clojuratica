@@ -53,7 +53,6 @@ Clojure::usage =
 
 
 (*
-
 Clojure is the name of a set of (overloaded) functions that provide the main interface to
 Clojure and Java. Clojure can be called with five kinds of argument, namely the five ways one can
 access Java from Mathematica. These are:
@@ -66,7 +65,7 @@ Class`staticfield
 
 In the first three cases, Clojure translates all arguments into native Clojure data structures
 (to the extent possible) before passing them on to the class or object in question. The final four cases, 
-Clojure translates into a native Mathematica expression the method's return value method or the 
+Clojure translates into a native Mathematica expression the method's return value or the 
 accessed field value.
 
 Clojure can be called using standard syntax. For example:
@@ -77,22 +76,20 @@ However, it is conventional and preferred to use prefix syntax. For example:
 
 Clojure@Class`staticmethod[args]
 Clojure@obj@method[args]
-
-
 *)
 
 
-Clojure@object_Symbol@method_Symbol[args___] :=
+Clojure@object_Symbol@method_Symbol[args___] /; JavaObjectQ[object] :=
 	With[{convertedArgSeq = ConvertIntoSeq[args]},
 		object@method[convertedArgSeq] // ReturnAsJavaObject // ClojureParse]
 
 
-Clojure@staticMethod_Symbol[args___] :=
+Clojure[staticMethod_[args___]] :=
 	With[{convertedArgSeq = ConvertIntoSeq[args]},
 		staticMethod[convertedArgSeq] // ReturnAsJavaObject // ClojureParse]
 
 
-Clojure@object_Symbol@field_Symbol := 
+Clojure@object_Symbol@field_Symbol /; JavaObjectQ[object] := 
 	object@field // ReturnAsJavaObject // ClojureParse
 
 
@@ -164,11 +161,7 @@ ClojureConvert[expr_] :=
 
 
 ClojureSetGlobal::usage = 
-	"ClojureSetGlobal[string, expr] " <>
-  "clojuratica.clojuratica is automatically required and com.wolfram.jlink is automatically imported. Returns " <>
-  "a result converted to a Mathematica expression where possible. Note that the embedded Clojure compiler is " <>
-  "SLOW. Do not use this interface for production work. Instead, use gen-class to create a Java class called with " <>
-  "Clojure[...].";
+	"";
 
 
 ClojureSetGlobal[var_String, value_] :=

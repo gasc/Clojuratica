@@ -39,7 +39,7 @@
            [com.wolfram.jlink Expr])
   (:use [clojuratica.lib]))
 
-(declare string-to-expr build-set-expr)
+(declare string-to-expr build-set-expr add-head)
 
 (defn convert
   "Converts any Java object, including any Clojure data structure, to a CExpr. Sequential objects
@@ -91,22 +91,22 @@
   ; Takes a string and a KernelLink instance. Treats s as a Mathematica expression and evaluates it
   ; using the kernel at the other end of kernel-link. Returns a CExpr containing the output.
   (locking kernel-link
-    ;(println ">" s)
+    (println ">" s)
     (.evaluate kernel-link s)
     (.waitForAnswer kernel-link)
     (let [output (.. kernel-link getExpr)]
-      ;(println output)
+      (println output)
       (express output))))
 
 (defmethod send-read :expr [expr kernel-link]
   ; Takes an Expr instance and a KernelLink instance. Evaluates expr using the kernel at the other
   ; end of kernel-link. Returns a CExpr containing the output.
   (locking kernel-link
-    ;(println ">" expr)
+    (println ">" expr)
     (.evaluate kernel-link expr)
     (.waitForAnswer kernel-link)
     (let [output (.. kernel-link getExpr)]
-      ;(println output)
+      (println output)
       (express output))))
 
 (defmethod send-read :cexpr [cexpr kernel-link]
@@ -143,10 +143,29 @@
 (defmethod parse :nil [& args]
   nil)
 
+(defn mmafn [str evaluator kernel-link]
+  (let [expr (.getExpr (express str kernel-link))
+        head (.toString (.part expr 0))
+        lhs  (.part expr 1)
+        name (if (zero? (count (.args lhs)))
+               (.toString lhs)
+               (.toString (.head lhs)))
+        evaluate evaluator]
+    (if-not (or (= "Set"        (.toString (.part expr 0)))
+                (= "SetDelayed" (.toString (.part expr 0))))
+      (throw (Exception. (str "MMA function creator must be passed a "
+                              "string that defines an expression using "
+                              "Set (=) or SetDelayed (:=)"))))
+    (fn [& args]
+      (let [expressed-args (map (fn [x] (.getExpr (convert x kernel-link))) args)
+            fn-call (add-head name args)]
+        (parse (evaluate [name :undefined] expr fn-call))))))
+
+
 (defn add-head
   "Creates an Expr with head argument as its head and with exprs as its arguments. exprs must be Expr
   instances."
-  [head & exprs]
+  [head exprs]
   (let [loop (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)]
     (.putFunction loop head (count exprs))
     (dorun
@@ -190,14 +209,14 @@
                          "CompoundExpression")]
     (.putFunction loop "Module" 2)
     (.put loop
-      (apply add-head (cons "List" set-expr-seq)))
+      (add-head "List" set-expr-seq))
     (when (some #{:parallel} flags)
       (let [local-vars (for [set-expr set-expr-seq] (.part set-expr 1))]
         (.putFunction loop "ParallelSubmit" 2)
         (.put loop
-          (apply add-head (cons "List" local-vars)))))
+          (add-head "List" local-vars))))
     (.put loop
-      (apply add-head (cons compounder expr-seq)))
+      (add-head compounder expr-seq))
     (.endPacket loop)
     (.getExpr loop)))
 
@@ -205,13 +224,18 @@
   "Creates an Expr containing a Mathematica Set[] expression. The righthand side (rhs) of the assignment
   is converted to a CExpr and then an Expr using the convert function."
   [lhs rhs]
-  (let [rhs (.getExpr (convert rhs))
-        loop (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)]
-    (.putFunction loop "Set" 2)
-    (.putSymbol loop lhs)
-    (.put loop rhs)
-    (.endPacket loop)
-    (.getExpr loop)))
+  (let [loop (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)]
+    (if (= rhs :undefined)
+      (do
+        (.putSymbol loop lhs)
+        (.endPacket loop)
+        (.getExpr loop))
+      (let [rhs (.getExpr (convert rhs))]
+        (.putFunction loop "Set" 2)
+        (.putSymbol loop lhs)
+        (.put loop rhs)
+        (.endPacket loop)
+        (.getExpr loop)))))
 
 (defn string-to-expr
   "Converts a string, s, to a Mathematica expression (i.e. an Expr object). Uses the Mathematica
@@ -219,7 +243,7 @@
   [s kernel-link]
   (let [held-s (str "HoldComplete[" s "]")]
     (locking kernel-link
-      ;(println "string-to-expr>" held-s)
+      (println "string-to-expr>" held-s)
       (.evaluate kernel-link held-s)
       (.waitForAnswer kernel-link)
       (let [result (.. kernel-link getExpr args)]

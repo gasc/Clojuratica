@@ -59,7 +59,21 @@
   [kernel-link]
     (fn [lhs rhs] (clojuratica.parallel/global-set lhs rhs kernel-link)))
 
-
+(defn vectorize [s]  ; courtesy of Meikel Brandmeyer
+  (if-not (seq? s)
+    s
+    (loop [s     s
+           v     []
+           stack nil]
+      (if-let [s (seq s)]
+        (let [fst (first s)]
+          (if (seq? fst)
+            (recur fst [] (conj stack [(next s) v]))
+            (recur (next s) (conj v fst) stack)))
+        (if (seq stack)
+          (let [[s v-s] (peek stack)]
+            (recur s (conj v-s v) (pop stack)))
+          v)))))
 
 
 
