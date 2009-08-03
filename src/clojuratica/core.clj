@@ -178,7 +178,7 @@
                                   (.toString lhs)
                                   (.toString (.head lhs)))
                 fn-call         (add-head name expressed-args)]
-            (parse (evaluate [name :undefined] expr fn-call))))))))
+            (evaluate [name :undefined] expr fn-call)))))))
 
 (defmethod mmafn :nil [& args]
   nil)
