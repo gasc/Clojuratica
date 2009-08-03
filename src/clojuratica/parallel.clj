@@ -105,7 +105,7 @@
 (defn move-queue [kernel-link process-queue]
   (let [update-item     (fn [[pid process-data]]
                           (when-not (= :finished (:state @process-data))
-                            (let [state-expr (.getExpr (send-read (add-head "ProcessState" pid) kernel-link))
+                            (let [state-expr (.getExpr (send-read (add-head "ProcessState" (list pid)) kernel-link))
                                   state-prefix (apply str (take 3 (.toString state-expr)))
                                   state (cond (= "run" state-prefix) :running
                                               (= "fin" state-prefix) :finished
@@ -120,7 +120,7 @@
                             (when (and (= :finished (:state @process-data)) (not (:returned @process-data)))
                               (let [new-process-data (conj @process-data {:returned true})]
                                 (dosync (alter process-data conj new-process-data)))
-                              (send-read (add-head "Clear" pid) kernel-link)
+                              (send-read (add-head "Clear" (list pid)) kernel-link)
                               (.interrupt (:thread @process-data))))]
   (dorun (map update-item @process-queue))
   (dorun (map return-item-if-done @process-queue))))

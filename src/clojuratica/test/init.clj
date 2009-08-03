@@ -17,14 +17,15 @@
 
 (def global-set (get-global-setter kernel-link))
 
-(def pevaluate (get-evaluator kernel-link :parallel))
-(def pmath (comp parse pevaluate))
+(def p-evaluate (get-evaluator kernel-link :parallel))
+
+(def p-math (comp parse p-evaluate))
+
+(def mmafn (get-mmafn p-evaluate kernel-link))
+
 (require '[clojuratica.core :as core])
 
-
-
-
-(def foo (core/mmafn "Foo[x_]:=1" evaluate kernel-link))
+(def foo (mmafn "Function[{x},x+10]" :parse))
 
 
 

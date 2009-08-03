@@ -51,6 +51,20 @@
       (apply clojuratica.parallel/get-evaluator args)
       (apply clojuratica.serial/get-evaluator args))))
 
+(defn get-mmafn
+  "Passthrough flags allowed"
+  [& retained-args]
+  (let [retained-flags (flags retained-args)
+        retained-args  (remove-flags retained-args)
+        evaluator      (first retained-args)
+        kernel-link    (second retained-args)]
+    (when-not (fn? evaluator)
+      (throw (Exception. "First non-flag argument to get-mmafn must be a Clojuratica evaluator.")))
+    (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
+      (throw (Exception. "Second non-flag argument to get-mmafn must be a KernelLink object.")))
+    (fn [& args]
+      (apply clojuratica.core/mmafn (concat args retained-flags (list evaluator kernel-link))))))
+
 (defn get-parser [& [kernel-link]]
   "No valid flags."
   (fn [arg] (clojuratica.core/parse arg kernel-link)))

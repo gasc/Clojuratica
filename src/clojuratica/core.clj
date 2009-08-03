@@ -50,15 +50,17 @@
 (defn- common-dispatch
   "Dispatches to the appropriate method. Used by the following multimethods: express, send-read,
   and parse."
-  [expression & args]
-  (cond (string? expression)          :string
-        (instance? Expr expression)   :expr
-        (instance? CExpr expression)  :cexpr
-        (nil? expression)             :nil
-        true  (throw
-                (Exception. (str "Expression in common-dispatch must be "
-                                 "string, Expr, CExpr, or nil. Passed an object "
-                                 "of class " (class expression))))))
+  [& args]
+  (let [args       (remove-flags args)
+        expression (first args)]
+    (cond (string? expression)          :string
+          (instance? Expr expression)   :expr
+          (instance? CExpr expression)  :cexpr
+          (nil? expression)             :nil
+          true  (throw
+                  (Exception. (str "Expression in common-dispatch must be "
+                                   "string, Expr, CExpr, or nil. Passed an object "
+                                   "of class " (class expression)))))))
 
 (defmulti express common-dispatch)
 
@@ -145,17 +147,35 @@
 
 (defmulti mmafn common-dispatch)
 
-(defmethod mmafn :string [s evaluator kernel-link]
-  (let [expr (.getExpr (express s kernel-link))]
-    (mmafn expr evaluator kernel-link)))
+(defmethod mmafn :string [& args]
+  (let [flags       (flags args)
+        args        (remove-flags args)
+        kernel-link (nth args 2)
+        evaluator   (nth args 1)
+        s           (nth args 0)
+        expr        (.getExpr (express s kernel-link))]
+    (apply mmafn (concat flags (list expr evaluator kernel-link)))))
 
-(defmethod mmafn :cexpr [cexpr evaluator kernel-link]
-  (let [expr (.getExpr cexpr)]
-    (mmafn expr evaluator kernel-link)))
+(defmethod mmafn :cexpr [& args]
+  (let [flags       (flags args)
+        args        (remove-flags args)
+        kernel-link (nth args 2)
+        evaluator   (nth args 1)
+        cexpr       (nth args 0)
+        expr        (.getExpr cexpr)]
+    (apply mmafn (concat flags (list expr evaluator kernel-link)))))
 
-(defmethod mmafn :expr [expr evaluator kernel-link]
-  (let [head (.toString (.part expr 0))
-        evaluate evaluator]
+(defmethod mmafn :expr [& args]
+  (let [flag-sets     [[:parse :no-parse]]
+        flags         (flags args flag-sets)
+        args          (remove-flags args)
+        kernel-link   (nth args 2)
+        evaluator     (nth args 1)
+        expr          (nth args 0)
+        call          (if (some #{:parse} flags)
+                        (comp parse evaluator)
+                        evaluator)
+        head          (.toString (.part expr 0))]
     (if-not (or (= "Set"        head)
                 (= "SetDelayed" head)
                 (= "Function"   head)
@@ -170,7 +190,7 @@
           (let [expressed-args     (map (fn [x] (.getExpr (convert x))) args)
                 expressed-arg-list (add-head "List" expressed-args)
                 fn-call            (add-head "Apply" [expr expressed-arg-list])]
-            (parse (evaluate [] fn-call))))
+            (call [] fn-call)))
         (fn [& args]
           (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
                 lhs             (.part expr 1)
@@ -178,7 +198,7 @@
                                   (.toString lhs)
                                   (.toString (.head lhs)))
                 fn-call         (add-head name expressed-args)]
-            (evaluate [name :undefined] expr fn-call)))))))
+            (call [name :undefined] expr fn-call)))))))
 
 (defmethod mmafn :nil [& args]
   nil)
