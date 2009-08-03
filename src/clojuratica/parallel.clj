@@ -110,7 +110,7 @@
                                   state (cond (= "run" state-prefix) :running
                                               (= "fin" state-prefix) :finished
                                               (= "que" state-prefix) :queued
-                                              true (println "Error! State unrecognized:" state-expr))
+                                              true (throw (Exception. (str "Error! State unrecognized: " state-expr))))
                                   new-process-data (conj @process-data {:state state})
                                   new-process-data (if (= state :finished)
                                                      (conj new-process-data {:output (.part state-expr 1)})
@@ -120,7 +120,7 @@
                             (when (and (= :finished (:state @process-data)) (not (:returned @process-data)))
                               (let [new-process-data (conj @process-data {:returned true})]
                                 (dosync (alter process-data conj new-process-data)))
-                              (send-read (add-head "Clear" (list pid)) kernel-link)
+                              (send-read (add-head "ClearAll" (list pid)) kernel-link)
                               (.interrupt (:thread @process-data))))]
   (dorun (map update-item @process-queue))
   (dorun (map return-item-if-done @process-queue))))

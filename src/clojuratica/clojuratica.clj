@@ -36,7 +36,8 @@
 (ns clojuratica.clojuratica
   (:require [clojuratica.core]
             [clojuratica.serial]
-            [clojuratica.parallel]) 
+            [clojuratica.parallel]
+            [clojuratica.mmafn])
   (:use [clojuratica.lib]))
 
 (defn get-evaluator
@@ -63,7 +64,7 @@
     (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
       (throw (Exception. "Second non-flag argument to get-mmafn must be a KernelLink object.")))
     (fn [& args]
-      (apply clojuratica.core/mmafn (concat args retained-flags (list evaluator kernel-link))))))
+      (apply clojuratica.mmafn/mmafn (concat args retained-flags (list evaluator kernel-link))))))
 
 (defn get-parser [& [kernel-link]]
   "No valid flags."
@@ -73,23 +74,6 @@
   [kernel-link]
     (fn [lhs rhs] (clojuratica.parallel/global-set lhs rhs kernel-link)))
 
-(defn vectorize [s]  ; courtesy of Meikel Brandmeyer
-  (if-not (seq? s)
-    s
-    (loop [s     s
-           v     []
-           stack nil]
-      (if-let [s (seq s)]
-        (let [fst (first s)]
-          (if (seq? fst)
-            (recur fst [] (conj stack [(next s) v]))
-            (recur (next s) (conj v fst) stack)))
-        (if (seq stack)
-          (let [[s v-s] (peek stack)]
-            (recur s (conj v-s v) (pop stack)))
-          v)))))
-
-
-
+(def vectorize clojuratica.core/vectorize)
 
 

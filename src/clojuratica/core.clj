@@ -39,13 +39,7 @@
            [com.wolfram.jlink Expr])
   (:use [clojuratica.lib]))
 
-(declare string-to-expr build-set-expr add-head)
-
-(defn convert
-  "Converts any Java object, including any Clojure data structure, to a CExpr. Sequential objects
-  are converted to Mathematica lists. See the CExpr class documentation for more information."
-  [obj]
-  (CExpr. obj))
+(declare string-to-expr build-set-expr add-head convert)
 
 (defn- common-dispatch
   "Dispatches to the appropriate method. Used by the following multimethods: express, send-read,
@@ -145,63 +139,11 @@
 (defmethod parse :nil [& args]
   nil)
 
-(defmulti mmafn common-dispatch)
-
-(defmethod mmafn :string [& args]
-  (let [flags       (flags args)
-        args        (remove-flags args)
-        kernel-link (nth args 2)
-        evaluator   (nth args 1)
-        s           (nth args 0)
-        expr        (.getExpr (express s kernel-link))]
-    (apply mmafn (concat flags (list expr evaluator kernel-link)))))
-
-(defmethod mmafn :cexpr [& args]
-  (let [flags       (flags args)
-        args        (remove-flags args)
-        kernel-link (nth args 2)
-        evaluator   (nth args 1)
-        cexpr       (nth args 0)
-        expr        (.getExpr cexpr)]
-    (apply mmafn (concat flags (list expr evaluator kernel-link)))))
-
-(defmethod mmafn :expr [& args]
-  (let [flag-sets     [[:parse :no-parse]]
-        flags         (flags args flag-sets)
-        args          (remove-flags args)
-        kernel-link   (nth args 2)
-        evaluator     (nth args 1)
-        expr          (nth args 0)
-        call          (if (some #{:parse} flags)
-                        (comp parse evaluator)
-                        evaluator)
-        head          (.toString (.part expr 0))]
-    (if-not (or (= "Set"        head)
-                (= "SetDelayed" head)
-                (= "Function"   head)
-                (= "Symbol"     head))
-      (throw (Exception. (str "MMA function creator must be passed a "
-                              "string that contains a pure function "
-                              "(head Function), a function definition "
-                              "(head Set (=) or SetDelayed (:=)), or "
-                              "a symbol (head Symbol).")))
-      (if (or (= "Function" head) (= "Symbol" head))
-        (fn [& args]
-          (let [expressed-args     (map (fn [x] (.getExpr (convert x))) args)
-                expressed-arg-list (add-head "List" expressed-args)
-                fn-call            (add-head "Apply" [expr expressed-arg-list])]
-            (call [] fn-call)))
-        (fn [& args]
-          (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
-                lhs             (.part expr 1)
-                name            (if (zero? (count (.args lhs)))
-                                  (.toString lhs)
-                                  (.toString (.head lhs)))
-                fn-call         (add-head name expressed-args)]
-            (call [name :undefined] expr fn-call)))))))
-
-(defmethod mmafn :nil [& args]
-  nil)
+(defn convert
+  "Converts any Java object, including any Clojure data structure, to a CExpr. Sequential objects
+  are converted to Mathematica lists. See the CExpr class documentation for more information."
+  [obj]
+  (CExpr. obj))
 
 (defn add-head
   "Creates an Expr with head argument as its head and with exprs as its arguments. exprs must be Expr
@@ -239,6 +181,10 @@
         set-spec-seqs  (partition 2 set-specs)
         set-expr-seq   (for [set-spec-seq set-spec-seqs]
                          (apply build-set-expr set-spec-seq))
+        local-vars     (for [set-expr set-expr-seq]
+                         (if (> (count (.args set-expr)) 0)
+                           (.part set-expr 1)
+                           set-expr))
         expression-seq (drop-last (rest args))
         kernel-link    (last args)
         cexpr-seq      (for [expression expression-seq]
@@ -252,10 +198,9 @@
     (.put loop
       (add-head "List" set-expr-seq))
     (when (some #{:parallel} flags)
-      (let [local-vars (for [set-expr set-expr-seq] (.part set-expr 1))]
-        (.putFunction loop "ParallelSubmit" 2)
-        (.put loop
-          (add-head "List" local-vars))))
+      (.putFunction loop "ParallelSubmit" 2)
+      (.put loop
+        (add-head "List" local-vars)))
     (.put loop
       (add-head compounder expr-seq))
     (.endPacket loop)
@@ -291,5 +236,22 @@
         (if (next result)
           (throw (Exception. (str "Invalid expression: " s))))
         (first result)))))
+
+(defn vectorize [s]  ; courtesy of Meikel Brandmeyer
+  (if-not (seq? s)
+    s
+    (loop [s     s
+           v     []
+           stack nil]
+      (if-let [s (seq s)]
+        (let [fst (first s)]
+          (if (seq? fst)
+            (recur fst [] (conj stack [(next s) v]))
+            (recur (next s) (conj v fst) stack)))
+        (if (seq stack)
+          (let [[s v-s] (peek stack)]
+            (recur s (conj v-s v) (pop stack)))
+          v)))))
+
 
 

@@ -25,7 +25,7 @@
 
 (require '[clojuratica.core :as core])
 
-(def foo (mmafn "Function[{x},x+10]" :parse))
 
+(def foo (mmafn ["foob" -6] "Foo=Function[{x},x]" :parse))
 
 
