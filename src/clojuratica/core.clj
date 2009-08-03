@@ -91,22 +91,22 @@
   ; Takes a string and a KernelLink instance. Treats s as a Mathematica expression and evaluates it
   ; using the kernel at the other end of kernel-link. Returns a CExpr containing the output.
   (locking kernel-link
-    (println ">" s)
+    ;(println ">" s)
     (.evaluate kernel-link s)
     (.waitForAnswer kernel-link)
     (let [output (.. kernel-link getExpr)]
-      (println output)
+      ;(println output)
       (express output))))
 
 (defmethod send-read :expr [expr kernel-link]
   ; Takes an Expr instance and a KernelLink instance. Evaluates expr using the kernel at the other
   ; end of kernel-link. Returns a CExpr containing the output.
   (locking kernel-link
-    (println ">" expr)
+    ;(println ">" expr)
     (.evaluate kernel-link expr)
     (.waitForAnswer kernel-link)
     (let [output (.. kernel-link getExpr)]
-      (println output)
+      ;(println output)
       (express output))))
 
 (defmethod send-read :cexpr [cexpr kernel-link]
@@ -264,7 +264,7 @@
   [s kernel-link]
   (let [held-s (str "HoldComplete[" s "]")]
     (locking kernel-link
-      (println "string-to-expr>" held-s)
+      ;(println "string-to-expr>" held-s)
       (.evaluate kernel-link held-s)
       (.waitForAnswer kernel-link)
       (let [result (.. kernel-link getExpr args)]
