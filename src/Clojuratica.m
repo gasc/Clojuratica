@@ -38,11 +38,11 @@
 *)
 
 
-BeginPackage["Clojuratica`", {"JLink`"}]
+BeginPackage["Clojuratica`", {"JLink`"}];
 
 
-Off[SetDelayed::write]  (* Loading a Java class with protected fields (i.e. *any Clojure object with state) 
-                           produces a harmless message. Disable the message. *)
+Off[SetDelayed::write];  (* Loading a Java class with protected fields (i.e. *any Clojure object with state) 
+                            produces a harmless message. Disable the message. *)
 
 
 Clojure::usage = 
@@ -81,28 +81,28 @@ Clojure@obj@method[args]
 
 Clojure@object_Symbol@method_Symbol[args___] /; JavaObjectQ[object] :=
 	With[{convertedArgSeq = ConvertIntoSeq[args]},
-		object@method[convertedArgSeq] // ReturnAsJavaObject // ClojureParse]
+		object@method[convertedArgSeq] // ReturnAsJavaObject // ClojureParse];
 
 
 Clojure[staticMethod_[args___]] :=
 	With[{convertedArgSeq = ConvertIntoSeq[args]},
-		staticMethod[convertedArgSeq] // ReturnAsJavaObject // ClojureParse]
+		staticMethod[convertedArgSeq] // ReturnAsJavaObject // ClojureParse];
 
 
 Clojure@object_Symbol@field_Symbol /; JavaObjectQ[object] := 
-	object@field // ReturnAsJavaObject // ClojureParse
+	object@field // ReturnAsJavaObject // ClojureParse;
 
 
 Clojure@staticField_Symbol := 
-	staticField // ReturnAsJavaObject // ClojureParse
+	staticField // ReturnAsJavaObject // ClojureParse;
 
 
 Clojure@JavaNew[class_String, args___] :=
 	With[{convertedArgSeq = ConvertIntoSeq[args]},
-		JavaNew[class, convertedArgSeq]]
+		JavaNew[class, convertedArgSeq]];
 
 
-SetAttributes[Clojure, HoldAll]
+SetAttributes[Clojure, HoldAll];
 
 
 ClojureRun::usage = "foo";
@@ -130,10 +130,10 @@ ClojureEvaluate[str__String, OptionsPattern[]] :=
 			Map[SendRead, List[str]],
 			With[{},
 				Scan[SendRead, List[str][[;;-2]]];
-				List[str][[-1]] // SendRead]] ]
+				List[str][[-1]] // SendRead]]];
 
 
-Options[ClojureEvaluate] = {AllOutput -> False}
+Options[ClojureEvaluate] = {AllOutput -> False};
 
 
 (* Parse a Clojure data structure into a Mathematica expr *)
@@ -141,7 +141,7 @@ ClojureParse[obj_] :=
 	With[{},
 		InstallJava[];
 		LoadJavaClass["clojuratica.CLink"];
-		obj // CLink`parse]
+		obj // CLink`parse];
 
 
 (* Parse a Clojure data structure into a Mathematica expr *)
@@ -149,7 +149,7 @@ ClojureParse[{objs__}] :=
 	With[{},
 		InstallJava[];
 		LoadJavaClass["clojuratica.CLink"];
-		Map[CLink`parse, {objs}]]
+		Map[CLink`parse, {objs}]];
 
 
 (* Convert a Mathematica expr into a Clojure data structure *)
@@ -157,7 +157,7 @@ ClojureConvert[expr_] :=
 	With[{},
 		InstallJava[];
 		LoadJavaClass["clojuratica.CLink"];
-		expr // MakeJavaExpr // CLink`convert // ReturnAsJavaObject]
+		expr // MakeJavaExpr // CLink`convert // ReturnAsJavaObject];
 
 
 ClojureSetGlobal::usage = 
@@ -171,11 +171,44 @@ ClojureSetGlobal[var_String, value_] :=
 																			(com.wolfram.jlink.StdLink/getLink))
 													 parse (clojuratica.clojuratica/get-parser)]
 											 (parse (evaluate [] varname))))"},
-		Clojuratica`globalTransferer = value;
-		SendRead["(def " <> var <> " (" <> clojureFn <> " \"Clojuratica`globalTransferer\"))"]]
+		Clojuratica`Private`globalTransferer = value;
+		SendRead["(def " <> var <> " (" <> clojureFn <> " \"Clojuratica`Private`globalTransferer\"))"]];
 
 
-EmbedClojure[] :=
+InstallClojure[] :=
+	With[{},
+		LoadClojure[];
+		If[Not[JavaObjectQ[Clojuratica`Private`compiler]],
+			Clojuratica`Private`compiler = JavaNew["clojure.lang.Compiler"];]];
+
+
+ReinstallClojure[] :=
+	With[{},
+		LoadClojure[];
+		Clojuratica`Private`compiler = JavaNew["clojure.lang.Compiler"];];
+
+
+Begin["`Private`"];
+
+
+SendRead[str_String] :=
+	With[{},
+		InstallJava[];
+		InstallClojure[];
+		LoadJavaClass["clojure.lang.Compiler"];
+		LoadJavaClass["java.io.StringReader"];
+		LoadJavaClass["clojuratica.CLink"];
+		CLink`mirrorClasspath[];
+		With[{stringReader = JavaNew["java.io.StringReader", str]},
+			Clojuratica`Private`compiler@load[stringReader] // ReturnAsJavaObject]];
+
+
+ConvertIntoSeq[args___] :=
+	With[{convertedArgs = Map[ClojureConvert, {args}]},
+		Apply[Sequence, convertedArgs]];
+
+
+LoadClojure[] :=
 	With[{},
 		InstallJava[];
 		LoadJavaClass["clojure.lang.AFn"];
@@ -265,30 +298,10 @@ EmbedClojure[] :=
 		LoadJavaClass["clojure.lang.TransactionalHashMap"];
 		LoadJavaClass["clojure.lang.Util"];
 		LoadJavaClass["clojure.lang.Var"];
-		LoadJavaClass["clojure.lang.XMLHandler"];]
+		LoadJavaClass["clojure.lang.XMLHandler"];];
 
 
-Begin["`Private`"]
+End[];
 
 
-SendRead[str_String] :=
-	With[{},
-		InstallJava[];
-		EmbedClojure[];
-		LoadJavaClass["clojure.lang.Compiler"];
-		LoadJavaClass["java.io.StringReader"];
-		LoadJavaClass["clojuratica.CLink"];
-		CLink`mirrorClasspath[];
-		With[{stringReader = JavaNew["java.io.StringReader", str]},
-			clojure`lang`Compiler`load[stringReader] // ReturnAsJavaObject]]
-
-
-ConvertIntoSeq[args___] :=
-	With[{convertedArgs = Map[ClojureConvert, {args}]},
-		Apply[Sequence, convertedArgs]]
-
-
-End[]
-
-
-EndPackage[]
+EndPackage[];

@@ -50,7 +50,7 @@
 (defn- common-dispatch
   "Dispatches to the appropriate method. Used by the following multimethods: express, send-read,
   and parse."
-  [expression & [kernel-link]]
+  [expression & args]
   (cond (string? expression)          :string
         (instance? Expr expression)   :expr
         (instance? CExpr expression)  :cexpr
@@ -143,24 +143,45 @@
 (defmethod parse :nil [& args]
   nil)
 
-(defn mmafn [str evaluator kernel-link]
-  (let [expr (.getExpr (express str kernel-link))
-        head (.toString (.part expr 0))
-        lhs  (.part expr 1)
-        name (if (zero? (count (.args lhs)))
-               (.toString lhs)
-               (.toString (.head lhs)))
-        evaluate evaluator]
-    (if-not (or (= "Set"        (.toString (.part expr 0)))
-                (= "SetDelayed" (.toString (.part expr 0))))
-      (throw (Exception. (str "MMA function creator must be passed a "
-                              "string that defines an expression using "
-                              "Set (=) or SetDelayed (:=)"))))
-    (fn [& args]
-      (let [expressed-args (map (fn [x] (.getExpr (convert x kernel-link))) args)
-            fn-call (add-head name args)]
-        (parse (evaluate [name :undefined] expr fn-call))))))
+(defmulti mmafn common-dispatch)
 
+(defmethod mmafn :string [s evaluator kernel-link]
+  (let [expr (.getExpr (express s kernel-link))]
+    (mmafn expr evaluator kernel-link)))
+
+(defmethod mmafn :cexpr [cexpr evaluator kernel-link]
+  (let [expr (.getExpr cexpr)]
+    (mmafn expr evaluator kernel-link)))
+
+(defmethod mmafn :expr [expr evaluator kernel-link]
+  (let [head (.toString (.part expr 0))
+        evaluate evaluator]
+    (if-not (or (= "Set"        head)
+                (= "SetDelayed" head)
+                (= "Function"   head)
+                (= "Symbol"     head))
+      (throw (Exception. (str "MMA function creator must be passed a "
+                              "string that contains a pure function "
+                              "(head Function), a function definition "
+                              "(head Set (=) or SetDelayed (:=)), or "
+                              "a symbol (head Symbol).")))
+      (if (or (= "Function" head) (= "Symbol" head))
+        (fn [& args]
+          (let [expressed-args     (map (fn [x] (.getExpr (convert x))) args)
+                expressed-arg-list (add-head "List" expressed-args)
+                fn-call            (add-head "Apply" [expr expressed-arg-list])]
+            (parse (evaluate [] fn-call))))
+        (fn [& args]
+          (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
+                lhs             (.part expr 1)
+                name            (if (zero? (count (.args lhs)))
+                                  (.toString lhs)
+                                  (.toString (.head lhs)))
+                fn-call         (add-head name expressed-args)]
+            (parse (evaluate [name :undefined] expr fn-call))))))))
+
+(defmethod mmafn :nil [& args]
+  nil)
 
 (defn add-head
   "Creates an Expr with head argument as its head and with exprs as its arguments. exprs must be Expr
