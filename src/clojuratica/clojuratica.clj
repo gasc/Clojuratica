@@ -49,13 +49,15 @@
   (when-not (fn? evaluate)
     (throw (Exception. "First non-flag argument to get-mmafn must be a Clojuratica evaluator.")))
   (fn [& args]
-    (apply clojuratica.mmafn/mmafn (concat args retained-flags (list evaluate)))))
+    (apply clojuratica.mmafn/mmafn (concat args retained-flags [evaluate]))))
 
-(defn get-parser [& [evaluate]]
-  (fn [arg] (clojuratica.core/parse arg (evaluate :get-kernel-link))))
+(defnf get-parser [[evaluate] _ retained-flags] []
+  (when-not (fn? evaluate)
+    (throw (Exception. "First non-flag argument to get-parser must be a Clojuratica evaluator.")))
+  (fn [& args]
+    (apply clojuratica.core/parse (concat args retained-flags [evaluate]))))
 
-(defn get-global-setter
-  [kernel-link]
-    (fn [lhs rhs] (clojuratica.parallel/global-set lhs rhs kernel-link)))
+(defn get-global-setter [evaluate]
+    (fn [lhs rhs] (clojuratica.core/global-set lhs rhs evaluate)))
 
 

@@ -41,11 +41,6 @@
 
 (declare waitloop evaluate)
 
-(defn global-set [lhs rhs kernel-link]
-  (let [result (send-read (build-set-expr lhs rhs) kernel-link)]
-    (send-read (str "DistributeDefinitions[" lhs "]") kernel-link)
-    result))
-
 (defnf get-evaluator
   "No valid flags; passthrough flags allowed"
   [retained-args _ retained-flags] []
@@ -80,17 +75,19 @@
             (.interrupt waitloop-thread))
         (some #{:get-kernel-link} args)
           kernel-link
+        (some #{:parallel?} args)
+          true
         (not (.isAlive waitloop-thread))
           (throw (Exception. "This parallel evaluator is not running."))
         true
           (apply evaluate
-                 (concat args retained-flags (list kernel-link
-                                                   process-number
-                                                   process-queue
-                                                   waitloop-thread)))))))
+                 (concat args retained-flags [kernel-link
+                                              process-number
+                                              process-queue
+                                              waitloop-thread]))))))
 
 (defnf evaluate
-  [args flags passthrough-flags] [[:vector :lazy-seq]]
+  [args flags passthrough-flags] [[:vector :seq]]
   (let [[kernel-link
          process-number
          process-queue
@@ -108,11 +105,11 @@
       (try
         (while 1 (Thread/sleep 100000))
         (catch InterruptedException _
-          (let [output (:output @(get @process-queue pid))]
+          (let [output (CExpr. (:output @(get @process-queue pid)))]
             (dosync (commute process-queue dissoc pid))
-            (if (flags :vector)
-              (.vectorize (CExpr. output))
-              (CExpr. output)))))))
+            (cond (flags :vector) (.vectorize output)
+                  (flags :seq)    (.seqify output)
+                  true            output))))))
 
 (defn move-queue [kernel-link process-queue]
   (let [update-item     (fn [[pid process-data]]

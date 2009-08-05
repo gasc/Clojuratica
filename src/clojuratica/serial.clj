@@ -40,9 +40,6 @@
 
 (declare evaluate)
 
-(defn global-set [lhs rhs kernel-link]
-  (send-read (build-set-expr lhs rhs) kernel-link))
-
 (defnf get-evaluator
   "No valid flags; passthrough flags allowed"
   [retained-args _ retained-flags] []
@@ -55,11 +52,13 @@
       (cond
         (some #{:get-kernel-link} args)
           kernel-link
+        (some #{:parallel?} args)
+          false
         true
-          (apply evaluate (concat args retained-flags (list kernel-link)))))))
+          (apply evaluate (concat args retained-flags [kernel-link]))))))
 
-(defnf evaluate [args flags] [[:vector :lazy-seq]]
-  (let [result (send-read (apply build-module args) (last args))]
-    (if (flags :vector)
-      (.vectorize result)
-      result)))
+(defnf evaluate [args flags] [[:vector :seq]]
+  (let [output (send-read (apply build-module args) (last args))]
+    (cond (flags :vector) (.vectorize output)
+          (flags :seq)    (.seqify output)
+          true            output)))

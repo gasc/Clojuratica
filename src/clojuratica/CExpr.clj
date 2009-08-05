@@ -40,7 +40,7 @@
              [getPos           [] Integer]
              [getVectorFlag    [] Boolean]
              [vectorize        [] Object]
-             [devectorize      [] Object]
+             [seqify           [] Object]
              [parse            [] Object]
              [parseAtom        [] Object]
              [parseToLazySeqs  [] Object]
@@ -80,7 +80,7 @@
                       (.getPos this)
                       true))
 
-(defn -devectorize [this]
+(defn -seqify [this]
   (clojuratica.CExpr. (.getExpr this)
                       (.getPos this)
                       false))

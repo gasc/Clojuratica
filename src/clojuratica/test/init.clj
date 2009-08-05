@@ -16,7 +16,7 @@
 
 (def math (comp parse evaluate))
 
-(def global-set (get-global-setter kernel-link))
+(def global-set (get-global-setter evaluate))
 
 (def pevaluate (get-evaluator kernel-link :parallel))
 

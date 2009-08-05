@@ -4,31 +4,31 @@
   (and (== (count classes) (count instances))
        (every? true? (map instance? classes instances))))
 
-(defn remove-flags [args flag-sets]
-  (remove (set (apply concat flag-sets)) args))
+(defn remove-flags [args flaggroup-coll]
+  (remove (set (apply concat flaggroup-coll)) args))
 
-(defn match-flags [args flag-sets]
-  (set (for [flag-set flag-sets] (some (set flag-set) args))))
+(defn match-flags [args flaggroup-coll]
+  (set (for [flaggroup flaggroup-coll] (some (set flaggroup) args))))
 
-(defn parse-flags [args & [flag-set]]
-  (let [all-args              (remove keyword? args)
-        local-flags           (match-flags args flag-set)
-        passthrough-flags     (set (filter keyword? (remove-flags args flag-set)))
-        passthrough-all       (remove-flags args flag-set)]
-    [all-args local-flags passthrough-flags passthrough-all]))
+(defn parse-flags [args flaggroup-coll]
+  (let [all-args           (remove keyword? args)
+        local-flags        (match-flags args flaggroup-coll)
+        passthrough-flags  (filter keyword? (remove-flags args flaggroup-coll))
+        passthrough        (remove-flags args flaggroup-coll)]
+    [all-args local-flags passthrough-flags passthrough]))
 
 (defn take-last [i coll]
   (drop (- (count coll) i) coll))
 
-(defmacro defmethodf [name dispatch-val v flag-set & body]
+(defmacro defmethodf [name dispatch-val v flaggroup-coll & body]
  `(defmethod ~name ~dispatch-val [& args#]
-    (let [~v (parse-flags args# ~flag-set)]
+    (let [~v (parse-flags args# ~flaggroup-coll)]
       ~@body)))
 
-(defmacro defnf [name arg1 & remainder]
-  (let [docstring           (if (string? arg1) (list arg1) '())
-        [v flag-set & body] (if (string? arg1) remainder (cons arg1 remainder))]
-   `(defn ~name ~@docstring [& args#]
-      (let [~v (parse-flags args# ~flag-set)]
+(defmacro defnf [name arg1 & r]
+  (let [docstring-splicer          (if (string? arg1) (list arg1) '())
+        [v flaggroup-coll & body] (if (string? arg1) r (cons arg1 r))]
+   `(defn ~name ~@docstring-splicer [& args#]
+      (let [~v (parse-flags args# ~flaggroup-coll)]
         ~@body))))
 

@@ -121,19 +121,24 @@
   is required only if the first argument is a string. Otherwise, second argument is optional."
   common-dispatch)
 
-(defmethod parse :string [s evaluate]
+(defmethodf parse :string
+  [[s evaluate] _ passthrough-flags] []
   ; Takes a string and a KernelLink instance. Converts s to a CExpr using kernel-link, then parses the
   ; resulting CExpr into a Clojure object. Returns this Clojure object. For details on how CExprs
   ; are parsed see the documentation for the CExpr class.
   (if (nil? evaluate)
     (throw (Exception. "When first argument to parse is a string, second argument must be an evaluator.")))
-  (.parse (express s (evaluate :get-kernel-link))))
+  (parse (express s (evaluate :get-kernel-link))))
 
-(defmethod parse :expr [expr & [evaluate]]
-  (.parse (express expr)))
+(defmethodf parse :expr
+  [[expr] _ passthrough-flags] []
+  (parse (express expr)))
 
-(defmethod parse :cexpr [cexpr & [evaluate]]
-  (.parse cexpr))
+(defmethodf parse :cexpr
+  [[cexpr] flags] [[:vector :seq]]
+  (cond (flags :vector)   (.. cexpr vectorize parse)
+        (flags :seq)      (.. cexpr seqify parse)
+        true              (.. cexpr parse)))
 
 (defmethod parse :nil [& args]
   nil)
@@ -143,6 +148,12 @@
   are converted to Mathematica lists. See the CExpr class documentation for more information."
   [obj]
   (CExpr. obj))
+
+(defn global-set [lhs rhs evaluate]
+  (let [result (evaluate [] (build-set-expr lhs rhs))]
+    (if (evaluate :parallel?)
+      (evaluate [] (str "DistributeDefinitions[" lhs "]")))
+    result))
 
 (defn add-head
   "Creates an Expr with head argument as its head and with exprs as its arguments. exprs must be Expr

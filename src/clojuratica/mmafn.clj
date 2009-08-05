@@ -4,8 +4,6 @@
            [com.wolfram.jlink Expr]))
 
 (defnf dispatch
-  "Dispatches to the appropriate method. Used by the following multimethods: express, send-read,
-  and parse."
   [args] []
   (let [assignments  (first args)
         expression   (second args)]
@@ -34,7 +32,7 @@
     (apply mmafn (concat passthrough-flags (list assignments expr evaluate)))))
 
 (defmethodf mmafn :expr
-  [[assignments expr evaluate] flags] [[:parse :no-parse]]
+  [[assignments expr evaluate] flags passthrough_flags] [[:parse :no-parse]]
   (let [call (if (flags :parse) (comp parse evaluate) evaluate)
         head (.toString (.part expr 0))]
     (if-not (or (= "Set"        head)
@@ -51,7 +49,7 @@
         (let [expressed-args     (map (fn [x] (.getExpr (convert x))) args)
               expressed-arg-list (add-head "List" expressed-args)
               fn-call            (add-head "Apply" [expr expressed-arg-list])]
-          (call assignments fn-call)))
+          (apply call assignments fn-call passthrough_flags)))
       (fn [& args]
         (let [lhs             (.part expr 1)
               expressed-args  (map (fn [x] (.getExpr (convert x))) args)
@@ -60,7 +58,7 @@
                                 (.toString (.head lhs)))
               assignments     (vec (concat assignments [name :undefined]))
               fn-call         (add-head name expressed-args)]
-          (call assignments expr fn-call))))))
+          (apply call assignments expr fn-call passthrough_flags))))))
 
 (defmethod mmafn :nil [& args]
   nil)
