@@ -25,13 +25,9 @@
     (let [~v (parse-flags args# ~flag-set)]
       ~@body)))
 
-(defmacro defnf [name & remainder]
-  (let [docstring           (if (string? (first remainder))
-                              (list (first remainder))
-                              '())
-        [v flag-set & body] (if (string? (first remainder))
-                              (rest remainder)
-                              remainder)]
+(defmacro defnf [name arg1 & remainder]
+  (let [docstring           (if (string? arg1) (list arg1) '())
+        [v flag-set & body] (if (string? arg1) remainder (cons arg1 remainder))]
    `(defn ~name ~@docstring [& args#]
       (let [~v (parse-flags args# ~flag-set)]
         ~@body))))
