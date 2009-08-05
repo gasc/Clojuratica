@@ -34,7 +34,7 @@
 ; ***** END LICENSE BLOCK *****
 ;
 
-(ns clojuratica.serial
+(ns clojuratica.serial-evaluator
   (:use [clojuratica.core]
         [clojuratica.lib]))
 

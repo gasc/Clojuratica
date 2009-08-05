@@ -33,7 +33,7 @@
 ;
 ; ***** END LICENSE BLOCK *****
 
-(ns clojuratica.parallel
+(ns clojuratica.parallel-evaluator
   (:import [clojuratica CExpr]
            [com.wolfram.jlink Expr])
   (:use [clojuratica.core]

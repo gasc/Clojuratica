@@ -40,18 +40,14 @@
              [getPos           [] Integer]
              [getVectorFlag    [] Boolean]
              [vectorize        [] Object]
-             [seqify           [] Object]
-             [parse            [] Object]
-             [parseAtom        [] Object]
-             [parseToLazySeqs  [] Object]
-             [parseToVectors   [] Object]]
+             [seqify           [] Object]]
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] []
                   [Object Integer Boolean] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
-  (:require [clojuratica.lib :as lib] [clojuratica.low-level :as low-level]))
+  (:require [clojuratica.lib :as lib]))
 
 (defn -first [this]
   (.. this getExpr (part (int-array (list (.getPos this))))))
@@ -84,43 +80,6 @@
   (clojuratica.CExpr. (.getExpr this)
                       (.getPos this)
                       false))
-
-(defn -parse [this]
-  (if (.getVectorFlag this)
-    (.parseToVectors this)
-    (.parseToLazySeqs this)))
-
-(defn -parseAtom [this]
-  (let [expr (.getExpr this)]
-    (cond (.bigIntegerQ expr)         (.asBigInteger expr)
-          (.bigDecimalQ expr)         (.asBigDecimal expr)
-          (.integerQ expr)            (.asLong expr)
-          (.realQ expr)               (.asDouble expr)
-          (.stringQ expr)             (.asString expr)
-          (= "Null" (.toString expr)) nil
-          true                        expr)))
-
-(defn -parseToLazySeqs [this]
-  (let [expr (.getExpr this)]
-    (if-not (.listQ expr)
-      (.parseAtom this)
-      (map (fn [x] (.parseToLazySeqs (clojuratica.CExpr. x))) (rest this)))))
-
-(defn -parseToVectors [this]  ; logic courtesy of Meikel Brandmeyer
-  (if-not (.listQ (.getExpr this))
-    (.parseAtom this)
-    (loop [s        (rest this)
-           v        []
-           stack    nil]
-      (if-let [s (seq s)]
-        (let [fst (first s)]
-          (if-not (.listQ fst)
-            (recur (next s) (conj v (.parseAtom (clojuratica.CExpr. fst))) stack)
-            (recur (rest (clojuratica.CExpr. fst)) [] (conj stack [(next s) v]))))
-        (if (seq stack)
-          (let [[s v-s] (peek stack)]
-            (recur s (conj v-s v) (pop stack)))
-          v)))))
 
 (defn constructor-dispatch [& args]
   (letfn [(class-match? [classes] (lib/instances? classes args))]

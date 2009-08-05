@@ -34,30 +34,34 @@
 ; ***** END LICENSE BLOCK *****
 
 (ns clojuratica.clojuratica
-  (:require [clojuratica.core]
-            [clojuratica.serial]
-            [clojuratica.parallel]
-            [clojuratica.mmafn])
+  (:require [clojuratica.serial-evaluator   :as serial-evaluator]
+            [clojuratica.parallel-evaluator :as parallel-evaluator]
+            [clojuratica.mmafn              :as mmafn]
+            [clojuratica.parser             :as parser]
+            [clojuratica.global-setter      :as global-setter])
   (:use [clojuratica.lib]))
 
 (defnf get-evaluator [_ flags _ passthrough] [[:parallel :serial]]
   (if (flags :parallel)
-    (apply clojuratica.parallel/get-evaluator passthrough)
-    (apply clojuratica.serial/get-evaluator   passthrough)))
+    (apply parallel-evaluator/get-evaluator passthrough)
+    (apply serial-evaluator/get-evaluator passthrough)))
 
 (defnf get-mmafn [[evaluate] _ retained-flags] []
   (when-not (fn? evaluate)
     (throw (Exception. "First non-flag argument to get-mmafn must be a Clojuratica evaluator.")))
   (fn [& args]
-    (apply clojuratica.mmafn/mmafn (concat args retained-flags [evaluate]))))
+    (apply mmafn/mmafn (concat args retained-flags [evaluate]))))
 
 (defnf get-parser [[evaluate] _ retained-flags] []
   (when-not (fn? evaluate)
     (throw (Exception. "First non-flag argument to get-parser must be a Clojuratica evaluator.")))
   (fn [& args]
-    (apply clojuratica.core/parse (concat args retained-flags [evaluate]))))
+    (apply parser/parse (concat args retained-flags [evaluate]))))
 
 (defn get-global-setter [evaluate]
-    (fn [lhs rhs] (clojuratica.core/global-set lhs rhs evaluate)))
+  (when-not (fn? evaluate)
+    (throw (Exception. "First non-flag argument to get-global-setter must be a Clojuratica evaluator.")))
+  (fn [lhs rhs]
+    (global-setter/global-set lhs rhs evaluate)))
 
 

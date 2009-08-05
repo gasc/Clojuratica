@@ -35,15 +35,14 @@
 
 
 (ns clojuratica.core
-  (:import [clojuratica CExpr]
-           [com.wolfram.jlink Expr])
-  (:use [clojuratica.lib]))
+  (:import  [clojuratica CExpr]
+            [com.wolfram.jlink Expr])
+  (:use     [clojuratica.lib]))
 
 (declare string-to-expr build-set-expr add-head convert)
 
 (defnf common-dispatch
-  "Dispatches to the appropriate method. Used by the following multimethods: express, send-read,
-  and parse."
+  "Dispatches to the appropriate method. Used by the following multimethods: express, send-read, parser/parse."
   [args] []
   (let [expression (first args)]
     (cond (string? expression)          :string
@@ -113,47 +112,12 @@
   ; Send-read returns nil if passed nil.
   nil)
 
-; Parse
-
-(defmulti parse
-  "Turns the first argument into a CExpr using the KernelLink instance provided in the
-  second argument. First argument can be a string, an Expr, or a CExpr. Second argument
-  is required only if the first argument is a string. Otherwise, second argument is optional."
-  common-dispatch)
-
-(defmethodf parse :string
-  [[s evaluate] _ passthrough-flags] []
-  ; Takes a string and a KernelLink instance. Converts s to a CExpr using kernel-link, then parses the
-  ; resulting CExpr into a Clojure object. Returns this Clojure object. For details on how CExprs
-  ; are parsed see the documentation for the CExpr class.
-  (if (nil? evaluate)
-    (throw (Exception. "When first argument to parse is a string, second argument must be an evaluator.")))
-  (parse (express s (evaluate :get-kernel-link))))
-
-(defmethodf parse :expr
-  [[expr] _ passthrough-flags] []
-  (parse (express expr)))
-
-(defmethodf parse :cexpr
-  [[cexpr] flags] [[:vector :seq]]
-  (cond (flags :vector)   (.. cexpr vectorize parse)
-        (flags :seq)      (.. cexpr seqify parse)
-        true              (.. cexpr parse)))
-
-(defmethod parse :nil [& args]
-  nil)
-
 (defn convert
   "Converts any Java object, including any Clojure data structure, to a CExpr. Sequential objects
   are converted to Mathematica lists. See the CExpr class documentation for more information."
   [obj]
   (CExpr. obj))
 
-(defn global-set [lhs rhs evaluate]
-  (let [result (evaluate [] (build-set-expr lhs rhs))]
-    (if (evaluate :parallel?)
-      (evaluate [] (str "DistributeDefinitions[" lhs "]")))
-    result))
 
 (defn add-head
   "Creates an Expr with head argument as its head and with exprs as its arguments. exprs must be Expr
@@ -241,6 +205,8 @@
       (.evaluate kernel-link held-s)
       (.waitForAnswer kernel-link)
       (let [result (.. kernel-link getExpr args)]
+        (if-not (first result)
+          (throw (Exception. (str "Invalid expression: " s))))
         (if (next result)
           (throw (Exception. (str "Invalid expression: " s))))
         (first result)))))

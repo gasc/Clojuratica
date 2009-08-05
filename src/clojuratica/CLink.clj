@@ -7,7 +7,8 @@
     (:import [com.wolfram.jlink StdLink Expr]
              [clojure.lang.*]
              [java.io StringReader])
-    (:use [clojuratica.clojuratica] [clojuratica.low-level]))
+    (:use [clojuratica.clojuratica]
+          [clojuratica.low-level]))
 
 (defn -convert [expr]
   (let [parse (get-parser (get-evaluator (StdLink/getLink)))]

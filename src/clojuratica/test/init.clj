@@ -28,4 +28,3 @@
 
 (def foo (mmafn ["foob" -6] "Foo=Function[{x},x]" :parse))
 
-(.parse (evaluate [] "{1+1,3,4}"))

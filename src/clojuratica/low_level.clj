@@ -37,9 +37,6 @@
 (ns clojuratica.low-level
   (:require [clojuratica.core]))
 
-(defn parse [& args]
-  (apply clojuratica.core/parse args))
-
 (defn express [& args]
   (apply clojuratica.core/express args))
 

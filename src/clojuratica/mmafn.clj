@@ -1,5 +1,7 @@
 (ns clojuratica.mmafn
-  (:use [clojuratica.core] [clojuratica.lib])
+  (:use [clojuratica.core]
+        [clojuratica.parser]
+        [clojuratica.lib])
   (:import [clojuratica CExpr]
            [com.wolfram.jlink Expr]))
 
