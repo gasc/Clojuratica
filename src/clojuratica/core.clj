@@ -41,12 +41,11 @@
 
 (declare string-to-expr build-set-expr add-head convert)
 
-(defn- common-dispatch
+(defnf common-dispatch
   "Dispatches to the appropriate method. Used by the following multimethods: express, send-read,
   and parse."
-  [& args]
-  (let [args       (remove-flags args)
-        expression (first args)]
+  [args] []
+  (let [expression (first args)]
     (cond (string? expression)          :string
           (instance? Expr expression)   :expr
           (instance? CExpr expression)  :cexpr
@@ -122,18 +121,18 @@
   is required only if the first argument is a string. Otherwise, second argument is optional."
   common-dispatch)
 
-(defmethod parse :string [s kernel-link]
+(defmethod parse :string [s evaluate]
   ; Takes a string and a KernelLink instance. Converts s to a CExpr using kernel-link, then parses the
   ; resulting CExpr into a Clojure object. Returns this Clojure object. For details on how CExprs
   ; are parsed see the documentation for the CExpr class.
-  (if (nil? kernel-link)
-    (throw (Exception. "When first argument to parse is a string, second argument must be a KernelLink object.")))
-  (.parse (express s kernel-link)))
+  (if (nil? evaluate)
+    (throw (Exception. "When first argument to parse is a string, second argument must be an evaluator.")))
+  (.parse (express s (evaluate :get-kernel-link))))
 
-(defmethod parse :expr [expr & [kernel-link]]
+(defmethod parse :expr [expr & [evaluate]]
   (.parse (express expr)))
 
-(defmethod parse :cexpr [cexpr & [kernel-link]]
+(defmethod parse :cexpr [cexpr & [evaluate]]
   (.parse cexpr))
 
 (defmethod parse :nil [& args]
@@ -156,9 +155,7 @@
     (.endPacket loop)
     (.getExpr loop)))
 
-; Set-evaluate
-
-(defn build-module
+(defnf build-module
   "Creates an Expr containing a Mathematica module. The syntax of build-module is similar to that
   of Clojure's let. The Mathematica module created will have local (lexically scoped) variables
   as specified in the first argument to build-module, which must be a vector of pairs, as in
@@ -172,12 +169,12 @@
   :all-output - Packages expressions in a list, such that the output of each expression is returned.
   :last-output - Default. Packages expressions in a CompoundExpression[], such that the output
                  of only the last expression is returned. Opposite of all-output."
-  [& args]
-  (let [flag-sets      [[:all-output :last-output]
-                        [:parallel :serial]]
-        flags          (flags args flag-sets)
-        args           (remove-flags args)
-        set-specs      (first args)
+  [args flags] [[:all-output :last-output]
+                [:parallel :serial]]
+
+  (if-not (vector? (first args))
+    (throw (Exception. "First non-flag argument to Clojuratica evaluator must be a vector (possibly empty) of bindings.")))
+  (let [set-specs      (first args)
         set-spec-seqs  (partition 2 set-specs)
         set-expr-seq   (for [set-spec-seq set-spec-seqs]
                          (apply build-set-expr set-spec-seq))
@@ -191,13 +188,13 @@
                          (express expression kernel-link))
         expr-seq       (map (memfn getExpr) cexpr-seq)
         loop           (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)
-        compounder     (if (some #{:all-output} flags)
+        compounder     (if (flags :all-output)
                          "List"
                          "CompoundExpression")]
     (.putFunction loop "Module" 2)
     (.put loop
       (add-head "List" set-expr-seq))
-    (when (some #{:parallel} flags)
+    (when (flags :parallel)
       (.putFunction loop "ParallelSubmit" 2)
       (.put loop
         (add-head "List" local-vars)))
@@ -237,21 +234,6 @@
           (throw (Exception. (str "Invalid expression: " s))))
         (first result)))))
 
-(defn vectorize [s]  ; courtesy of Meikel Brandmeyer
-  (if-not (seq? s)
-    s
-    (loop [s     s
-           v     []
-           stack nil]
-      (if-let [s (seq s)]
-        (let [fst (first s)]
-          (if (seq? fst)
-            (recur fst [] (conj stack [(next s) v]))
-            (recur (next s) (conj v fst) stack)))
-        (if (seq stack)
-          (let [[s v-s] (peek stack)]
-            (recur s (conj v-s v) (pop stack)))
-          v)))))
 
 
 

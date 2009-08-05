@@ -40,40 +40,22 @@
             [clojuratica.mmafn])
   (:use [clojuratica.lib]))
 
-(defn get-evaluator
-  "Valid flags: :parallel :serial
-  Passthrough flags allowed"
-  [& args]
-  (let [flags (flags args [[:parallel :serial]])
-        args  (remove-flags args [[:parallel :serial]])]
-    (when-not (instance? com.wolfram.jlink.KernelLink (first args))
-      (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
-    (if (some #{:parallel} flags)
-      (apply clojuratica.parallel/get-evaluator args)
-      (apply clojuratica.serial/get-evaluator args))))
+(defnf get-evaluator [_ flags _ passthrough] [[:parallel :serial]]
+  (if (flags :parallel)
+    (apply clojuratica.parallel/get-evaluator passthrough)
+    (apply clojuratica.serial/get-evaluator   passthrough)))
 
-(defn get-mmafn
-  "Passthrough flags allowed"
-  [& retained-args]
-  (let [retained-flags (flags retained-args)
-        retained-args  (remove-flags retained-args)
-        evaluator      (first retained-args)
-        kernel-link    (second retained-args)]
-    (when-not (fn? evaluator)
-      (throw (Exception. "First non-flag argument to get-mmafn must be a Clojuratica evaluator.")))
-    (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
-      (throw (Exception. "Second non-flag argument to get-mmafn must be a KernelLink object.")))
-    (fn [& args]
-      (apply clojuratica.mmafn/mmafn (concat args retained-flags (list evaluator kernel-link))))))
+(defnf get-mmafn [[evaluate] _ retained-flags] []
+  (when-not (fn? evaluate)
+    (throw (Exception. "First non-flag argument to get-mmafn must be a Clojuratica evaluator.")))
+  (fn [& args]
+    (apply clojuratica.mmafn/mmafn (concat args retained-flags (list evaluate)))))
 
-(defn get-parser [& [kernel-link]]
-  "No valid flags."
-  (fn [arg] (clojuratica.core/parse arg kernel-link)))
+(defn get-parser [& [evaluate]]
+  (fn [arg] (clojuratica.core/parse arg (evaluate :get-kernel-link))))
 
 (defn get-global-setter
   [kernel-link]
     (fn [lhs rhs] (clojuratica.parallel/global-set lhs rhs kernel-link)))
-
-(def vectorize clojuratica.core/vectorize)
 
 

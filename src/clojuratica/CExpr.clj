@@ -36,49 +36,96 @@
 
 (ns clojuratica.CExpr
   (:gen-class
-   :methods [[getExpr [] com.wolfram.jlink.Expr]
-             [getPos [] Integer]
-             [parse [] Object]]
+   :methods [[getExpr          [] com.wolfram.jlink.Expr]
+             [getPos           [] Integer]
+             [getVectorFlag    [] Boolean]
+             [vectorize        [] Object]
+             [devectorize      [] Object]
+             [parse            [] Object]
+             [parseAtom        [] Object]
+             [parseToLazySeqs  [] Object]
+             [parseToVectors   [] Object]]
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] []
-                  [Object Object] []}
+                  [Object Integer Boolean] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
   (:require [clojuratica.lib :as lib] [clojuratica.low-level :as low-level]))
 
 (defn -first [this]
-  (let [cexpr (clojuratica.CExpr. (.. this getExpr (part (int-array (list (.getPos this))))))]
-    (.parse cexpr)))
+  (.. this getExpr (part (int-array (list (.getPos this))))))
 
 (defn -next [this]
   (let [expr   (.getExpr this)
         pos    (.getPos this)
+        vf     (.getVectorFlag this)
         length (.length expr)]
     (if-not (== length pos)
-      (clojuratica.CExpr. expr (inc pos)))))
-
-(defn -getPos [this]
-  (:pos (.state this)))
+      (clojuratica.CExpr. expr
+                          (inc pos)
+                          vf))))
 
 (defn -getExpr [this]
   (:expr (.state this)))
 
+(defn -getPos [this]
+  (:pos (.state this)))
+
+(defn -getVectorFlag [this]
+  (:vector-flag (.state this)))
+
+(defn -vectorize [this]
+  (clojuratica.CExpr. (.getExpr this)
+                      (.getPos this)
+                      true))
+
+(defn -devectorize [this]
+  (clojuratica.CExpr. (.getExpr this)
+                      (.getPos this)
+                      false))
+
 (defn -parse [this]
-    (let [expr (.getExpr this)]
-      (cond (.bigIntegerQ expr)         (.asBigInteger expr)
-            (.bigDecimalQ expr)         (.asBigDecimal expr)
-            (.integerQ expr)            (.asLong expr)
-            (.realQ expr)               (.asDouble expr)
-            (.stringQ expr)             (.asString expr)
-            (.listQ expr)               (lazy-seq (next this))
-            (= "Null" (.toString expr)) nil
-            true                        expr)))
+  (if (.getVectorFlag this)
+    (.parseToVectors this)
+    (.parseToLazySeqs this)))
+
+(defn -parseAtom [this]
+  (let [expr (.getExpr this)]
+    (cond (.bigIntegerQ expr)         (.asBigInteger expr)
+          (.bigDecimalQ expr)         (.asBigDecimal expr)
+          (.integerQ expr)            (.asLong expr)
+          (.realQ expr)               (.asDouble expr)
+          (.stringQ expr)             (.asString expr)
+          (= "Null" (.toString expr)) nil
+          true                        expr)))
+
+(defn -parseToLazySeqs [this]
+  (let [expr (.getExpr this)]
+    (if-not (.listQ expr)
+      (.parseAtom this)
+      (map (fn [x] (.parseToLazySeqs (clojuratica.CExpr. x))) (rest this)))))
+
+(defn -parseToVectors [this]  ; logic courtesy of Meikel Brandmeyer
+  (if-not (.listQ (.getExpr this))
+    (.parseAtom this)
+    (loop [s        (rest this)
+           v        []
+           stack    nil]
+      (if-let [s (seq s)]
+        (let [fst (first s)]
+          (if-not (.listQ fst)
+            (recur (next s) (conj v (.parseAtom (clojuratica.CExpr. fst))) stack)
+            (recur (rest (clojuratica.CExpr. fst)) [] (conj stack [(next s) v]))))
+        (if (seq stack)
+          (let [[s v-s] (peek stack)]
+            (recur s (conj v-s v) (pop stack)))
+          v)))))
 
 (defn constructor-dispatch [& args]
   (letfn [(class-match? [classes] (lib/instances? classes args))]
     (cond (class-match? [Expr])                                :expr
-          (class-match? [Expr Integer])                        :expr+integer
+          (class-match? [Expr Integer Boolean])                :expr+integer+boolean
           (class-match? [String])                              :string
           (class-match? [Number])                              :number
           (class-match? [clojure.lang.IPersistentCollection])  :coll
@@ -89,13 +136,13 @@
 (defmulti construct constructor-dispatch)
 
 (defmethod construct :expr [expr]
-  {:expr expr :pos 0})
+  {:expr expr :pos 0 :vector-flag false})
 
-(defmethod construct :expr+integer [expr pos]
-  {:expr expr :pos pos})
+(defmethod construct :expr+integer+boolean [expr pos vector-flag]
+  {:expr expr :pos pos :vector-flag vector-flag})
 
 (defmethod construct :string [s]
-  {:expr (Expr. s) :pos 0})
+  {:expr (Expr. s) :pos 0 :vector-flag false})
 
 (defmethod construct :number [n]
   (let [typed-n (cond (instance? BigInteger n)         n
@@ -108,26 +155,26 @@
                       (instance? Float n)              (double n)
                       (instance? clojure.lang.Ratio n) (double n)
                       true (throw (Exception. (str "CExpr constructor does not know how to handle number of class " (class n)))))]
-    {:expr (Expr. typed-n) :pos 0}))
+    {:expr (Expr. typed-n) :pos 0 :vector-flag false}))
 
 (defmethod construct :coll [expression-coll]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putFunction loop "List" (count expression-coll))
-    (dorun (for [expression expression-coll] (.put loop (.getExpr (clojuratica.CExpr. expression)))))
+    (dorun (for [expression expression-coll] (.put loop expression)))
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0}))
+    {:expr (.getExpr loop) :pos 0 :vector-flag false}))
 
 (defmethod construct :object [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.put loop obj)
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0}))
+    {:expr (.getExpr loop) :pos 0 :vector-flag false}))
 
 (defmethod construct :nil [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putSymbol loop "Null")
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0}))
+    {:expr (.getExpr loop) :pos 0 :vector-flag false}))
 
 (defn -init [& args] 
   [[] (apply construct args)])

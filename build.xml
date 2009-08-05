@@ -76,7 +76,7 @@
     <echo>JAR written to ${basedir}${file.separator}clojuratica.jar</echo>
   </target>
 
-  <target name="jarcopy" depends="check_hasjartarget,dist"
+  <target name="tojardir" depends="check_hasjartarget,dist"
         description="copy jar to jartarget" >
     <!-- Create the distribution directory -->
     <mkdir dir="${jartarget}"/>

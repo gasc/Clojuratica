@@ -38,20 +38,28 @@
   (:use [clojuratica.core]
         [clojuratica.lib]))
 
-(defn evaluate [& args]
-  (send-read (apply build-module args) (last args)))
-
-(defn get-evaluator
-  "No valid flags; passthrough flags allowed"
-  [& retained-args]
-  (let [retained-flags (flags retained-args)
-        retained-args (remove-flags retained-args)
-        kernel-link (first retained-args)]
-    (fn [& args]
-      (if-not (vector? (first args))
-        (throw (Exception. "First argument to Clojuratica evaluator must be a vector (possibly empty) of bindings.")))
-      (apply evaluate (concat args retained-flags (list kernel-link))))))
+(declare evaluate)
 
 (defn global-set [lhs rhs kernel-link]
   (send-read (build-set-expr lhs rhs) kernel-link))
 
+(defnf get-evaluator
+  "No valid flags; passthrough flags allowed"
+  [retained-args _ retained-flags] []
+  (let [kernel-link (first retained-args)]
+    (when-not (instance? com.wolfram.jlink.KernelLink (first retained-args))
+      (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
+
+    ; This is the anonymous function returned from a call to get-evaluator
+    (fn [& args]
+      (cond
+        (some #{:get-kernel-link} args)
+          kernel-link
+        true
+          (apply evaluate (concat args retained-flags (list kernel-link)))))))
+
+(defnf evaluate [args flags] [[:vector :lazy-seq]]
+  (let [result (send-read (apply build-module args) (last args))]
+    (if (flags :vector)
+      (.vectorize result)
+      result)))

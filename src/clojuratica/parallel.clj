@@ -39,68 +39,80 @@
   (:use [clojuratica.core]
         [clojuratica.lib]))
 
-(declare waitloop)
-
-(defn evaluate [& args]
-  (let [passthrough-flags     (flags args)
-        args                  (remove-flags args)
-        waitloop-thread       (last args)
-        process-queue         (last (drop-last args))
-        process-number        (last (drop-last (drop-last args)))
-        args                  (drop-last (drop-last (drop-last args)))
-        kernel-link           (last args)
-        pid-string            (str "Clojuratica`Concurrent`process" (dosync (alter process-number inc)))
-        pid                   (Expr. Expr/SYMBOL pid-string)
-        module                (apply build-module :parallel (concat passthrough-flags args))
-        queue-item            {pid (ref {:thread (Thread/currentThread)})}]
-    (send-read (build-set-expr pid-string module) kernel-link)
-    (dosync (commute process-queue conj queue-item))
-    (.interrupt waitloop-thread)
-    (try
-      (while 1 (Thread/sleep 100000))
-      (catch InterruptedException _
-        (let [output (:output @(get @process-queue pid))]
-          (dosync (commute process-queue dissoc pid))
-          (CExpr. output))))))
+(declare waitloop evaluate)
 
 (defn global-set [lhs rhs kernel-link]
   (let [result (send-read (build-set-expr lhs rhs) kernel-link)]
     (send-read (str "DistributeDefinitions[" lhs "]") kernel-link)
     result))
 
-(defn get-evaluator
+(defnf get-evaluator
   "No valid flags; passthrough flags allowed"
-  [& retained-args]
-  (let [retained-flags (flags retained-args)
-        retained-args (remove-flags retained-args)
-        kernel-link (first retained-args)
-        poll-interval (or (second retained-args) 5)]
+  [retained-args _ retained-flags] []
+
+  (let [kernel-link         (first retained-args)
+        poll-interval       (or (second retained-args) 5)
+        soft-kill           (ref false)
+        hard-kill           (ref false)
+        process-number      (ref 0)
+        process-queue       (ref {})
+        waitloop-thread     (Thread. (fn [] (waitloop kernel-link
+                                                      process-queue
+                                                      soft-kill
+                                                      hard-kill
+                                                      poll-interval)))]
+    (when-not (instance? com.wolfram.jlink.KernelLink (first retained-args))
+      (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
     (send-read "Needs[\"Parallel`Developer`\"]" kernel-link)
     (send-read "QueueRun[]" kernel-link)
-    (let [soft-kill (ref false)
-          hard-kill (ref false)
-          process-number (ref 0)
-          process-queue (ref {})
-          waitloop-thread (Thread. (fn [] (waitloop kernel-link
-                                                    process-queue
-                                                    soft-kill
-                                                    hard-kill
-                                                    poll-interval)))]
-      (.start waitloop-thread)
-      (fn [& args]
-        (if-not (vector? (first args))
-          (throw (Exception. "First argument to Clojuratica evaluator must be a vector (possibly empty) of bindings.")))
-        (cond (some #{:soft-kill} args) (do
-                                          (dosync (ref-set soft-kill true))
-                                          (.interrupt waitloop-thread))
-              (some #{:hard-kill} args) (do
-                                          (dosync (ref-set hard-kill true))
-                                          (.interrupt waitloop-thread))
-              true                      (apply evaluate
-                                               (concat args retained-flags (list kernel-link
-                                                                                 process-number
-                                                                                 process-queue
-                                                                                 waitloop-thread))))))))
+    (.start waitloop-thread)
+
+    ; This is the anonymous function returned from a call to get-evaluator
+    (fn [& args]
+      (cond
+        (some #{:hard-kill} args)
+          (do
+            (dosync (ref-set hard-kill true))
+            (.interrupt waitloop-thread))
+        (some #{:soft-kill} args)
+          (do
+            (dosync (ref-set soft-kill true))
+            (.interrupt waitloop-thread))
+        (some #{:get-kernel-link} args)
+          kernel-link
+        (not (.isAlive waitloop-thread))
+          (throw (Exception. "This parallel evaluator is not running."))
+        true
+          (apply evaluate
+                 (concat args retained-flags (list kernel-link
+                                                   process-number
+                                                   process-queue
+                                                   waitloop-thread)))))))
+
+(defnf evaluate
+  [args flags passthrough-flags] [[:vector :lazy-seq]]
+  (let [[kernel-link
+         process-number
+         process-queue
+         waitloop-thread]      (take-last 4 args)
+         passthrough-args      (drop-last 3 args)
+         module                (apply build-module :parallel (concat passthrough-flags passthrough-args))
+         pid-string            (str "Clojuratica`Concurrent`process" (dosync (alter process-number inc)))
+         pid                   (Expr. Expr/SYMBOL pid-string)
+         queue-item            {pid (ref {:thread (Thread/currentThread)})}]
+
+      (send-read (build-set-expr pid-string module) kernel-link)
+
+      (dosync (commute process-queue conj queue-item))
+      (.interrupt waitloop-thread)
+      (try
+        (while 1 (Thread/sleep 100000))
+        (catch InterruptedException _
+          (let [output (:output @(get @process-queue pid))]
+            (dosync (commute process-queue dissoc pid))
+            (if (flags :vector)
+              (.vectorize (CExpr. output))
+              (CExpr. output)))))))
 
 (defn move-queue [kernel-link process-queue]
   (let [update-item     (fn [[pid process-data]]

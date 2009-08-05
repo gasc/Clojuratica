@@ -3,13 +3,12 @@
   (:import [clojuratica CExpr]
            [com.wolfram.jlink Expr]))
 
-(defn- dispatch
+(defnf dispatch
   "Dispatches to the appropriate method. Used by the following multimethods: express, send-read,
   and parse."
-  [& args]
-  (let [args        (remove-flags args)
-        assignments (first args)
-        expression  (second args)]
+  [args] []
+  (let [assignments  (first args)
+        expression   (second args)]
     (if-not (vector? assignments)
       (throw (Exception. (str "First argument to mmafn "
                               "must be a vector of assignments"))))
@@ -23,38 +22,21 @@
 
 (defmulti mmafn dispatch)
 
-(defmethod mmafn :string [& args]
-  (let [flags       (flags args)
-        args        (remove-flags args)
-        kernel-link (try (nth args 3) (catch Exception _ (throw (Exception. "Too few args."))))
-        evaluator   (try (nth args 2) (catch Exception _ (throw (Exception. "Too few args."))))
-        s           (try (nth args 1) (catch Exception _ (throw (Exception. "Too few args."))))
-        assignments (try (nth args 0) (catch Exception _ (throw (Exception. "Too few args."))))
+(defmethodf mmafn :string
+  [[assignments s evaluate] _ passthrough-flags] []
+  (let [kernel-link (evaluate :get-kernel-link)
         expr        (.getExpr (express s kernel-link))]
-    (apply mmafn (concat flags (list assignments expr evaluator kernel-link)))))
+    (apply mmafn (concat passthrough-flags (list assignments expr evaluate)))))
 
-(defmethod mmafn :cexpr [& args]
-  (let [flags       (flags args)
-        args        (remove-flags args)
-        kernel-link (try (nth args 3) (catch Exception _ (throw (Exception. "Too few args."))))
-        evaluator   (try (nth args 2) (catch Exception _ (throw (Exception. "Too few args."))))
-        cexpr       (try (nth args 1) (catch Exception _ (throw (Exception. "Too few args."))))
-        assignments (try (nth args 0) (catch Exception _ (throw (Exception. "Too few args."))))
-        expr        (.getExpr cexpr)]
-    (apply mmafn (concat flags (list assignments expr evaluator kernel-link)))))
+(defmethodf mmafn :cexpr
+  [[assignments cexpr evaluate] _ passthrough-flags] []
+  (let [expr (.getExpr cexpr)]
+    (apply mmafn (concat passthrough-flags (list assignments expr evaluate)))))
 
-(defmethod mmafn :expr [& args]
-  (let [flag-sets   [[:parse :no-parse]]
-        flags       (flags args flag-sets)
-        args        (remove-flags args)
-        kernel-link (try (nth args 3) (catch Exception _ (throw (Exception. "Too few args."))))
-        evaluator   (try (nth args 2) (catch Exception _ (throw (Exception. "Too few args."))))
-        expr        (try (nth args 1) (catch Exception _ (throw (Exception. "Too few args."))))
-        assignments (try (nth args 0) (catch Exception _ (throw (Exception. "Too few args."))))
-        call        (if (some #{:parse} flags)
-                        (comp parse evaluator)
-                        evaluator)
-        head        (.toString (.part expr 0))]
+(defmethodf mmafn :expr
+  [[assignments expr evaluate] flags] [[:parse :no-parse]]
+  (let [call (if (flags :parse) (comp parse evaluate) evaluate)
+        head (.toString (.part expr 0))]
     (if-not (or (= "Set"        head)
                 (= "SetDelayed" head)
                 (= "Function"   head)

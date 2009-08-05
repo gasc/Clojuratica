@@ -4,12 +4,35 @@
   (and (== (count classes) (count instances))
        (every? true? (map instance? classes instances))))
 
-(defn flags [args & [flag-sets]]
-  (if flag-sets
-    (for [flag-set flag-sets] (some (set flag-set) args))
-    (filter keyword? args)))
+(defn remove-flags [args flag-sets]
+  (remove (set (apply concat flag-sets)) args))
 
-(defn remove-flags [args & [flag-sets]]
-  (if flag-sets
-    (remove (set (apply concat flag-sets)) args)
-    (remove keyword? args)))
+(defn match-flags [args flag-sets]
+  (set (for [flag-set flag-sets] (some (set flag-set) args))))
+
+(defn parse-flags [args & [flag-set]]
+  (let [all-args              (remove keyword? args)
+        local-flags           (match-flags args flag-set)
+        passthrough-flags     (set (filter keyword? (remove-flags args flag-set)))
+        passthrough-all       (remove-flags args flag-set)]
+    [all-args local-flags passthrough-flags passthrough-all]))
+
+(defn take-last [i coll]
+  (drop (- (count coll) i) coll))
+
+(defmacro defmethodf [name dispatch-val v flag-set & body]
+ `(defmethod ~name ~dispatch-val [& args#]
+    (let [~v (parse-flags args# ~flag-set)]
+      ~@body)))
+
+(defmacro defnf [name & remainder]
+  (let [docstring           (if (string? (first remainder))
+                              (list (first remainder))
+                              '())
+        [v flag-set & body] (if (string? (first remainder))
+                              (rest remainder)
+                              remainder)]
+   `(defn ~name ~@docstring [& args#]
+      (let [~v (parse-flags args# ~flag-set)]
+        ~@body))))
+

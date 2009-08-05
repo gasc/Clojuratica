@@ -1,5 +1,6 @@
 
 (use 'clojuratica.clojuratica)
+(use 'clojuratica.lib)
 (require '[clojuratica.low-level :as low-level])
 (import '[com.wolfram.jlink MathLinkFactory])
 (def kernel-link (MathLinkFactory/createKernelLink
@@ -10,22 +11,21 @@
 (.discardAnswer kernel-link)
 
 (def evaluate (get-evaluator kernel-link))
-
-(def parse (get-parser kernel-link))
+ 
+(def parse (get-parser evaluate))
 
 (def math (comp parse evaluate))
 
 (def global-set (get-global-setter kernel-link))
 
-(def p-evaluate (get-evaluator kernel-link :parallel))
+(def pevaluate (get-evaluator kernel-link :parallel))
 
-(def p-math (comp parse p-evaluate))
+(def pmath (comp parse pevaluate))
 
-(def mmafn (get-mmafn p-evaluate kernel-link))
+(def mmafn (get-mmafn evaluate))
 
-(require '[clojuratica.core :as core])
-
+(require '[clojuratica.core :as core] '[clojuratica.low-level :as low-level])
 
 (def foo (mmafn ["foob" -6] "Foo=Function[{x},x]" :parse))
 
-
+(.parse (evaluate [] "{1+1,3,4}"))

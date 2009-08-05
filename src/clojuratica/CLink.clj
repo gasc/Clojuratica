@@ -10,7 +10,7 @@
     (:use [clojuratica.clojuratica] [clojuratica.low-level]))
 
 (defn -convert [expr]
-  (let [parse (get-parser (StdLink/getLink))]
+  (let [parse (get-parser (get-evaluator (StdLink/getLink)))]
     (parse expr)))
 
 (defn -parse [obj]
