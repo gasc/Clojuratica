@@ -37,14 +37,12 @@
 (ns clojuratica.CExpr
   (:gen-class
    :methods [[getExpr          [] com.wolfram.jlink.Expr]
-             [getPos           [] Integer]
-             [getVectorFlag    [] Boolean]
-             [vectorize        [] Object]
-             [seqify           [] Object]]
+             [getPos           [] Integer]]
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] []
-                  [Object Integer Boolean] []}
+                  [Object Integer] []
+                  [Object clojure.lang.IPersistentCollection] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
   (:require [clojuratica.lib :as lib]))
@@ -55,12 +53,10 @@
 (defn -next [this]
   (let [expr   (.getExpr this)
         pos    (.getPos this)
-        vf     (.getVectorFlag this)
         length (.length expr)]
     (if-not (== length pos)
       (clojuratica.CExpr. expr
-                          (inc pos)
-                          vf))))
+                          (inc pos)))))
 
 (defn -getExpr [this]
   (:expr (.state this)))
@@ -68,40 +64,35 @@
 (defn -getPos [this]
   (:pos (.state this)))
 
-(defn -getVectorFlag [this]
-  (:vector-flag (.state this)))
-
-(defn -vectorize [this]
-  (clojuratica.CExpr. (.getExpr this)
-                      (.getPos this)
-                      true))
-
-(defn -seqify [this]
-  (clojuratica.CExpr. (.getExpr this)
-                      (.getPos this)
-                      false))
+(defn -getFlags [this]
+  (:flags (.state this)))
 
 (defn constructor-dispatch [& args]
   (letfn [(class-match? [classes] (lib/instances? classes args))]
-    (cond (class-match? [Expr])                                :expr
-          (class-match? [Expr Integer Boolean])                :expr+integer+boolean
-          (class-match? [String])                              :string
-          (class-match? [Number])                              :number
-          (class-match? [clojure.lang.IPersistentCollection])  :coll
-          (class-match? [Object])                              :object
-          (nil? (first args))                                  :nil
+    (cond (class-match? [Expr])                                     :expr
+          (class-match? [Expr Integer])                             :expr+integer
+          (class-match? [clojuratica.CExpr
+                         clojure.lang.IPersistentCollection])       :cexpr+coll
+          (class-match? [String])                                   :string
+          (class-match? [Number])                                   :number
+          (class-match? [clojure.lang.IPersistentCollection])       :coll
+          (class-match? [Object])                                   :object
+          (nil? (first args))                                       :nil
           true (throw (Exception. "Argument of invalid class passed to CExpr constructor: ")))))
 
 (defmulti construct constructor-dispatch)
 
 (defmethod construct :expr [expr]
-  {:expr expr :pos 0 :vector-flag false})
+  {:expr expr :pos 0})
 
-(defmethod construct :expr+integer+boolean [expr pos vector-flag]
-  {:expr expr :pos pos :vector-flag vector-flag})
+(defmethod construct :expr+integer [expr pos]
+  {:expr expr :pos pos})
+
+(defmethod construct :cexpr+coll [expr coll]
+  {:expr expr :pos 0 :flags coll})
 
 (defmethod construct :string [s]
-  {:expr (Expr. s) :pos 0 :vector-flag false})
+  {:expr (Expr. s) :pos 0})
 
 (defmethod construct :number [n]
   (let [typed-n (cond (instance? BigInteger n)         n
@@ -114,26 +105,26 @@
                       (instance? Float n)              (double n)
                       (instance? clojure.lang.Ratio n) (double n)
                       true (throw (Exception. (str "CExpr constructor does not know how to handle number of class " (class n)))))]
-    {:expr (Expr. typed-n) :pos 0 :vector-flag false}))
+    {:expr (Expr. typed-n) :pos 0}))
 
 (defmethod construct :coll [expression-coll]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putFunction loop "List" (count expression-coll))
     (dorun (for [expression expression-coll] (.put loop expression)))
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0 :vector-flag false}))
+    {:expr (.getExpr loop) :pos 0}))
 
 (defmethod construct :object [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.put loop obj)
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0 :vector-flag false}))
+    {:expr (.getExpr loop) :pos 0}))
 
 (defmethod construct :nil [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putSymbol loop "Null")
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0 :vector-flag false}))
+    {:expr (.getExpr loop) :pos 0}))
 
 (defn -init [& args] 
   [[] (apply construct args)])

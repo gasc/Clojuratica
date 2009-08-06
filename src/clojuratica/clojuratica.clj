@@ -52,11 +52,11 @@
   (fn [& args]
     (apply mmafn/mmafn (concat args retained-flags [evaluate]))))
 
-(defnf get-parser [[evaluate] _ retained-flags] []
-  (when-not (fn? evaluate)
-    (throw (Exception. "First non-flag argument to get-parser must be a Clojuratica evaluator.")))
+(defnf get-parser [[kernel-link] _ retained-flags] []
+  (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
+    (throw (Exception. "First non-flag argument to get-parser must be a KernelLink.")))
   (fn [& args]
-    (apply parser/parse (concat args retained-flags [evaluate]))))
+    (apply parser/parse (concat args retained-flags [kernel-link]))))
 
 (defn get-global-setter [evaluate]
   (when-not (fn? evaluate)

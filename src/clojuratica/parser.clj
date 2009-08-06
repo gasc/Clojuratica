@@ -7,34 +7,40 @@
          parse-to-lazy-seqs
          parse-to-vectors)
 
+(defnf parse-dispatch
+  "Dispatches to the appropriate method. Used by the following multimethods: express, send-read."
+  [args] []
+  (let [expression (first args)]
+    (cond (string? expression)                                  :string
+          (instance? com.wolfram.jlink.Expr expression)         :expr
+          (instance? CExpr expression)                          :cexpr
+          (nil? expression)                                     :nil
+          true  (throw
+                  (Exception. (str "Argument to parser must be string, Expr, CExpr, or nil."))))))
 ; Parse
 
-(defmulti parse
-  "Turns the first argument into a CExpr using the KernelLink instance provided in the
-  second argument. First argument can be a string, an Expr, or a CExpr. Second argument
-  is required only if the first argument is a string. Otherwise, second argument is optional."
-  common-dispatch)
+(defmulti parse parse-dispatch)
 
 (defmethodf parse :string
-  [[s evaluate] _ passthrough-flags] []
+  [[s kernel-link] _ passthrough-flags] []
   ; Takes a string and a KernelLink instance. Converts s to a CExpr using kernel-link, then parses the
   ; resulting CExpr into a Clojure object. Returns this Clojure object. For details on how CExprs
   ; are parsed see the documentation for the CExpr class.
-  (if (nil? evaluate)
-    (throw (Exception. "When first argument to parse is a string, second argument must be an evaluator.")))
-  (parse (express s (evaluate :get-kernel-link))))
+  (if-not (instance? com.wolfram.jlink.KernelLink kernel-link)
+    (throw (Exception. "When argument to parse is a string, the parser must have been created with a kernel-link argument.")))
+  (parse (express s kernel-link)))
 
 (defmethodf parse :expr
   [[expr] _ passthrough-flags] []
   (parse (express expr)))
 
 (defmethodf parse :cexpr
-  [[cexpr] flags] [[:vector :seq]]
+  [[cexpr _ mmafn] flags] [[:vector :seq] [:mmafn :no-mmafn]]
+  (if (and (flags :mmafn) (nil? mmafn))
+    (throw (Exception. "Cannot parse functions using mmafn unless parser was created with an mmafn argument.")))
   (cond (flags :vector)   (parse-to-vectors cexpr)
         (flags :seq)      (parse-to-lazy-seqs cexpr)
-        true              (if (.getVectorFlag cexpr)
-                            (parse-to-vectors cexpr)
-                            (parse-to-lazy-seqs cexpr)))) ;default
+        true              (parse-to-lazy-seqs cexpr)))
 
 (defmethod parse :nil [& args]
   nil)
@@ -55,9 +61,7 @@
       (parse-atom cexpr)
       (let [parse-recur (fn [expr]
                           (parse-to-lazy-seqs
-                            (CExpr. expr
-                                    0
-                                    (.getVectorFlag cexpr))))
+                            (CExpr. expr)))
             elements    (rest cexpr)]
         (map parse-recur elements)))))
 
@@ -68,9 +72,7 @@
            v        []
            stack    nil]
       (if-let [elements (seq elements)]
-        (let [first-cexpr (CExpr. (first elements)
-                                         0
-                                         (.getVectorFlag cexpr))]
+        (let [first-cexpr (CExpr. (first elements))]
           (if-not (.listQ (.getExpr first-cexpr))
             (recur (next elements) (conj v (parse-atom first-cexpr)) stack)
             (recur (rest first-cexpr) [] (conj stack [(next elements) v]))))

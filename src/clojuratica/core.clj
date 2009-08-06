@@ -42,16 +42,16 @@
 (declare string-to-expr build-set-expr add-head convert)
 
 (defnf common-dispatch
-  "Dispatches to the appropriate method. Used by the following multimethods: express, send-read, parser/parse."
+  "Dispatches to the appropriate method. Used by the following multimethods: express, send-read."
   [args] []
   (let [expression (first args)]
     (cond (string? expression)          :string
           (instance? Expr expression)   :expr
           (instance? CExpr expression)  :cexpr
-          (nil? expression)             :nil
+          ;(nil? expression)             :nil
           true  (throw
-                  (Exception. (str "Expression in common-dispatch must be "
-                                   "string, Expr, CExpr, or nil. Passed an object "
+                  (Exception. (str "First argument to express or send-read must be "
+                                   "string, Expr, or CExpr. You passed an object "
                                    "of class " (class expression)))))))
 
 (defmulti express common-dispatch)
@@ -70,9 +70,9 @@
   ; Takes a CExpr instance and an optional (unused) KernelLink instance. Simply returns cexpr.
   cexpr)
 
-(defmethod express :nil [& args]
-  ; Express returns nil if passed nil.
-  nil)
+;(defmethod express :nil [& args]
+;  ; Express returns nil if passed nil.
+;  nil)
 
 ; Send-read
 
@@ -108,9 +108,9 @@
   ; end of kernel-link. Returns a CExpr containing the output.
   (send-read (.getExpr cexpr) kernel-link))
 
-(defmethod send-read :nil [& args]
-  ; Send-read returns nil if passed nil.
-  nil)
+;(defmethod send-read :nil [& args]
+;  ; Send-read returns nil if passed nil.
+;  nil)
 
 (defn convert
   "Converts any Java object, including any Clojure data structure, to a CExpr. Sequential objects
@@ -148,7 +148,8 @@
                 [:parallel :serial]]
 
   (if-not (vector? (first args))
-    (throw (Exception. "First non-flag argument to Clojuratica evaluator must be a vector (possibly empty) of bindings.")))
+    (throw (Exception. (str "First non-flag argument to Clojuratica evaluator or module-builder"
+                            "must be a vector (possibly empty) of bindings."))))
   (let [set-specs      (first args)
         set-spec-seqs  (partition 2 set-specs)
         set-expr-seq   (for [set-spec-seq set-spec-seqs]

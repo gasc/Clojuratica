@@ -5,7 +5,7 @@
   (:import [clojuratica CExpr]
            [com.wolfram.jlink Expr]))
 
-(defnf dispatch
+(defnf mmafn-dispatch
   [args] []
   (let [assignments  (first args)
         expression   (second args)]
@@ -15,12 +15,11 @@
     (cond (string? expression)          :string
           (instance? Expr expression)   :expr
           (instance? CExpr expression)  :cexpr
-          (nil? expression)             :nil
-          true (throw (Exception. (str "Expression in mmafn must be "
-                                       "string, Expr, CExpr, or nil. Passed an object "
+          true (throw (Exception. (str "Second argument to mmafn must be "
+                                       "string, Expr, or CExpr. You passed an object "
                                        "of class " (class expression)))))))
 
-(defmulti mmafn dispatch)
+(defmulti mmafn mmafn-dispatch)
 
 (defmethodf mmafn :string
   [[assignments s evaluate] _ passthrough-flags] []
@@ -61,6 +60,3 @@
               assignments     (vec (concat assignments [name :undefined]))
               fn-call         (add-head name expressed-args)]
           (apply call assignments expr fn-call passthrough_flags))))))
-
-(defmethod mmafn :nil [& args]
-  nil)
