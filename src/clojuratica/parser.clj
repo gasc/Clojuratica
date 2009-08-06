@@ -28,19 +28,22 @@
   ; are parsed see the documentation for the CExpr class.
   (if-not (instance? com.wolfram.jlink.KernelLink kernel-link)
     (throw (Exception. "When argument to parse is a string, the parser must have been created with a kernel-link argument.")))
-  (parse (express s kernel-link)))
+  (apply parse (express s kernel-link) passthrough-flags))
 
 (defmethodf parse :expr
   [[expr] _ passthrough-flags] []
-  (parse (express expr)))
+  (apply parse (express expr) passthrough-flags))
 
-(defmethodf parse :cexpr
-  [[cexpr _ mmafn] flags] [[:vector :seq] [:mmafn :no-mmafn]]
+(defmethodfd parse :cexpr
+  [[cexpr _ mmafn] flags]
+  (concat (.getFlags cexpr) [:seq :no-mmafn])
+  [[:vector :seq] [:mmafn :no-mmafn]]
+
   (if (and (flags :mmafn) (nil? mmafn))
     (throw (Exception. "Cannot parse functions using mmafn unless parser was created with an mmafn argument.")))
-  (cond (flags :vector)   (parse-to-vectors cexpr)
-        (flags :seq)      (parse-to-lazy-seqs cexpr)
-        true              (parse-to-lazy-seqs cexpr)))
+  (if (flags :vector)
+    (parse-to-vectors cexpr)
+    (parse-to-lazy-seqs cexpr)))
 
 (defmethod parse :nil [& args]
   nil)

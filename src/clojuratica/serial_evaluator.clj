@@ -36,7 +36,8 @@
 
 (ns clojuratica.serial-evaluator
   (:use [clojuratica.core]
-        [clojuratica.lib]))
+        [clojuratica.lib])
+  (:import [clojuratica CExpr]))
 
 (declare evaluate)
 
@@ -57,8 +58,6 @@
         true
           (apply evaluate (concat args retained-flags [kernel-link]))))))
 
-(defnf evaluate [args flags] [[:vector :seq]]
+(defnf evaluate [args flags passthrough-flags] []
   (let [output (send-read (apply build-module args) (last args))]
-    (cond (flags :vector) (.vectorize output)
-          (flags :seq)    (.seqify output)
-          true            output)))
+    (CExpr. output passthrough-flags)))

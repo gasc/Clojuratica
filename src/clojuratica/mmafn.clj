@@ -25,12 +25,12 @@
   [[assignments s evaluate] _ passthrough-flags] []
   (let [kernel-link (evaluate :get-kernel-link)
         expr        (.getExpr (express s kernel-link))]
-    (apply mmafn (concat passthrough-flags (list assignments expr evaluate)))))
+    (apply mmafn assignments expr evaluate passthrough-flags)))
 
 (defmethodf mmafn :cexpr
   [[assignments cexpr evaluate] _ passthrough-flags] []
   (let [expr (.getExpr cexpr)]
-    (apply mmafn (concat passthrough-flags (list assignments expr evaluate)))))
+    (apply mmafn assignments expr evaluate passthrough-flags)))
 
 (defmethodf mmafn :expr
   [[assignments expr evaluate] flags passthrough_flags] [[:parse :no-parse]]

@@ -37,7 +37,8 @@
 (ns clojuratica.CExpr
   (:gen-class
    :methods [[getExpr          [] com.wolfram.jlink.Expr]
-             [getPos           [] Integer]]
+             [getPos           [] Integer]
+             [getFlags         [] clojure.lang.IPersistentCollection]]
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] []
@@ -83,16 +84,16 @@
 (defmulti construct constructor-dispatch)
 
 (defmethod construct :expr [expr]
-  {:expr expr :pos 0})
+  {:expr expr :pos 0 :flags '()})
 
 (defmethod construct :expr+integer [expr pos]
-  {:expr expr :pos pos})
+  {:expr expr :pos pos :flags '()})
 
-(defmethod construct :cexpr+coll [expr coll]
-  {:expr expr :pos 0 :flags coll})
+(defmethod construct :cexpr+coll [cexpr coll]
+  {:expr (.getExpr cexpr) :pos 0 :flags coll})
 
 (defmethod construct :string [s]
-  {:expr (Expr. s) :pos 0})
+  {:expr (Expr. s) :pos 0 :flags '()})
 
 (defmethod construct :number [n]
   (let [typed-n (cond (instance? BigInteger n)         n
@@ -105,26 +106,26 @@
                       (instance? Float n)              (double n)
                       (instance? clojure.lang.Ratio n) (double n)
                       true (throw (Exception. (str "CExpr constructor does not know how to handle number of class " (class n)))))]
-    {:expr (Expr. typed-n) :pos 0}))
+    {:expr (Expr. typed-n) :pos 0 :flags '()}))
 
 (defmethod construct :coll [expression-coll]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putFunction loop "List" (count expression-coll))
     (dorun (for [expression expression-coll] (.put loop expression)))
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0}))
+    {:expr (.getExpr loop) :pos 0 :flags '()}))
 
 (defmethod construct :object [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.put loop obj)
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0}))
+    {:expr (.getExpr loop) :pos 0 :flags '()}))
 
 (defmethod construct :nil [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putSymbol loop "Null")
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0}))
+    {:expr (.getExpr loop) :pos 0 :flags '()}))
 
 (defn -init [& args] 
   [[] (apply construct args)])

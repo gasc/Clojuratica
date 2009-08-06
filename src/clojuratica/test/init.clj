@@ -12,7 +12,7 @@
 
 (def evaluate (get-evaluator kernel-link))
  
-(def parse (get-parser evaluate))
+(def parse (get-parser kernel-link))
 
 (def math (comp parse evaluate))
 

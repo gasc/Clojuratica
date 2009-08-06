@@ -88,7 +88,7 @@
                                               waitloop-thread]))))))
 
 (defnf evaluate
-  [args flags passthrough-flags] [[:vector :seq]]
+  [args flags passthrough-flags] []
   (let [[kernel-link
          process-number
          process-queue
@@ -108,9 +108,7 @@
         (catch InterruptedException _
           (let [output (CExpr. (:output @(get @process-queue pid)))]
             (dosync (commute process-queue dissoc pid))
-            (cond (flags :vector) (.vectorize output)
-                  (flags :seq)    (.seqify output)
-                  true            output))))))
+            (CExpr. output passthrough-flags))))))
 
 (defn move-queue [kernel-link process-queue]
   (let [update-item     (fn [[pid process-data]]
