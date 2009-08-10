@@ -115,7 +115,7 @@
 (defmethod construct :coll [expression-coll]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putFunction loop "List" (count expression-coll))
-    (dorun (for [expression expression-coll] (.put loop expression)))
+    (dorun (for [expression expression-coll] (.put loop (.getExpr (clojuratica.CExpr. expression)))))
     (.endPacket loop)
     {:expr (.getExpr loop) :pos 0 :flags '()}))
 

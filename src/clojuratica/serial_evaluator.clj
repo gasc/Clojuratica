@@ -43,19 +43,18 @@
 
 (defnf get-evaluator [] []
   [_ retained-flags _]
-  [& retained-args]
-  (let [kernel-link (first retained-args)]
-    (when-not (instance? com.wolfram.jlink.KernelLink (first retained-args))
-      (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
-    ; This is the anonymous function returned from a call to get-evaluator
-    (fn [& args]
-      (cond
-        (some #{:get-kernel-link} args)
-          kernel-link
-        (some #{:parallel?} args)
-          false
-        true
-          (apply evaluate (concat args retained-flags [kernel-link]))))))
+  [kernel-link]
+  (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
+    (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
+  ; This is the anonymous function returned from a call to get-evaluator
+  (fn [& args]
+    (cond
+      (some #{:get-kernel-link} args)
+        kernel-link
+      (some #{:parallel?} args)
+        false
+      true
+        (apply evaluate (concat args retained-flags [kernel-link])))))
 
 (defnf evaluate [] []
   [flags passthrough-flags _]

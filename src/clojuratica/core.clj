@@ -119,7 +119,6 @@
   [obj]
   (CExpr. obj))
 
-
 (defn add-head
   "Creates an Expr with head argument as its head and with exprs as its arguments. exprs must be Expr
   instances."

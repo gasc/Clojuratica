@@ -44,10 +44,8 @@
 (defnf get-evaluator [] []
   "No valid flags; passthrough flags allowed"
   [_ retained-flags]
-  [& retained-args]
-
-  (let [kernel-link         (first retained-args)
-        poll-interval       (or (second retained-args) 5)
+  [kernel-link & [poll-interval]]
+  (let [poll-interval       (or poll-interval 5)
         soft-kill           (ref false)
         hard-kill           (ref false)
         process-number      (ref 0)
@@ -57,7 +55,7 @@
                                                       soft-kill
                                                       hard-kill
                                                       poll-interval)))]
-    (when-not (instance? com.wolfram.jlink.KernelLink (first retained-args))
+    (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
       (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
 
     (send-read "Needs[\"Parallel`Developer`\"]" kernel-link)
@@ -112,7 +110,8 @@
             (dosync (commute process-queue dissoc pid))
             (CExpr. output passthrough-flags))))))
 
-(defn move-queue [kernel-link process-queue]
+(defn move-queue
+  [kernel-link process-queue]
   (let [update-item     (fn [[pid process-data]]
                           (when-not (= :finished (:state @process-data))
                             (let [state-expr (.getExpr (send-read (add-head "ProcessState" (list pid)) kernel-link))
@@ -135,7 +134,8 @@
   (dorun (map update-item @process-queue))
   (dorun (map return-item-if-done @process-queue))))
 
-(defn waitloop [kernel-link process-queue soft-kill hard-kill poll-interval]
+(defn waitloop
+  [kernel-link process-queue soft-kill hard-kill poll-interval]
   (while (and (not @soft-kill) (not @hard-kill))
     (try
       ;(println "Waitloop going to sleep...")

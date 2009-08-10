@@ -1,3 +1,6 @@
+(ns clojuratica.clojuratica)
+(declare get-mmafn get-parser)
+
 (ns clojuratica.mmafn
   (:use [clojuratica.core]
         [clojuratica.clojuratica]
@@ -25,25 +28,27 @@
 
 (defmethodf mmafn :string [] []
   [_ passthrough-flags]
-  [assignments s kernel-link evaluate]
-  (let [expr (.getExpr (express s kernel-link))]
-    (apply mmafn assignments expr kernel-link evaluate passthrough-flags)))
+  [assignments s evaluate]
+  (let [kernel-link (evaluate :get-kernel-link)
+        expr        (.getExpr (express s kernel-link))]
+    (apply mmafn assignments expr evaluate passthrough-flags)))
 
 (defmethodf mmafn :cexpr [] []
   [_ passthrough-flags]
-  [assignments cexpr kernel-link evaluate]
+  [assignments cexpr evaluate]
   (let [expr (.getExpr cexpr)]
-    (apply mmafn assignments expr kernel-link evaluate passthrough-flags)))
+    (apply mmafn assignments expr evaluate passthrough-flags)))
 
-(defmethodf mmafn :expr [[:parse :no-parse]] [:no-parse]
+(defmethodf mmafn :expr [[:parse :no-parse]] [:parse]
   [flags passthrough-flags]
-  [assignments expr kernel-link evaluate]
-  (let [head     (.toString (.part expr 0))
-        parse    (if (flags :parse)
-                   (get-parser kernel-link
-                               (apply get-mmafn kernel-link evaluate flags))
-                   identity)
-        math     (comp parse evaluate)]
+  [assignments expr evaluate]
+  (let [head        (.toString (.part expr 0))
+        kernel-link (evaluate :get-kernel-link)
+        mmafn       (apply get-mmafn evaluate flags)
+        parse       (if (flags :parse)
+                      (get-parser kernel-link mmafn)
+                      identity)
+        math        (comp parse evaluate)]
     (if-not (or (= "Set"        head)
                 (= "SetDelayed" head)
                 (= "Function"   head)
