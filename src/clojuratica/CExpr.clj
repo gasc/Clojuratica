@@ -36,8 +36,7 @@
 
 (ns clojuratica.CExpr
   (:gen-class
-   :methods [[getExpr          [] com.wolfram.jlink.Expr]
-             [getPos           [] Integer]]
+   :methods [[getExpr [] com.wolfram.jlink.Expr]]
    :extends clojure.lang.ASeq
    :implements [clojuratica.Flaggable]
    :init init
@@ -49,21 +48,13 @@
   (:require [clojuratica.lib :as lib]))
 
 (defn -first [this]
-  (.. this getExpr (part (int-array (list (.getPos this))))))
+  (.head (:expr (.state this))))
 
 (defn -next [this]
-  (let [expr   (.getExpr this)
-        pos    (.getPos this)
-        length (.length expr)]
-    (if-not (== length pos)
-      (clojuratica.CExpr. expr
-                          (inc pos)))))
+  (seq (.args (:expr (.state this)))))
 
 (defn -getExpr [this]
   (:expr (.state this)))
-
-(defn -getPos [this]
-  (:pos (.state this)))
 
 (defn -getFlags [this]
   (:flags (.state this)))
@@ -85,19 +76,27 @@
 (defmulti construct constructor-dispatch)
 
 (defmethod construct :expr [expr]
-  {:expr expr :pos 0 :flags '()})
+  {:expr expr
+   :flags '()})
 
 (defmethod construct :expr+integer [expr pos]
-  {:expr expr :pos pos :flags '()})
+  {:expr expr
+   :flags '()})
 
 (defmethod construct :cexpr [cexpr]
-  {:expr (.getExpr cexpr) :pos 0 :flags (.getFlags cexpr)})
+  (let [expr (.getExpr cexpr)]
+    {:expr expr
+     :flags (.getFlags cexpr)}))
 
 (defmethod construct :cexpr+coll [cexpr coll]
-  {:expr (.getExpr cexpr) :pos 0 :flags (concat coll (.getFlags cexpr))})
+  (let [expr (.getExpr cexpr)]
+    {:expr expr
+     :flags (concat coll (.getFlags cexpr))}))
 
 (defmethod construct :string [s]
-  {:expr (Expr. s) :pos 0 :flags '()})
+  (let [expr (Expr. s)]
+    {:expr expr
+     :flags '()}))
 
 (defmethod construct :number [n]
   (let [typed-n (cond (instance? BigInteger n)         n
@@ -109,27 +108,35 @@
                       (instance? Double n)             n
                       (instance? Float n)              (double n)
                       (instance? clojure.lang.Ratio n) (double n)
-                      true (throw (Exception. (str "CExpr constructor does not know how to handle number of class " (class n)))))]
-    {:expr (Expr. typed-n) :pos 0 :flags '()}))
+                      true (throw (Exception. (str "CExpr constructor does not know how to handle number of class " (class n)))))
+        expr          (Expr. typed-n)]
+    {:expr expr
+     :flags '()}))
 
 (defmethod construct :coll [expression-coll]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putFunction loop "List" (count expression-coll))
     (dorun (for [expression expression-coll] (.put loop (.getExpr (clojuratica.CExpr. expression)))))
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0 :flags '()}))
+    (let [expr (.getExpr loop)]
+      {:expr expr
+       :flags '()})))
 
 (defmethod construct :object [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.put loop obj)
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0 :flags '()}))
+    (let [expr (.getExpr loop)]
+      {:expr expr
+       :flags '()})))
 
 (defmethod construct :nil [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putSymbol loop "Null")
     (.endPacket loop)
-    {:expr (.getExpr loop) :pos 0 :flags '()}))
+    (let [expr (.getExpr loop)]
+      {:expr expr
+       :flags '()})))
 
-(defn -init [& args] 
+(defn -init [& args]
   [[] (apply construct args)])

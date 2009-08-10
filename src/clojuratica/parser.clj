@@ -1,3 +1,39 @@
+; ***** BEGIN LICENSE BLOCK *****
+; Version: MPL 1.1/GPL 2.0/LGPL 2.1
+;
+; The contents of this file are subject to the Mozilla Public License Version
+; 1.1 (the "License"); you may not use this file except in compliance with
+; the License. You may obtain a copy of the License at
+; http://www.mozilla.org/MPL/
+;
+; Software distributed under the License is distributed on an "AS IS" basis,
+; WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+; for the specific language governing rights and limitations under the
+; License.
+;
+; The Original Code is the Clojure-Mathematica interface library Clojuratica.
+;
+; The Initial Developer of the Original Code is Garth Sheldon-Coulson.
+; Portions created by the Initial Developer are Copyright (C) 2009
+; the Initial Developer. All Rights Reserved.
+;
+; Contributor(s):
+;
+; Alternatively, the contents of this file may be used under the terms of
+; either the GNU General Public License Version 2 or later (the "GPL"), or
+; the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+; in which case the provisions of the GPL or the LGPL are applicable instead
+; of those above. If you wish to allow use of your version of this file only
+; under the terms of either the GPL or the LGPL, and not to allow others to
+; use your version of this file under the terms of the MPL, indicate your
+; decision by deleting the provisions above and replace them with the notice
+; and other provisions required by the GPL or the LGPL. If you do not delete
+; the provisions above, a recipient may use your version of this file under
+; the terms of any one of the MPL, the GPL or the LGPL.
+;
+; ***** END LICENSE BLOCK *****
+
+
 (ns clojuratica.parser
   (:import [clojuratica CExpr])
   (:use [clojuratica.lib]
@@ -11,7 +47,6 @@
   "Dispatches to the appropriate method. Used by the following multimethods: express, send-read."
   []
   [& args]
-
   (let [expression (first args)]
     (cond (string? expression)                                  :string
           (instance? com.wolfram.jlink.Expr expression)         :expr
@@ -38,8 +73,9 @@
   [expr & [_ mmafn]]
   (apply parse (express expr) nil mmafn passthrough-flags))
 
-(defmethodfa parse :cexpr [[:vectors :seqs]
-                           [:mmafn :no-mmafn]] [:seqs]
+(defmethodf parse :cexpr [[:vectors :seqs]
+                          [:mmafn :no-mmafn]]
+                         (concat (.getFlags cexpr) [:seqs])
   [flags]
   [cexpr & [_ mmafn]]
   (if (and (flags :mmafn) (nil? mmafn))
@@ -64,25 +100,27 @@
           true                                    expr)))
 
 (defn parse-to-lazy-seqs [cexpr mmafn]
-  (let [expr (.getExpr cexpr)]
-    (if-not (.listQ expr)
-      (parse-atom cexpr mmafn)
-      (let [parse-recur (fn [expr]
-                          (parse-to-lazy-seqs (CExpr. expr) mmafn))
-            elements    (rest cexpr)]
-        (map parse-recur elements)))))
+  (if-not (.listQ (.getExpr cexpr))
+    (parse-atom cexpr mmafn)
+    (let [parse-list-elements
+            (fn parse-list-elements [s]
+               (when (seq s)
+                 (lazy-seq
+                   (cons (parse-to-lazy-seqs (CExpr. (first s)) mmafn)
+                         (parse-list-elements (rest s))))))]
+      (parse-list-elements (rest cexpr)))))
 
 (defn parse-to-vectors [cexpr mmafn]  ; logic courtesy of Meikel Brandmeyer
   (if-not (.listQ (.getExpr cexpr))
     (parse-atom cexpr mmafn)
-    (loop [elements (rest cexpr)
+    (loop [elements (next cexpr)
            v        []
            stack    nil]
       (if-let [elements (seq elements)]
         (let [first-cexpr (CExpr. (first elements))]
           (if-not (.listQ (.getExpr first-cexpr))
             (recur (next elements) (conj v (parse-atom first-cexpr mmafn)) stack)
-            (recur (rest first-cexpr) [] (conj stack [(next elements) v]))))
+            (recur (next first-cexpr) [] (conj stack [(next elements) v]))))
         (if (seq stack)
           (let [[elements prior-v] (peek stack)]
             (recur elements (conj prior-v v) (pop stack)))

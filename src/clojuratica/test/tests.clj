@@ -53,7 +53,7 @@
   (assert (= 2 (increment-me 1)))
 
   (def fn-generating-fn (mmafn [] "Function[{x}, Table[Function[{y}, y+1], {x}]]" :vectors))
-  (def fn-list (fn-generating-fn 10))
+  (def fn-vector (fn-generating-fn 10))
   (assert (= 10 (count fn-vector)))
   (assert (= 0 ((fn-vector 4) -1)))
 

@@ -131,7 +131,8 @@
     (.getExpr loop)))
 
 (defnf build-module [[:all-output :last-output]
-                     [:parallel :serial]]         []
+                     [:parallel :serial]]
+                    []
   "Creates an Expr containing a Mathematica module. The syntax of build-module is similar to that
   of Clojure's let. The Mathematica module created will have local (lexically scoped) variables
   as specified in the first argument to build-module, which must be a vector of pairs, as in
