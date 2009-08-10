@@ -11,20 +11,13 @@
 (.discardAnswer kernel-link)
 
 (def evaluate (get-evaluator kernel-link))
- 
 (def parse (get-parser kernel-link))
-
 (def math (comp parse evaluate))
-
 (def global-set (get-global-setter evaluate))
-
 (def pevaluate (get-evaluator kernel-link :parallel))
-
 (def pmath (comp parse pevaluate))
-
-(def mmafn (get-mmafn evaluate))
-
+(def mmafn (get-mmafn kernel-link math))
 (require '[clojuratica.core :as core] '[clojuratica.low-level :as low-level])
 
-(def foo (mmafn ["foob" -6] "Foo=Function[{x},x]" :parse))
+(def foo (mmafn ["foob" -6] "Foo=Function[{x},x]"))
 

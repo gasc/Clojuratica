@@ -37,9 +37,9 @@
 (ns clojuratica.CExpr
   (:gen-class
    :methods [[getExpr          [] com.wolfram.jlink.Expr]
-             [getPos           [] Integer]
-             [getFlags         [] clojure.lang.IPersistentCollection]]
+             [getPos           [] Integer]]
    :extends clojure.lang.ASeq
+   :implements [clojuratica.Flaggable]
    :init init
    :constructors {[Object] []
                   [Object Integer] []
@@ -72,6 +72,7 @@
   (letfn [(class-match? [classes] (lib/instances? classes args))]
     (cond (class-match? [Expr])                                     :expr
           (class-match? [Expr Integer])                             :expr+integer
+          (class-match? [clojuratica.CExpr])                        :cexpr
           (class-match? [clojuratica.CExpr
                          clojure.lang.IPersistentCollection])       :cexpr+coll
           (class-match? [String])                                   :string
@@ -89,8 +90,11 @@
 (defmethod construct :expr+integer [expr pos]
   {:expr expr :pos pos :flags '()})
 
+(defmethod construct :cexpr [cexpr]
+  {:expr (.getExpr cexpr) :pos 0 :flags (.getFlags cexpr)})
+
 (defmethod construct :cexpr+coll [cexpr coll]
-  {:expr (.getExpr cexpr) :pos 0 :flags coll})
+  {:expr (.getExpr cexpr) :pos 0 :flags (concat coll (.getFlags cexpr))})
 
 (defmethod construct :string [s]
   {:expr (Expr. s) :pos 0 :flags '()})

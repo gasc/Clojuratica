@@ -1,12 +1,14 @@
 (ns clojuratica.mmafn
   (:use [clojuratica.core]
+        [clojuratica.clojuratica]
         [clojuratica.parser]
         [clojuratica.lib])
   (:import [clojuratica CExpr]
            [com.wolfram.jlink Expr]))
 
-(defnf mmafn-dispatch
-  [args] []
+(defnf mmafn-dispatch [] []
+  []
+  [& args]
   (let [assignments  (first args)
         expression   (second args)]
     (if-not (vector? assignments)
@@ -21,21 +23,27 @@
 
 (defmulti mmafn mmafn-dispatch)
 
-(defmethodf mmafn :string
-  [[assignments s evaluate] _ passthrough-flags] []
-  (let [kernel-link (evaluate :get-kernel-link)
-        expr        (.getExpr (express s kernel-link))]
-    (apply mmafn assignments expr evaluate passthrough-flags)))
+(defmethodf mmafn :string [] []
+  [_ passthrough-flags]
+  [assignments s kernel-link evaluate]
+  (let [expr (.getExpr (express s kernel-link))]
+    (apply mmafn assignments expr kernel-link evaluate passthrough-flags)))
 
-(defmethodf mmafn :cexpr
-  [[assignments cexpr evaluate] _ passthrough-flags] []
+(defmethodf mmafn :cexpr [] []
+  [_ passthrough-flags]
+  [assignments cexpr kernel-link evaluate]
   (let [expr (.getExpr cexpr)]
-    (apply mmafn assignments expr evaluate passthrough-flags)))
+    (apply mmafn assignments expr kernel-link evaluate passthrough-flags)))
 
-(defmethodf mmafn :expr
-  [[assignments expr evaluate] flags passthrough_flags] [[:parse :no-parse]]
-  (let [call (if (flags :parse) (comp parse evaluate) evaluate)
-        head (.toString (.part expr 0))]
+(defmethodf mmafn :expr [[:parse :no-parse]] [:no-parse]
+  [flags passthrough-flags]
+  [assignments expr kernel-link evaluate]
+  (let [head     (.toString (.part expr 0))
+        parse    (if (flags :parse)
+                   (get-parser kernel-link
+                               (apply get-mmafn kernel-link evaluate flags))
+                   identity)
+        math     (comp parse evaluate)]
     (if-not (or (= "Set"        head)
                 (= "SetDelayed" head)
                 (= "Function"   head)
@@ -50,7 +58,7 @@
         (let [expressed-args     (map (fn [x] (.getExpr (convert x))) args)
               expressed-arg-list (add-head "List" expressed-args)
               fn-call            (add-head "Apply" [expr expressed-arg-list])]
-          (apply call assignments fn-call passthrough_flags)))
+          (apply math assignments fn-call passthrough-flags)))
       (fn [& args]
         (let [lhs             (.part expr 1)
               expressed-args  (map (fn [x] (.getExpr (convert x))) args)
@@ -59,4 +67,4 @@
                                 (.toString (.head lhs)))
               assignments     (vec (concat assignments [name :undefined]))
               fn-call         (add-head name expressed-args)]
-          (apply call assignments expr fn-call passthrough_flags))))))
+          (apply math assignments expr fn-call passthrough-flags))))))

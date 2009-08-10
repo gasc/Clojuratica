@@ -41,9 +41,10 @@
 
 (declare string-to-expr build-set-expr add-head convert)
 
-(defnf common-dispatch
+(defnf common-dispatch [] []
   "Dispatches to the appropriate method. Used by the following multimethods: express, send-read."
-  [args] []
+  []
+  [& args]
   (let [expression (first args)]
     (cond (string? expression)          :string
           (instance? Expr expression)   :expr
@@ -130,7 +131,8 @@
     (.endPacket loop)
     (.getExpr loop)))
 
-(defnf build-module
+(defnf build-module [[:all-output :last-output]
+                     [:parallel :serial]]         []
   "Creates an Expr containing a Mathematica module. The syntax of build-module is similar to that
   of Clojure's let. The Mathematica module created will have local (lexically scoped) variables
   as specified in the first argument to build-module, which must be a vector of pairs, as in
@@ -144,8 +146,8 @@
   :all-output - Packages expressions in a list, such that the output of each expression is returned.
   :last-output - Default. Packages expressions in a CompoundExpression[], such that the output
                  of only the last expression is returned. Opposite of all-output."
-  [args flags] [[:all-output :last-output]
-                [:parallel :serial]]
+  [flags]
+  [& args]
 
   (if-not (vector? (first args))
     (throw (Exception. (str "First non-flag argument to Clojuratica evaluator or module-builder"

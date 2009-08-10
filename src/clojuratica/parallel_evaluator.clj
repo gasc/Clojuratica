@@ -41,9 +41,10 @@
 
 (declare waitloop evaluate)
 
-(defnf get-evaluator
+(defnf get-evaluator [] []
   "No valid flags; passthrough flags allowed"
-  [retained-args _ retained-flags] []
+  [_ retained-flags]
+  [& retained-args]
 
   (let [kernel-link         (first retained-args)
         poll-interval       (or (second retained-args) 5)
@@ -87,8 +88,9 @@
                                               process-queue
                                               waitloop-thread]))))))
 
-(defnf evaluate
-  [args flags passthrough-flags] []
+(defnf evaluate [] []
+  [flags passthrough-flags]
+  [& args]
   (let [[kernel-link
          process-number
          process-queue

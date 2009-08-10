@@ -41,22 +41,30 @@
             [clojuratica.global-setter      :as global-setter])
   (:use [clojuratica.lib]))
 
-(defnf get-evaluator [_ flags _ passthrough] [[:parallel :serial]]
+(defnf get-evaluator [[:parallel :serial]] []
+  [flags _ passthrough]
+  [& _]
   (if (flags :parallel)
     (apply parallel-evaluator/get-evaluator passthrough)
     (apply serial-evaluator/get-evaluator passthrough)))
 
-(defnf get-mmafn [[evaluate] _ retained-flags] []
+(defnf get-mmafn [] []
+  [_ retained-flags]
+  [kernel-link evaluate]
+  (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
+    (throw (Exception. "First non-flag argument to get-mmafn must be a KernelLink.")))
   (when-not (fn? evaluate)
-    (throw (Exception. "First non-flag argument to get-mmafn must be a Clojuratica evaluator.")))
+    (throw (Exception. "Second non-flag argument to get-mmafn must be a Clojuratica evaluator.")))
   (fn [& args]
-    (apply mmafn/mmafn (concat args retained-flags [evaluate]))))
+    (apply mmafn/mmafn (concat args retained-flags [kernel-link evaluate]))))
 
-(defnf get-parser [[kernel-link] _ retained-flags] []
+(defnf get-parser [] []
+  [_ retained-flags]
+  [kernel-link & [mmafn]]
   (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
     (throw (Exception. "First non-flag argument to get-parser must be a KernelLink.")))
   (fn [& args]
-    (apply parser/parse (concat args retained-flags [kernel-link]))))
+    (apply parser/parse (concat args retained-flags [kernel-link mmafn]))))
 
 (defn get-global-setter [evaluate]
   (when-not (fn? evaluate)

@@ -41,13 +41,12 @@
 
 (declare evaluate)
 
-(defnf get-evaluator
-  "No valid flags; passthrough flags allowed"
-  [retained-args _ retained-flags] []
+(defnf get-evaluator [] []
+  [_ retained-flags _]
+  [& retained-args]
   (let [kernel-link (first retained-args)]
     (when-not (instance? com.wolfram.jlink.KernelLink (first retained-args))
       (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
-
     ; This is the anonymous function returned from a call to get-evaluator
     (fn [& args]
       (cond
@@ -58,6 +57,8 @@
         true
           (apply evaluate (concat args retained-flags [kernel-link]))))))
 
-(defnf evaluate [args flags passthrough-flags] []
+(defnf evaluate [] []
+  [flags passthrough-flags _]
+  [& args]
   (let [output (send-read (apply build-module args) (last args))]
     (CExpr. output passthrough-flags)))

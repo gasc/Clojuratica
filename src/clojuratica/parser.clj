@@ -7,9 +7,11 @@
          parse-to-lazy-seqs
          parse-to-vectors)
 
-(defnf parse-dispatch
+(defnf parse-dispatch [] []
   "Dispatches to the appropriate method. Used by the following multimethods: express, send-read."
-  [args] []
+  []
+  [& args]
+
   (let [expression (first args)]
     (cond (string? expression)                                  :string
           (instance? com.wolfram.jlink.Expr expression)         :expr
@@ -21,63 +23,65 @@
 
 (defmulti parse parse-dispatch)
 
-(defmethodf parse :string
-  [[s kernel-link] _ passthrough-flags] []
+(defmethodf parse :string [] []
+  [_ passthrough-flags]
+  [s kernel-link & [mmafn]]
   ; Takes a string and a KernelLink instance. Converts s to a CExpr using kernel-link, then parses the
   ; resulting CExpr into a Clojure object. Returns this Clojure object. For details on how CExprs
   ; are parsed see the documentation for the CExpr class.
   (if-not (instance? com.wolfram.jlink.KernelLink kernel-link)
     (throw (Exception. "When argument to parse is a string, the parser must have been created with a kernel-link argument.")))
-  (apply parse (express s kernel-link) passthrough-flags))
+  (apply parse (express s kernel-link) kernel-link mmafn passthrough-flags))
 
-(defmethodf parse :expr
-  [[expr] _ passthrough-flags] []
-  (apply parse (express expr) passthrough-flags))
+(defmethodf parse :expr [] []
+  [_ passthrough-flags]
+  [expr & [_ mmafn]]
+  (apply parse (express expr) nil mmafn passthrough-flags))
 
-(defmethodfd parse :cexpr
-  [[cexpr _ mmafn] flags]
-  (concat (.getFlags cexpr) [:seq :no-mmafn])
-  [[:vector :seq] [:mmafn :no-mmafn]]
-
+(defmethodfa parse :cexpr [[:vectors :seqs]
+                           [:mmafn :no-mmafn]] [:seqs]
+  [flags]
+  [cexpr & [_ mmafn]]
   (if (and (flags :mmafn) (nil? mmafn))
     (throw (Exception. "Cannot parse functions using mmafn unless parser was created with an mmafn argument.")))
-  (if (flags :vector)
-    (parse-to-vectors cexpr)
-    (parse-to-lazy-seqs cexpr)))
+  (let [mmafn (if (flags :no-mmafn) nil mmafn)]
+    (if (flags :vectors)
+      (parse-to-vectors cexpr mmafn)
+      (parse-to-lazy-seqs cexpr mmafn))))
 
 (defmethod parse :nil [& args]
   nil)
 
-(defn parse-atom [cexpr]
+(defn parse-atom [cexpr mmafn]
   (let [expr (.getExpr cexpr)]
-    (cond (.bigIntegerQ expr)            (.asBigInteger expr)
-          (.bigDecimalQ expr)            (.asBigDecimal expr)
-          (.integerQ expr)               (.asLong expr)
-          (.realQ expr)                  (.asDouble expr)
-          (.stringQ expr)                (.asString expr)
-          (= "Null" (.toString expr))    nil
-          true                           expr)))
+    (cond (.bigIntegerQ expr)                     (.asBigInteger expr)
+          (.bigDecimalQ expr)                     (.asBigDecimal expr)
+          (.integerQ expr)                        (.asLong expr)
+          (.realQ expr)                           (.asDouble expr)
+          (.stringQ expr)                         (.asString expr)
+          (= "Null" (.toString expr))             nil
+          (= "Function" (.toString (.head expr))) (if mmafn (mmafn [] expr) expr)
+          true                                    expr)))
 
-(defn parse-to-lazy-seqs [cexpr]
+(defn parse-to-lazy-seqs [cexpr mmafn]
   (let [expr (.getExpr cexpr)]
     (if-not (.listQ expr)
-      (parse-atom cexpr)
+      (parse-atom cexpr mmafn)
       (let [parse-recur (fn [expr]
-                          (parse-to-lazy-seqs
-                            (CExpr. expr)))
+                          (parse-to-lazy-seqs (CExpr. expr) mmafn))
             elements    (rest cexpr)]
         (map parse-recur elements)))))
 
-(defn parse-to-vectors [cexpr]  ; logic courtesy of Meikel Brandmeyer
+(defn parse-to-vectors [cexpr mmafn]  ; logic courtesy of Meikel Brandmeyer
   (if-not (.listQ (.getExpr cexpr))
-    (parse-atom cexpr)
+    (parse-atom cexpr mmafn)
     (loop [elements (rest cexpr)
            v        []
            stack    nil]
       (if-let [elements (seq elements)]
         (let [first-cexpr (CExpr. (first elements))]
           (if-not (.listQ (.getExpr first-cexpr))
-            (recur (next elements) (conj v (parse-atom first-cexpr)) stack)
+            (recur (next elements) (conj v (parse-atom first-cexpr mmafn)) stack)
             (recur (rest first-cexpr) [] (conj stack [(next elements) v]))))
         (if (seq stack)
           (let [[elements prior-v] (peek stack)]
