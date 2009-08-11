@@ -40,8 +40,8 @@
    :extends clojure.lang.ASeq
    :implements [clojuratica.Flaggable]
    :init init
-   :constructors {[Object] []
-                  [Object Integer] []
+   :constructors {[Object] [],
+                  [Object Integer] [],
                   [Object clojure.lang.IPersistentCollection] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])

@@ -140,24 +140,24 @@ Options[ClojureEvaluate] = {AllOutput -> False};
 ClojureParse[obj_] := 
 	With[{},
 		InstallJava[];
-		LoadJavaClass["clojuratica.CLink"];
-		obj // CLink`parse];
+		InstallCLink[];
+		Clojuratica`Private`clink@parse[obj]];
 
 
 (* Parse a Clojure data structure into a Mathematica expr *)
 ClojureParse[{objs__}] := 
 	With[{},
 		InstallJava[];
-		LoadJavaClass["clojuratica.CLink"];
-		Map[CLink`parse, {objs}]];
+		InstallCLink[];
+		Map[Clojuratica`Private`clink@parse, {objs}]];
 
 
 (* Convert a Mathematica expr into a Clojure data structure *)
 ClojureConvert[expr_] := 
 	With[{},
 		InstallJava[];
-		LoadJavaClass["clojuratica.CLink"];
-		expr // MakeJavaExpr // CLink`convert // ReturnAsJavaObject];
+		InstallCLink[];
+		Clojuratica`Private`clink@convert[expr // MakeJavaExpr] // ReturnAsJavaObject];
 
 
 ClojureSetGlobal::usage = 
@@ -173,6 +173,17 @@ ClojureSetGlobal[var_String, value_] :=
 											 (parse (evaluate [] varname))))"},
 		Clojuratica`Private`globalTransferer = value;
 		SendRead["(def " <> var <> " (" <> clojureFn <> " \"Clojuratica`Private`globalTransferer\"))"]];
+
+
+InstallCLink[] :=
+	With[{},
+		If[Not[JavaObjectQ[Clojuratica`Private`clink]],
+			Clojuratica`Private`clink = JavaNew["clojuratica.CLink"];]];
+
+
+ReinstallCLink[] :=
+	With[{},
+		Clojuratica`Private`clink = JavaNew["clojuratica.CLink"];];
 
 
 InstallClojure[] :=
