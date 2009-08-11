@@ -35,23 +35,21 @@
 
 (ns clojuratica.CLink
     (:gen-class
-     :methods [                 [convert [com.wolfram.jlink.Expr] Object]
-                                [parse [Object] com.wolfram.jlink.Expr]
+     :methods [#^{:static true} [convert [com.wolfram.jlink.Expr] Object]
+               #^{:static true} [parse [Object] com.wolfram.jlink.Expr]
                #^{:static true} [mirrorClasspath [] Object]]
-     :state state
-     :init init
-     :constructors {[] []})
-    (:import [com.wolfram.jlink StdLink Expr MathLinkFactory]
+     :state state)
+    (:import [com.wolfram.jlink StdLink Expr]
              [clojure.lang.*]
              [java.io StringReader])
     (:use [clojuratica.clojuratica]
           [clojuratica.low-level]))
 
-(defn -convert [this expr]
-  (let [parse (:parse (.state this))]
+(defn -convert [expr]
+  (let [parse (get-parser (StdLink/getLink))]
     (parse expr)))
 
-(defn -parse [this obj]
+(defn -parse [obj]
   (.getExpr (convert obj)))
 
 (defn -mirrorClasspath []
@@ -62,12 +60,3 @@
     (doseq [url m-url-classpath]
       (when-not (some #{url} c-classpath)
         (add-classpath url)))))
-
-(defn -init []
-  (let [kernel-link (StdLink/getLink)]
-    ;(.discardAnswer kernel-link)
-    (let [;parallel (if false :parallel :serial)
-          evaluate (get-evaluator kernel-link)
-          mmafn (if true (get-mmafn evaluate) nil)
-          parse (get-parser kernel-link mmafn)]
-      [[] {:evaluate evaluate :mmafn mmafn :parse parse}])))
