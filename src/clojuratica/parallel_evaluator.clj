@@ -142,7 +142,7 @@
                                        (not (:returned @process-data)))
                               (let [new-process-data (conj @process-data {:returned true})]
                                 (dosync (alter process-data conj new-process-data)))
-                              (send-read (add-head "ClearAll" (list pid)) kernel-link)
+                              (send-read (add-head "Remove" (list pid)) kernel-link)
                               (.interrupt (:thread @process-data)))
                             [pid process-data])
       update+return       (comp return-if-finished update-state)]
