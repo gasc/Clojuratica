@@ -60,7 +60,7 @@
 
 (defmethodf parse :string [] []
   [_ passthrough-flags]
-  [s kernel-link & [mmafn]]
+  [s & [kernel-link mmafn]]
   ; Takes a string and a KernelLink instance. Converts s to a CExpr using kernel-link, then parses the
   ; resulting CExpr into a Clojure object. Returns this Clojure object. For details on how CExprs
   ; are parsed see the documentation for the CExpr class.
@@ -96,8 +96,8 @@
           (.realQ expr)                           (.asDouble expr)
           (.stringQ expr)                         (.asString expr)
           (= "Null" (.toString expr))             nil
-          (= "Function" (.toString (.head expr))) (if mmafn (mmafn [] expr) expr)
-          true                                    expr)))
+          (= "Function" (.toString (.head expr))) (if mmafn (mmafn [] expr) cexpr)
+          true                                    cexpr)))
 
 (defn parse-to-lazy-seqs [cexpr mmafn]
   (if-not (.listQ (.getExpr cexpr))

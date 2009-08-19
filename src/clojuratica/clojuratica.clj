@@ -58,9 +58,7 @@
 
 (defnf get-parser [] []
   [_ retained-flags]
-  [kernel-link & [mmafn]]
-  (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
-    (throw (Exception. "First non-flag argument to get-parser must be a KernelLink.")))
+  [& [kernel-link mmafn]]
   (fn [& args]
     (apply parser/parse (concat args retained-flags [kernel-link mmafn]))))
 

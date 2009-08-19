@@ -1,0 +1,851 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 7.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     31533,        842]
+NotebookOptionsPosition[     27831,        709]
+NotebookOutlinePosition[     28349,        731]
+CellTagsIndexPosition[     28264,        726]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{"ReinstallJava", "[", "]"}]], "Input",
+ CellChangeTimes->{{3.4589359771470003`*^9, 3.458935980027*^9}}],
+
+Cell[BoxData[
+ RowBox[{"LinkObject", "[", 
+  RowBox[{"\<\"\\\"C:\\\\Program Files\\\\Wolfram \
+Research\\\\Mathematica\\\\7.0\\\\SystemFiles\\\\Java\\\\Windows\\\\bin\\\\\
+javaw\\\" -classpath \\\"C:\\\\Program Files\\\\Wolfram \
+Research\\\\Mathematica\\\\7.0\\\\SystemFiles\\\\Links\\\\JLink\\\\JLink.jar\\\
+\" -Xmx256m  \
+-Djava.system.class.loader=com.wolfram.jlink.JLinkSystemClassLoader \
+com.wolfram.jlink.Install -init \
+\\\"C:\\\\Users\\\\Garth\\\\AppData\\\\Local\\\\Temp\\\\m727.tmp\\\"\"\>", 
+   ",", "1699", ",", "4"}], "]"}]], "Output",
+ CellChangeTimes->{
+  3.458935987743*^9, 3.458936061594*^9, 3.4589363193719997`*^9, 
+   3.458936369477*^9, 3.458936521717*^9, 3.45894059867*^9, 3.45894081054*^9, 
+   3.458940907151*^9, 3.458941224057*^9, 3.45894158017*^9, 3.45894173327*^9, 
+   3.4589418853129997`*^9, 3.458942312495*^9, 3.458942495645*^9, 
+   3.458942734646*^9, 3.458948700951*^9, 3.4589524352390003`*^9, 
+   3.459084723861*^9, 3.45908823974*^9, 3.4590887646879997`*^9, 
+   3.459089005903*^9, 3.459089157691*^9, 3.4590892884119997`*^9, 
+   3.459089350514*^9, 3.459089558983*^9, 3.459089928572*^9, 3.459090043151*^9,
+    3.459092216678*^9, {3.459092294296*^9, 3.4590923008190002`*^9}, 
+   3.459092417054*^9, 3.45909247341*^9, 3.459092600998*^9, 
+   3.4590927517530003`*^9, 3.4590930108640003`*^9, {3.4590940965769997`*^9, 
+   3.459094100591*^9}, {3.4590951358599997`*^9, 3.459095140398*^9}, 
+   3.4590985439230003`*^9, 3.4590990017860003`*^9, 3.4590994261210003`*^9, 
+   3.4590995790290003`*^9, 3.459100093211*^9, 3.459100175788*^9, 
+   3.459106211238*^9, 3.459106464234*^9, 3.45910679075*^9, 
+   3.4591076533789997`*^9, 3.459171692203*^9, 3.459172767467*^9, 
+   3.459175308001*^9, 3.459177256825*^9, 3.459177391644*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ReinstallJava", "[", 
+  RowBox[{"CommandLine", "\[Rule]", "\"\<javaw -server\>\""}], "]"}]], "Input",
+ CellChangeTimes->{{3.459617800924*^9, 3.459617849493*^9}, {3.459617890935*^9,
+    3.459617893965*^9}, 3.459618084545*^9}],
+
+Cell[BoxData[
+ RowBox[{"LinkObject", "[", 
+  RowBox[{"\<\"javaw -server -classpath \\\"C:\\\\Program Files\\\\Wolfram \
+Research\\\\Mathematica\\\\7.0\\\\SystemFiles\\\\Links\\\\JLink\\\\JLink.jar\\\
+\" -Xmx256m  \
+-Djava.system.class.loader=com.wolfram.jlink.JLinkSystemClassLoader \
+com.wolfram.jlink.Install -init \
+\\\"C:\\\\Users\\\\Garth\\\\AppData\\\\Local\\\\Temp\\\\mD9DA.tmp\\\"\"\>", 
+   ",", "34", ",", "4"}], "]"}]], "Output",
+ CellChangeTimes->{{3.459617813097*^9, 3.459617852204*^9}, 3.459617894441*^9, 
+   3.459618085197*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"?", "InstallJava"}]], "Input",
+ CellChangeTimes->{{3.459617706172*^9, 3.4596177075550003`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  StyleBox["\<\"InstallJava[] launches the Java runtime and prepares it to be \
+used from Mathematica. Only one Java runtime is ever launched; subsequent \
+calls to InstallJava after the first have no effect.\"\>", "MSG"], 
+  "\[NonBreakingSpace]", 
+  ButtonBox[
+   StyleBox["\[RightSkeleton]", "SR"],
+   Active->True,
+   BaseStyle->"Link",
+   ButtonData->"paclet:JLink/ref/InstallJava"]}]], "Print", "PrintUsage",
+ CellChangeTimes->{3.4596177080039997`*^9},
+ CellTags->"Info3459603307-7237037"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"LoadJavaClass", "[", "\"\<clojuratica.test.SimpleClass\>\"", 
+  "]"}]], "Input",
+ CellChangeTimes->{{3.458935695047*^9, 3.458935712476*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"JavaClass", "[", 
+   RowBox[{"clojuratica", ".", "test", ".", "SimpleClass"}], ",", "<>", "]"}],
+  JLink`JavaClass["clojuratica.test.SimpleClass", 9, {
+    JLink`JVM["vm1"], 
+    JLink`JVM["vm5"]}, 1, "clojuratica`test`SimpleClass`", False, 
+   True]]], "Output",
+ CellChangeTimes->{
+  3.4589357186549997`*^9, 3.458936134263*^9, 3.458936322159*^9, 
+   3.458936372908*^9, 3.4589365249300003`*^9, 3.458940605236*^9, 
+   3.4589408143380003`*^9, 3.45894090944*^9, 3.45894122738*^9, 
+   3.458941583067*^9, 3.4589417528710003`*^9, 3.458941888184*^9, 
+   3.458941973481*^9, 3.458942316006*^9, 3.4589424987869997`*^9, 
+   3.4589427383459997`*^9, 3.458948704098*^9, 3.458952440609*^9, 
+   3.459088673689*^9, 3.459088769703*^9, 3.4590890082130003`*^9, 
+   3.459089178976*^9, 3.459089290984*^9, 3.459089353156*^9, 3.459089560936*^9,
+    3.459089932597*^9, 3.459089974351*^9, 3.459090046105*^9, 
+   3.459092219406*^9, 3.459092303138*^9, 3.459092420043*^9, 
+   3.4590924761470003`*^9, 3.459092603651*^9, 3.459092753882*^9, {
+   3.4590930178450003`*^9, 3.459093042059*^9}, 3.4590941035439997`*^9, 
+   3.459095142704*^9, 3.459098548847*^9, 3.459098620932*^9, 3.459099035326*^9,
+    3.459099440969*^9, {3.4590995817390003`*^9, 3.459099585525*^9}, 
+   3.4591000964639997`*^9, 3.459100198019*^9, 3.459106219467*^9, 
+   3.45910646701*^9, 3.459106793968*^9, 3.459107658692*^9, 
+   3.4591717022650003`*^9, 3.459172771462*^9, 3.459178777398*^9, 
+   3.459612856*^9, 3.459618046974*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Clojure", "@", 
+  RowBox[{"SimpleClass`clojureMap", "[", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"1", "+", "#"}], "&"}], " ", ",", 
+    RowBox[{"Table", "[", 
+     RowBox[{"x", ",", 
+      RowBox[{"{", 
+       RowBox[{"x", ",", "2"}], "}"}]}], "]"}]}], " ", "]"}]}]], "Input",
+ CellChangeTimes->{{3.4589357316949997`*^9, 3.458935808715*^9}, {
+   3.458935991519*^9, 3.458935998632*^9}, {3.458936129513*^9, 
+   3.458936146362*^9}, {3.458936377266*^9, 3.458936395441*^9}, {
+   3.45894109431*^9, 3.458941144321*^9}, {3.458941258534*^9, 
+   3.458941270466*^9}, {3.458941418207*^9, 3.458941423082*^9}, {
+   3.45894150441*^9, 3.4589415060629997`*^9}, {3.4589415899119997`*^9, 
+   3.458941595841*^9}, {3.45894166579*^9, 3.458941676618*^9}, 
+   3.458941729969*^9, 3.4589419274700003`*^9, {3.458941997218*^9, 
+   3.4589420068310003`*^9}, {3.458942103837*^9, 3.4589421074519997`*^9}, {
+   3.458942265609*^9, 3.4589422660550003`*^9}, {3.4589423746210003`*^9, 
+   3.458942438984*^9}, 3.458942752208*^9, {3.458952449054*^9, 
+   3.458952474792*^9}, {3.459089752873*^9, 3.45908978281*^9}, {
+   3.459092556968*^9, 3.459092560921*^9}, {3.459093014229*^9, 
+   3.459093014968*^9}, {3.459098591001*^9, 3.4590986122980003`*^9}, {
+   3.459178846698*^9, 3.459178875042*^9}, {3.459612871933*^9, 
+   3.459612877501*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"2", ",", "3"}], "}"}]], "Output",
+ CellChangeTimes->{{3.459106228908*^9, 3.459106250646*^9}, {3.459171712064*^9,
+    3.459171718348*^9}, {3.459171804211*^9, 3.459171810928*^9}, 
+   3.459172780724*^9, 3.4591728379700003`*^9, 3.459178790493*^9, {
+   3.459178866804*^9, 3.459178875534*^9}, {3.459612860901*^9, 
+   3.459612878086*^9}, 3.459618053815*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "Clojure", "]"}], " ", "=", " ", 
+   RowBox[{"{", 
+    RowBox[{"Mmafn", " ", "->", " ", "True"}], "}"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.4590897743059998`*^9, 3.459089798513*^9}, {
+   3.459089978658*^9, 3.45908997912*^9}, {3.459090056843*^9, 
+   3.459090072104*^9}, {3.459092233205*^9, 3.45909224617*^9}, {
+   3.4590924764300003`*^9, 3.459092477373*^9}, {3.45909251337*^9, 
+   3.459092517554*^9}, {3.459098564999*^9, 3.4590985681949997`*^9}, {
+   3.459098708751*^9, 3.459098709101*^9}, {3.459099041295*^9, 
+   3.4590990687469997`*^9}, {3.459099436958*^9, 3.4590994779230003`*^9}, {
+   3.459099597941*^9, 3.459099623337*^9}, {3.459099706028*^9, 
+   3.4590997210959997`*^9}, {3.459099763481*^9, 3.459099763825*^9}, {
+   3.459100202625*^9, 3.4591002533059998`*^9}, 3.459106216953*^9}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"LoadJavaClass", "[", "\"\<clojuratica.CLink\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.4590892160550003`*^9, 3.4590892196689997`*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"JavaClass", "[", 
+   RowBox[{"clojuratica", ".", "CLink"}], ",", "<>", "]"}],
+  JLink`JavaClass["clojuratica.CLink", 26, {
+    JLink`JVM["vm1"]}, 1, "clojuratica`CLink`", False, True]]], "Output",
+ CellChangeTimes->{{3.459089220125*^9, 3.459089225383*^9}, 
+   3.459089293087*^9, {3.459089355623*^9, 3.459089366936*^9}, 
+   3.459089562317*^9, {3.459099272367*^9, 3.459099282782*^9}, 
+   3.4591000986809998`*^9, 3.459106657755*^9, 3.459106796835*^9, 
+   3.45910765996*^9, 3.4591718520030003`*^9, 3.459172775686*^9, 
+   3.459612966873*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"LoadJavaClass", "[", "\"\<com.wolfram.jlink.MathLinkFactory\>\"", 
+  "]"}]], "Input",
+ CellChangeTimes->{{3.459084715683*^9, 3.459084723558*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"JavaClass", "[", 
+   RowBox[{"com", ".", "wolfram", ".", "jlink", ".", "MathLinkFactory"}], ",",
+    "<>", "]"}],
+  JLink`JavaClass["com.wolfram.jlink.MathLinkFactory", 19, {
+    JLink`JVM["vm1"]}, 1, "com`wolfram`jlink`MathLinkFactory`", False, 
+   True]]], "Output",
+ CellChangeTimes->{3.459084731774*^9, 3.459098669416*^9, 3.459099022776*^9, 
+  3.4590994587*^9, 3.459099740672*^9, 3.459100222991*^9, 
+  3.4591066348970003`*^9, 3.459106799153*^9, 3.459107661775*^9, 
+  3.4591718395810003`*^9, 3.459172776646*^9, 3.459612887373*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"kl", "=", 
+  RowBox[{
+  "MathLinkFactory`createKernelLink", "[", 
+   "\"\<-linkmode launch -linkname 'c:\\\\\\\\program files\\\\\\\\wolfram \
+research\\\\\\\\mathematica\\\\\\\\7.0\\\\\\\\mathkernel.exe'\>\"", 
+   "]"}]}]], "Input",
+ CellChangeTimes->{{3.4590847463529997`*^9, 3.459084796573*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{"com", ".", "wolfram", ".", "jlink", ".", "WrappedKernelLink"}], 
+    "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm1`JavaObject285729410252801]], "Output",
+ CellChangeTimes->{
+  3.459084800797*^9, {3.45909866377*^9, 3.4590986709040003`*^9}, {
+   3.459099020343*^9, 3.459099024157*^9}, 3.459099459842*^9, {
+   3.459099738913*^9, 3.4590997421219997`*^9}, 3.459100225026*^9, 
+   3.459106640615*^9, 3.459106800926*^9, 3.4591076643570004`*^9, 
+   3.459126342204*^9, 3.459171842361*^9, 3.4591728432799997`*^9, 
+   3.459612888472*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"kl", "@", 
+  RowBox[{"discardAnswer", "[", "]"}]}]], "Input",
+ CellChangeTimes->{{3.459084812127*^9, 3.459084817426*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"evaluate", "=", 
+  RowBox[{
+   RowBox[{"CLink`getEvaluator", "[", 
+    RowBox[{"kl", ",", " ", "\"\<:parallel\>\""}], "]"}], "//", 
+   "ReturnAsJavaObject"}]}]], "Input",
+ CellChangeTimes->{{3.45910666233*^9, 3.459106697883*^9}, 3.459126369377*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "parallel_evaluator$get"}], "_evaluator", 
+     "__", "364", "$fn__", "36", "__auto", "___", "_", "373", "$fn__", 
+     "379"}], "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm1`JavaObject376609911603201]], "Output",
+ CellChangeTimes->{{3.459106674606*^9, 3.45910669867*^9}, 3.459106812575*^9, 
+   3.459107675398*^9, {3.4591263363529997`*^9, 3.459126374199*^9}, {
+   3.459171836458*^9, 3.459171856396*^9}, 3.4591728501730003`*^9, 
+   3.459612893408*^9, 3.459612969677*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"mmafn", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"CLink`getMmafn", "[", 
+    RowBox[{"evaluate", ",", " ", "\"\<\>\""}], "]"}], "//", 
+   "ReturnAsJavaObject"}]}]], "Input",
+ CellChangeTimes->{{3.459106845626*^9, 3.459106883255*^9}, 3.45912637201*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "clojuratica$get_mmafn"}], "__", "558", 
+     "$fn__", "36", "__auto", "___", "_", "566", "$fn__", "568"}], "]"}], 
+   "\[RightGuillemet]"}],
+  JLink`Objects`vm1`JavaObject463648682147841]], "Output",
+ CellChangeTimes->{{3.4591068654*^9, 3.459106884127*^9}, 
+   3.4591076756879997`*^9, 3.459126375793*^9, 3.459172506699*^9, 
+   3.459172850466*^9, 3.459612894316*^9, 3.459612970486*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"parse", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"CLink`getParser", "[", 
+    RowBox[{"kl", ",", "mmafn", ",", " ", "\"\<:vectors\>\""}], "]"}], "//", 
+   "ReturnAsJavaObject"}]}]], "Input",
+ CellChangeTimes->{{3.459106870611*^9, 3.459106905995*^9}, {3.459126119538*^9,
+    3.459126121658*^9}, 3.4591262129230003`*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "clojuratica$get_parser"}], "__", "579", 
+     "$fn__", "36", "__auto", "___", "_", "588", "$fn__", "591"}], "]"}], 
+   "\[RightGuillemet]"}],
+  JLink`Objects`vm1`JavaObject492185317277697]], "Output",
+ CellChangeTimes->{
+  3.459106907082*^9, 3.459107676045*^9, {3.459126102862*^9, 
+   3.459126122101*^9}, {3.459126213741*^9, 3.4591262160480003`*^9}, {
+   3.459126325204*^9, 3.45912632675*^9}, 3.459126376565*^9, {
+   3.459172499102*^9, 3.459172507641*^9}, 3.459172850823*^9, 
+   3.459612895231*^9, 3.459612971332*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"globalsetter", " ", "=", " ", 
+  RowBox[{
+   RowBox[{"CLink`getGlobalSetter", "[", 
+    RowBox[{"evaluate", ",", " ", "\"\<\>\""}], "]"}], "//", 
+   "ReturnAsJavaObject"}]}]], "Input",
+ CellChangeTimes->{{3.459106945696*^9, 3.4591069602980003`*^9}, {
+  3.4591262023900003`*^9, 3.4591262063599997`*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "clojuratica$get_global"}], "_setter", "__", 
+     "602", "$fn__", "604"}], "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm1`JavaObject238363302952961]], "Output",
+ CellChangeTimes->{3.459106967658*^9, 3.459107676395*^9, 
+  3.4591262069560003`*^9, 3.459126378051*^9, 3.459172509134*^9, 
+  3.459172851172*^9, 3.459612896491*^9, 3.459612972749*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Clojure", "@", 
+  RowBox[{"SimpleClass`mIncrement", "[", 
+   RowBox[{"1", ",", "evaluate", ",", "parse", ",", "mmafn"}], 
+   "]"}]}]], "Input",
+ CellChangeTimes->{{3.459107687722*^9, 3.459107705242*^9}, {3.45910774875*^9, 
+  3.459107752593*^9}, {3.459107792101*^9, 3.459107832285*^9}, {
+  3.459126016606*^9, 3.459126028737*^9}, {3.4591260626099997`*^9, 
+  3.459126063414*^9}, {3.459126148778*^9, 3.459126239066*^9}, {
+  3.459126446314*^9, 3.459126529778*^9}, {3.45917198423*^9, 
+  3.459171992227*^9}, {3.459172886481*^9, 3.45917289946*^9}}],
+
+Cell[BoxData["11"], "Output",
+ CellChangeTimes->{
+  3.459107709118*^9, {3.459107796406*^9, 3.459107802961*^9}, 
+   3.4591078330109997`*^9, {3.459126023256*^9, 3.459126029686*^9}, 
+   3.459126064111*^9, {3.4591261511879997`*^9, 3.45912622966*^9}, {
+   3.45912636498*^9, 3.459126379093*^9}, {3.4591264551800003`*^9, 
+   3.4591265301619997`*^9}, {3.459171989324*^9, 3.459171992724*^9}, {
+   3.459172023671*^9, 3.459172049494*^9}, 3.459172512368*^9, 
+   3.459172853201*^9, {3.4591728874110003`*^9, 3.459172900381*^9}, 
+   3.459612901401*^9, {3.459612949865*^9, 3.459612974141*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ClojureSetGlobal", "[", 
+  RowBox[{"\"\<foobar\>\"", ",", " ", 
+   RowBox[{"{", 
+    RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.4591740325880003`*^9, 3.459174045612*^9}, {
+   3.459174102296*^9, 3.45917410251*^9}, 3.459612840983*^9}],
+
+Cell[BoxData[
+ RowBox[{"ClojureSetGlobal", "[", 
+  RowBox[{"\<\"foobar\"\>", ",", 
+   RowBox[{"{", 
+    RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "]"}]], "Output",
+ CellChangeTimes->{3.459612981227*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Java", "::", "\<\"excptn\"\>"}], ":", 
+  " ", "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"A Java exception occurred: \\\\\\\"\
+\\\", \\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"java.lang.Exception:\
+ Argument of invalid class passed to CExpr constructor:  (NO_SOURCE_FILE:1)\\\
+\\n\\\\tat \
+clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:2719)\\\\n\\\\tat \
+clojure.lang.\\\" \[Ellipsis] \\\" Source)\\\\n\\\\tat \
+clojure.lang.AFn.applyToHelper(AFn.java:173)\\\\n\\\\tat \
+clojure.lang.AFn.applyTo(AFn.java:164)\\\\n\\\\tat \
+clojure.lang.Compiler$InvokeExpr.eval(Compiler.java:2714)\\\\n\\\\t... 14 \
+more\\\"\\), \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\".\\\\\\\"\\\", \\\"MT\\\
+\"]\\)\"\>"}]], "Message", "MSG",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{3.459174063975*^9, 3.459174103579*^9, 3.459174293927*^9, 
+  3.459174330766*^9, 3.4591749716800003`*^9, 3.459612840984*^9}],
+
+Cell[BoxData["$Failed"], "Output",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{3.459174064026*^9, 3.459174103617*^9, 3.459174293975*^9, 
+  3.459174330781*^9, 3.459174971696*^9, 3.459612840984*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["Clojuratica`Private`globalTransferer"], "Input",
+ CellChangeTimes->{3.459612840984*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"1", ",", "2", ",", "3"}], "}"}]], "Output",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{3.459174996597*^9, 3.459612840984*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ClojureEvaluate", "[", 
+  "\"\<(let [evaluate (clojuratica.clojuratica/get-evaluator \n\t\t\t\t\t\t\t\
+\t\t\t\t\t\t\t\t\t\t\t\t(com.wolfram.jlink.StdLink/getLink))] (evaluate [] \\\
+\"1\\\"))\>\"", "]"}]], "Input",
+ CellChangeTimes->{{3.459175007908*^9, 3.459175057218*^9}, 
+   3.459175176024*^9, {3.459175794429*^9, 3.459175838552*^9}, 
+   3.459612840984*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Java", "::", "\<\"excptn\"\>"}], ":", 
+  " ", "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"A Java exception occurred: \\\\\\\"\
+\\\", \\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"java.lang.Exception:\
+ Argument of invalid class passed to CExpr constructor:  (NO_SOURCE_FILE:0)\\\
+\\n\\\\tat clojure.lang.Compiler.eval(Compiler.java:4543)\\\\n\\\\tat \
+clojure.lang.Compiler.lo\\\" \[Ellipsis] \\\"aluator.clj:57)\\\\n\\\\tat \
+clojure.lang.RestFn.invoke(RestFn.java:426)\\\\n\\\\tat \
+clojure.core$eval__7.invoke(Unknown Source)\\\\n\\\\tat \
+clojure.lang.Compiler.eval(Compiler.java:4532)\\\\n\\\\t... 12 more\\\"\\), \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\".\\\\\\\"\\\", \\\"MT\\\
+\"]\\)\"\>"}]], "Message", "MSG",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{{3.459175823852*^9, 3.4591758401879997`*^9}, 
+   3.459177294249*^9, 3.459177434792*^9, 3.4596128409849997`*^9}],
+
+Cell[BoxData["$Failed"], "Output",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{{3.459175028609*^9, 3.459175059689*^9}, 
+   3.4591751780179996`*^9, 3.4591753631280003`*^9, {3.45917577434*^9, 
+   3.459175840198*^9}, 3.459177294266*^9, 3.459177434829*^9, 
+   3.4596128409849997`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ClojureParse", "@", 
+  RowBox[{
+  "ClojureEvaluate", "[", 
+   "\"\<(instance? clojure.lang.IPersistentCollection (list))\>\"", 
+   "]"}]}]], "Input",
+ CellChangeTimes->{{3.459176966342*^9, 3.4591770620299997`*^9}, 
+   3.4596128409849997`*^9}],
+
+Cell[BoxData["True"], "Output",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{{3.4591769716870003`*^9, 3.4591769843120003`*^9}, {
+   3.459177022447*^9, 3.459177063549*^9}, 3.4596128409849997`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+  "ClojureEvaluate", "[", 
+   "\"\<(use 'clojuratica.lib ) (import 'clojuratica.CExpr) (defnf evaluate \
+[] []\n  [flags passthrough-flags _]\n  [& args]\n  (instance? \
+clojure.lang.IPersistentCollection passthrough-flags)) (evaluate [] \\\"2\\\"\
+\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t(com.wolfram.jlink.StdLink/getLink)) \
+\>\"", "]"}], "//", "ClojureParse"}]], "Input",
+ CellChangeTimes->{{3.459175007908*^9, 3.459175057218*^9}, 
+   3.459175176024*^9, {3.459175794429*^9, 3.459175838552*^9}, {
+   3.4591759265880003`*^9, 3.459175953229*^9}, {3.459176218163*^9, 
+   3.459176228104*^9}, {3.459176264429*^9, 3.459176486736*^9}, {
+   3.4591765431540003`*^9, 3.459176558166*^9}, {3.4591766508050003`*^9, 
+   3.459176704201*^9}, 3.459176736041*^9, {3.459176766833*^9, 
+   3.459176817284*^9}, {3.459176886223*^9, 3.459176910974*^9}, {
+   3.459177123436*^9, 3.459177162027*^9}, 3.4596128409849997`*^9}],
+
+Cell[BoxData["True"], "Output",
+ GeneratedCell->False,
+ CellAutoOverwrite->False,
+ CellChangeTimes->{{3.459177128245*^9, 3.459177163198*^9}, 
+   3.4596128409849997`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+  "ClojureEvaluate", "[", 
+   "\"\<(require '[clojuratica.serial-evaluator :as se] \
+'[clojuratica.low-level :as low-level] '[clojuratica.core :as core]) (use \
+'clojuratica.lib ) (import 'clojuratica.CExpr) (defnf evaluate [] []\n  \
+[flags passthrough-flags _]\n  [& args]\n  (let [output (low-level/send-read \
+(apply core/build-module args) (last args))]\n     (instance? \
+com.wolfram.jlink.Expr output))) (evaluate [] \\\"2\\\"\n\t\t\t\t\t\t\t\t\t\t\
+\t\t\t\t\t\t\t\t\t(com.wolfram.jlink.StdLink/getLink)) \>\"", "]"}], "//", 
+  "ClojureParse"}]], "Input",
+ CellChangeTimes->{{3.459175007908*^9, 3.459175057218*^9}, 
+   3.459175176024*^9, {3.459175794429*^9, 3.459175838552*^9}, {
+   3.4591759265880003`*^9, 3.459175953229*^9}, {3.459176218163*^9, 
+   3.459176228104*^9}, {3.459176264429*^9, 3.459176486736*^9}, {
+   3.4591765431540003`*^9, 3.459176558166*^9}, {3.4591766508050003`*^9, 
+   3.459176704201*^9}, 3.459176736041*^9, {3.459176766833*^9, 
+   3.459176817284*^9}, {3.459176886223*^9, 3.459176910974*^9}, {
+   3.4591774988050003`*^9, 3.4591775571429996`*^9}, {3.459177617283*^9, 
+   3.459177728748*^9}, {3.459177884264*^9, 3.4591779092390003`*^9}, {
+   3.4591780625*^9, 3.459178121475*^9}}],
+
+Cell[BoxData["False"], "Output",
+ CellChangeTimes->{
+  3.459175955281*^9, {3.459176225296*^9, 3.4591762298269997`*^9}, {
+   3.459176282328*^9, 3.459176423969*^9}, {3.459176465929*^9, 
+   3.459176487994*^9}, {3.4591765479519997`*^9, 3.459176559698*^9}, {
+   3.459176653191*^9, 3.459176705685*^9}, 3.459176737343*^9, {
+   3.459176772506*^9, 3.4591768185550003`*^9}, 3.459176854874*^9, 
+   3.459176912901*^9, {3.459177519986*^9, 3.459177558718*^9}, {
+   3.459177620458*^9, 3.45917773167*^9}, {3.4591778857860003`*^9, 
+   3.459177910973*^9}, {3.459178070242*^9, 3.459178122892*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+  "ClojureEvaluate", "[", 
+   "\"\<(require '[clojuratica.serial-evaluator :as se] \
+'[clojuratica.low-level :as low-level] '[clojuratica.core :as core]) (let \
+[evaluate #(low-level/send-read (apply core/build-module (list % %2 %3)) %3)] \
+(evaluate [] \\\"2\\\" (com.wolfram.jlink.StdLink/getLink)))\>\"", "]"}], "@", 
+  RowBox[{"getExpr", "[", "]"}]}]], "Input",
+ CellChangeTimes->{{3.459175398348*^9, 3.4591754362469997`*^9}, {
+  3.4591754897279997`*^9, 3.4591755170369997`*^9}, {3.4591755970550003`*^9, 
+  3.459175741362*^9}, {3.4591760528190002`*^9, 3.459176138715*^9}}],
+
+Cell[BoxData["2"], "Output",
+ CellChangeTimes->{{3.459175423686*^9, 3.459175438074*^9}, 3.459175524717*^9, 
+   3.4591756371210003`*^9, {3.4591756894119997`*^9, 3.4591757466610003`*^9}, {
+   3.459176073119*^9, 3.459176140092*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ClojureEvaluate", "[", "\"\<(CExpr. (CExpr. 1) (list :foo))\>\"", 
+  "]"}]], "Input",
+ CellChangeTimes->{{3.4591775873059998`*^9, 3.4591776045620003`*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{"clojuratica", ".", "CExpr"}], "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm11`JavaObject11278681880133633]], "Output",
+ CellChangeTimes->{3.4591776059379997`*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ RowBox[{"ReinstallClojure", "[", "]"}]], "Input",
+ CellChangeTimes->{{3.4591741660109997`*^9, 3.459174167712*^9}, {
+  3.459174209583*^9, 3.459174210684*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ClojureParse", "[", 
+  RowBox[{"ClojureEvaluate", "[", "\"\<(+ 1 1)\>\"", "]"}], "]"}]], "Input",
+ CellChangeTimes->{{3.459174105598*^9, 3.459174142307*^9}, {3.459175347844*^9,
+   3.459175350797*^9}}],
+
+Cell[BoxData["2"], "Output",
+ CellChangeTimes->{{3.4591741444440002`*^9, 3.4591741712790003`*^9}, 
+   3.4591742154700003`*^9, 3.459174275901*^9, {3.4591753453450003`*^9, 
+   3.4591753523599997`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.459172105072*^9, 3.4591721095950003`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"JavaClass", "[", 
+  InterpretationBox[
+   RowBox[{"\[LeftGuillemet]", 
+    RowBox[{"JavaObject", "[", 
+     RowBox[{
+      RowBox[{"clojuratica", ".", "parallel_evaluator$get"}], "_evaluator", 
+      "__", "1", "$fn__", "42", "__auto", "___", "_", "10", "$fn__", "16"}], 
+     "]"}], "\[RightGuillemet]"}],
+   JLink`Objects`vm6`JavaObject492305123377153], "]"}]], "Output",
+ CellChangeTimes->{3.4591720939779997`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ClojureConvert", "[", "evaluate", "]"}]], "Input",
+ CellChangeTimes->{{3.4591711488*^9, 3.459171152644*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "parallel_evaluator$get"}], "_evaluator", 
+     "__", "1", "$fn__", "42", "__auto", "___", "_", "10", "$fn__", "16"}], 
+    "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm6`JavaObject492305123377153]], "Output",
+ CellChangeTimes->{
+  3.459171157185*^9, {3.459171217525*^9, 3.45917121881*^9}, {
+   3.459172180534*^9, 3.4591721827320004`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"evaluate", "//", "MakeJavaExpr"}]], "Input",
+ CellChangeTimes->{{3.459171195204*^9, 3.4591711973719997`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Java", "::", "\<\"excptn\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"A Java exception occurred: \
+\\\\\\\"\\\", \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"java.lang.\
+IllegalArgumentException: argument type mismatch\\\"\\), \\\"MT\\\"]\\)\
+\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\".\\\\\\\"\\\", \
+\\\"MT\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.459171858514*^9}],
+
+Cell[BoxData["$Failed"], "Output",
+ CellChangeTimes->{
+  3.459171197795*^9, {3.4591718279300003`*^9, 3.45917185852*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ClojureConvert", "[", "evaluate", "]"}]], "Input",
+ CellChangeTimes->{{3.459171968033*^9, 3.4591719707530003`*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "parallel_evaluator$get"}], "_evaluator", 
+     "__", "1", "$fn__", "42", "__auto", "___", "_", "10", "$fn__", "16"}], 
+    "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm6`JavaObject492305123377153]], "Output",
+ CellChangeTimes->{3.4591719711940002`*^9}]
+}, Open  ]],
+
+Cell[BoxData["\"\<\>"], "Input",
+ CellChangeTimes->{3.4591261844709997`*^9}],
+
+Cell[BoxData["JavaExpr"], "Input",
+ CellChangeTimes->{{3.459125976068*^9, 3.4591259857609997`*^9}}]
+},
+WindowSize->{663, 533},
+WindowMargins->{{Automatic, 33}, {Automatic, 57}},
+ShowSelection->True,
+FrontEndVersion->"7.0 for Microsoft Windows (32-bit) (February 18, 2009)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "Info3459603307-7237037"->{
+  Cell[3421, 84, 519, 12, 62, "Print",
+   CellTags->"Info3459603307-7237037"]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"Info3459603307-7237037", 28161, 720}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[567, 22, 126, 2, 31, "Input"],
+Cell[696, 26, 1737, 28, 145, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2470, 59, 248, 4, 31, "Input"],
+Cell[2721, 65, 541, 10, 107, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3299, 80, 119, 2, 31, "Input"],
+Cell[3421, 84, 519, 12, 62, "Print",
+ CellTags->"Info3459603307-7237037"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3977, 101, 164, 3, 31, "Input"],
+Cell[4144, 106, 1507, 26, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5688, 137, 1317, 25, 31, "Input"],
+Cell[7008, 164, 390, 7, 30, "Output"]
+}, Open  ]],
+Cell[7413, 174, 852, 15, 31, "Input"],
+Cell[CellGroupData[{
+Cell[8290, 193, 160, 2, 31, "Input"],
+Cell[8453, 197, 581, 11, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9071, 213, 169, 3, 31, "Input"],
+Cell[9243, 218, 578, 11, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9858, 234, 322, 7, 72, "Input"],
+Cell[10183, 243, 638, 13, 30, "Output"]
+}, Open  ]],
+Cell[10836, 259, 145, 3, 31, "Input"],
+Cell[CellGroupData[{
+Cell[11006, 266, 272, 6, 31, "Input"],
+Cell[11281, 274, 615, 12, 50, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11933, 291, 272, 6, 31, "Input"],
+Cell[12208, 299, 527, 11, 50, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[12772, 315, 339, 7, 31, "Input"],
+Cell[13114, 324, 660, 14, 50, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[13811, 343, 326, 7, 31, "Input"],
+Cell[14140, 352, 489, 10, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14666, 367, 564, 10, 31, "Input"],
+Cell[15233, 379, 577, 9, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15847, 393, 296, 6, 31, "Input"],
+Cell[16146, 401, 204, 5, 30, "Output"],
+Cell[16353, 408, 961, 18, 158, "Message"],
+Cell[17317, 428, 221, 4, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17575, 437, 101, 1, 31, "Input"],
+Cell[17679, 440, 191, 5, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17907, 450, 384, 7, 72, "Input"],
+Cell[18294, 459, 946, 16, 158, "Message"],
+Cell[19243, 477, 305, 6, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19585, 488, 266, 7, 52, "Input"],
+Cell[19854, 497, 219, 4, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[20110, 506, 935, 16, 172, "Input"],
+Cell[21048, 524, 169, 4, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21254, 533, 1239, 21, 232, "Input"],
+Cell[22496, 556, 578, 9, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23111, 570, 611, 11, 132, "Input"],
+Cell[23725, 583, 229, 3, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23991, 591, 179, 3, 31, "Input"],
+Cell[24173, 596, 274, 6, 30, "Output"]
+}, Open  ]],
+Cell[24462, 605, 172, 3, 31, "Input"],
+Cell[CellGroupData[{
+Cell[24659, 612, 224, 4, 31, "Input"],
+Cell[24886, 618, 199, 3, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25122, 626, 91, 1, 31, "Input"],
+Cell[25216, 629, 441, 10, 50, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25694, 644, 132, 2, 31, "Input"],
+Cell[25829, 648, 484, 11, 50, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[26350, 664, 133, 2, 31, "Input"],
+Cell[26486, 668, 448, 10, 21, "Message"],
+Cell[26937, 680, 120, 2, 30, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[27094, 687, 139, 2, 31, "Input"],
+Cell[27236, 691, 398, 9, 50, "Output"]
+}, Open  ]],
+Cell[27649, 703, 76, 1, 31, "Input"],
+Cell[27728, 706, 99, 1, 31, "Input"]
+}
+]
+*)
+
+(* End of internal cache information *)

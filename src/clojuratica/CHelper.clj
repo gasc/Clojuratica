@@ -33,14 +33,33 @@
 ;
 ; ***** END LICENSE BLOCK *****
 
-(ns clojuratica.global-setter
-  (:use [clojuratica.lib]
-        [clojuratica.core]
-        [clojuratica.clojuratica]))
+(ns clojuratica.CHelper
+  (:gen-class
+   :methods [#^{:static true} [convert [Object boolean] Object]
+             #^{:static true} [parse [Object] com.wolfram.jlink.Expr]
+             #^{:static true} [mirrorClasspath [] Object]]
+   :state state)
+  (:import [com.wolfram.jlink StdLink]
+           [clojure.lang.*]
+           [java.io StringReader])
+  (:use [clojuratica.clojuratica]
+        [clojuratica.low-level]))
 
-(defn global-set [lhs rhs evaluate]
-  (let [serial-evaluate (get-evaluator :serial (evaluate :get-kernel-link))
-        result          (serial-evaluate [] (build-set-expr lhs rhs))]
-    (if (evaluate :parallel?)
-      (serial-evaluate [] (str "DistributeDefinitions[" lhs "]")))
-    result))
+(defn -convert [expr mmafn?]
+  (let [kernel-link (StdLink/getLink)
+        evaluate    (get-evaluator kernel-link)
+        mmafn       (if mmafn? (get-mmafn evaluate))
+        parse       (get-parser kernel-link mmafn)]
+    (parse expr)))
+
+(defn -parse [obj]
+  (.getExpr (convert obj)))
+
+(defn -mirrorClasspath []
+  (let [classloader (.getClassLoader (StdLink/getLink))
+        m-classpath (seq (.getClassPath classloader))
+        m-url-classpath (for [path m-classpath] (str "file://" path))
+        c-classpath (seq (.getURLs (clojure.lang.RT/baseLoader)))]
+    (doseq [url m-url-classpath]
+      (when-not (some #{url} c-classpath)
+        (add-classpath url)))))

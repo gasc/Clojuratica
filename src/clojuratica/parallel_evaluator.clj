@@ -37,52 +37,41 @@
   (:import [clojuratica CExpr]
            [com.wolfram.jlink Expr])
   (:use [clojuratica.core]
+        [clojuratica.parser]
         [clojuratica.lib]))
 
-(declare waitloop evaluate)
+(declare waitloop manage-queue evaluate)
 
 (defnf get-evaluator [] []
   "No valid flags; passthrough flags allowed"
   [_ retained-flags]
   [kernel-link & [poll-interval]]
-  (let [poll-interval       (or poll-interval 5)
-        soft-kill           (ref false)
-        hard-kill           (ref false)
-        process-number      (ref 0)
+  (let [poll-interval       (or poll-interval 15)
         process-queue       (ref {})
-        waitloop-thread     (Thread. (fn [] (waitloop kernel-link
-                                                      process-queue
-                                                      soft-kill
-                                                      hard-kill
-                                                      poll-interval)))]
+        waitloop            #(waitloop kernel-link
+                                       process-queue
+                                       poll-interval)
+        waitloop-thread     (Thread. waitloop)]
+
     (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
       (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
 
     (send-read "Needs[\"Parallel`Developer`\"]" kernel-link)
     (send-read "QueueRun[]" kernel-link)
+
+    (.setDaemon waitloop-thread true)
     (.start waitloop-thread)
 
     ; This is the anonymous function returned from a call to get-evaluator
     (fn [& args]
       (cond
-        (some #{:hard-kill} args)
-          (do
-            (dosync (ref-set hard-kill true))
-            (.interrupt waitloop-thread))
-        (some #{:soft-kill} args)
-          (do
-            (dosync (ref-set soft-kill true))
-            (.interrupt waitloop-thread))
         (some #{:get-kernel-link} args)
           kernel-link
         (some #{:parallel?} args)
           true
-        (not (.isAlive waitloop-thread))
-          (throw (Exception. "This parallel evaluator is not running."))
         true
           (apply evaluate
                  (concat args retained-flags [kernel-link
-                                              process-number
                                               process-queue
                                               waitloop-thread]))))))
 
@@ -90,63 +79,72 @@
   [flags passthrough-flags]
   [& args]
   (let [[kernel-link
-         process-number
          process-queue
-         waitloop-thread]      (take-last 4 args)
-         passthrough-args      (drop-last 3 args)
+         waitloop-thread]      (take-last 3 args)
+         passthrough-args      (drop-last 2 args)
          module                (apply build-module :parallel (concat passthrough-flags passthrough-args))
-         pid-string            (str "Clojuratica`Concurrent`process" (dosync (alter process-number inc)))
-         pid                   (Expr. Expr/SYMBOL pid-string)
+         pid                   (.getExpr (send-read "Unique[Clojuratica`Concurrent`process]" kernel-link))
+         pid-string            (.toString pid)
          queue-item            {pid (ref {:thread (Thread/currentThread)})}]
 
       (send-read (build-set-expr pid-string module) kernel-link)
 
       (dosync (commute process-queue conj queue-item))
-      (.interrupt waitloop-thread)
-      (try
-        (while 1 (Thread/sleep 100000))
-        (catch InterruptedException _
-          (let [output (CExpr. (:output @(get @process-queue pid)))]
-            (dosync (commute process-queue dissoc pid))
-            (CExpr. output passthrough-flags))))))
 
-(defn move-queue
-  [kernel-link process-queue]
-  (let [update-item     (fn [[pid process-data]]
-                          (when-not (= :finished (:state @process-data))
-                            (let [state-expr (.getExpr (send-read (add-head "ProcessState" (list pid)) kernel-link))
-                                  state-prefix (apply str (take 3 (.toString state-expr)))
-                                  state (cond (= "run" state-prefix) :running
-                                              (= "fin" state-prefix) :finished
-                                              (= "que" state-prefix) :queued
-                                              true (throw (Exception. (str "Error! State unrecognized: " state-expr))))
-                                  new-process-data (conj @process-data {:state state})
-                                  new-process-data (if (= state :finished)
-                                                     (conj new-process-data {:output (.part state-expr 1)})
-                                                     new-process-data)]
-                              (dosync (alter process-data conj new-process-data)))))
-      return-item-if-done (fn [[pid process-data]]
-                            (when (and (= :finished (:state @process-data)) (not (:returned @process-data)))
+      (.interrupt waitloop-thread)
+
+      (try
+        (while true (Thread/sleep 10000))
+        (catch InterruptedException _))
+
+      (let [output (CExpr. (:output @(get @process-queue pid)))]
+        (dosync (commute process-queue dissoc pid))
+        (CExpr. output passthrough-flags))))
+
+(defn waitloop
+  [kernel-link process-queue poll-interval]
+  ;(println "Waitloop starting...")
+  (while true
+    (while (seq @process-queue)
+        ;(println "Waitloop moving the queue...")
+        (send-read "QueueRun[]" kernel-link)
+        (manage-queue process-queue kernel-link)
+        (try
+          (Thread/sleep poll-interval)
+          (catch InterruptedException _)))
+    (try
+      ;(println "Waitloop going to sleep...")
+      (while true (Thread/sleep 10000)) ;nothing in list
+      (catch InterruptedException _
+        ;(println "Waitloop waking up...")
+        )))
+  ;(println "Waitloop dying...")
+  )
+
+(defn manage-queue
+  [process-queue kernel-link]
+  (let [update-state      (fn [[pid process-data]]
+                            (when-not (= :finished (:state @process-data))
+                              (let [state-expr        (.getExpr (send-read (add-head "ProcessState" (list pid)) kernel-link))
+                                    state-prefix      (apply str (take 3 (.toString state-expr)))
+                                    state             (cond (= "run" state-prefix) :running
+                                                            (= "fin" state-prefix) :finished
+                                                            (= "que" state-prefix) :queued
+                                                            true                   (throw (Exception. (str "Error! State unrecognized: " state-expr))))
+                                    new-process-data  (conj @process-data {:state state})
+                                    new-process-data  (if (= state :finished)
+                                                        (conj new-process-data {:output (.part state-expr 1)})
+                                                        new-process-data)]
+                                (dosync (alter process-data conj new-process-data))))
+                            [pid process-data])
+      return-if-finished  (fn [[pid process-data]]
+                            (when (and (= :finished (:state @process-data))
+                                       (not (:returned @process-data)))
                               (let [new-process-data (conj @process-data {:returned true})]
                                 (dosync (alter process-data conj new-process-data)))
                               (send-read (add-head "ClearAll" (list pid)) kernel-link)
-                              (.interrupt (:thread @process-data))))]
-  (dorun (map update-item @process-queue))
-  (dorun (map return-item-if-done @process-queue))))
-
-(defn waitloop
-  [kernel-link process-queue soft-kill hard-kill poll-interval]
-  (while (and (not @soft-kill) (not @hard-kill))
-    (try
-      ;(println "Waitloop going to sleep...")
-      (Thread/sleep 10000) ;nothing in list
-      (catch InterruptedException _))
-    (while (and (seq @process-queue) (not @hard-kill))
-      ;(println "Waitloop moving the queue...")
-      (send-read "QueueRun[]" kernel-link)
-      (move-queue kernel-link process-queue)
-      (try
-        (Thread/sleep poll-interval)
-        (catch InterruptedException _)))))
-  ;(println "Waitloop dying..."))
+                              (.interrupt (:thread @process-data)))
+                            [pid process-data])
+      update+return       (comp return-if-finished update-state)]
+  (dorun (map update+return @process-queue))))
 

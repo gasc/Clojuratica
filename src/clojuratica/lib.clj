@@ -34,7 +34,8 @@
 ; ***** END LICENSE BLOCK *****
 
 
-(ns clojuratica.lib)
+(ns clojuratica.lib
+  (:import [java.util.regex Pattern]))
 
 (defn instances? [classes instances]
   (and (== (count classes) (count instances))
@@ -56,44 +57,12 @@
 (defn take-last [i coll]
   (drop (- (count coll) i) coll))
 
-(comment
-(defmacro defmethodf
-  [name dispatch-val v flaggroup-coll & body]
- `(defmethodfd ~name ~dispatch-val ~v [] ~flaggroup-coll ~@body))
-
-(defmacro defnf [name arg1 & r]
-  (let [docstring-splicer          (if (string? arg1) (list arg1) '())
-        [v flaggroup-coll & body]  (if (string? arg1) r (cons arg1 r))]
-   `(defnfd ~name ~@docstring-splicer ~v [] ~flaggroup-coll ~@body)))
-
-(defmacro defmethodfd
-  [name dispatch-val [v1 v2 v3 v4] default-flags flaggroup-coll & body]
-  (let [all-args                    (or v1 `_#)
-        local-flags                 (or v2 `_#)
-        passthrough-flags           (or v3 `_#)
-        passthrough                 (or v4 `_#)]
-   `(defmethod ~name ~dispatch-val [& args#]
-      (let [~all-args          (remove keyword? args#)
-            ~local-flags       (match-flags (concat args# ~default-flags) ~flaggroup-coll)
-            ~passthrough-flags (filter keyword? (remove-flags args# ~flaggroup-coll))
-            ~passthrough       (remove-flags args# ~flaggroup-coll)]
-        ~@body))))
-
-(defmacro defnfd [name arg1 & r]
-  (let [docstring-splicer           (if (string? arg1) (list arg1) '())
-       [[v1 v2 v3 v4] default-flags
-        flaggroup-coll & body]      (if (string? arg1) r (cons arg1 r))
-        all-args                    (or v1 `_#)
-        local-flags                 (or v2 `_#)
-        passthrough-flags           (or v3 `_#)
-        passthrough                 (or v4 `_#)]
-   `(defn ~name ~@docstring-splicer [& args#]
-      (let [~all-args          (remove keyword? args#)
-            ~local-flags       (match-flags (concat args# ~default-flags) ~flaggroup-coll)
-            ~passthrough-flags (filter keyword? (remove-flags args# ~flaggroup-coll))
-            ~passthrough       (remove-flags args# ~flaggroup-coll)]
-        ~@body))))
-)
+(defn re-split
+  "Splits the string on instances of 'pattern'.  Returns a sequence of
+  strings.  Optional 'limit' argument is the maximum number of
+  splits.  Like Perl's 'split'."
+  ([#^Pattern pattern string] (seq (. pattern (split string))))
+  ([#^Pattern pattern string limit] (seq (. pattern (split string limit)))))
 
 (defmacro defnf-*
 [macro name parse-flaggable? dispatcher-list flagset-coll defaults doc?-flagbind? flagbind?-bind? & bind?+body]
@@ -122,9 +91,3 @@
 
 (defmacro defmethodf [name dispatcher & remainder]
  `(defnf-* defmethod ~name false (~dispatcher) ~@remainder))
-
-;(defmacro defnf-f [name flagset-coll & remainder]
-; `(defnf-fd ~name ~flagset-coll [] ~@remainder))
-;
-;(defmacro defnf [name & remainder]
-; `(defnf-f ~name [] ~@remainder))

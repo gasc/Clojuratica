@@ -57,7 +57,7 @@
         (apply evaluate (concat args retained-flags [kernel-link])))))
 
 (defnf evaluate [] []
-  [flags passthrough-flags _]
+  [_ passthrough-flags passthrough]
   [& args]
-  (let [output (send-read (apply build-module args) (last args))]
+  (let [output (send-read (apply build-module passthrough) (last args))]
     (CExpr. output passthrough-flags)))

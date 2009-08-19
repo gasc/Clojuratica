@@ -9,7 +9,7 @@
 
   <available property="hasclojure" file="${clojure.jar}"/>
   <available property="hasjlink" file="${jlink.jar}"/>
-    
+
   <target name="check_hasclojure"
           description="Print a warning message if clojure.jar is undefined"
           unless="hasclojure">
@@ -51,6 +51,7 @@
       <sysproperty key="clojure.compile.path" value="${build}"/>
       <arg value="clojuratica.Flaggable"/>
       <arg value="clojuratica.CExpr"/>
+      <arg value="clojuratica.CHelper"/>
       <arg value="clojuratica.CLink"/>
       <arg value="clojuratica.test.SimpleClass"/>
     </java>

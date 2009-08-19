@@ -1,7 +1,7 @@
 
 (use 'clojuratica.clojuratica)
 (use 'clojuratica.lib)
-(import '[com.wolfram.jlink MathLinkFactory])
+(import '[com.wolfram.jlink MathLinkFactory] '[clojuratica.CLink])
 (require '[clojuratica.core :as core] '[clojuratica.low-level :as low-level])
 (def kernel-link (MathLinkFactory/createKernelLink
           "-linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
