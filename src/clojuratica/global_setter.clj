@@ -33,6 +33,9 @@
 ;
 ; ***** END LICENSE BLOCK *****
 
+(ns clojuratica.clojuratica)
+(declare get-evaluator)
+
 (ns clojuratica.global-setter
   (:use [clojuratica.lib]
         [clojuratica.core]
