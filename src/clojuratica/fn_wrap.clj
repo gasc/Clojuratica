@@ -34,7 +34,7 @@
 ; ***** END LICENSE BLOCK *****
 
 (ns clojuratica.clojuratica)
-(declare get-fn-wrapper get-parser)
+(declare get-fn-wrapper get-parser get-evaluator)
 
 (ns clojuratica.fn-wrap
   (:use [clojuratica.core]
