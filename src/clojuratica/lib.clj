@@ -80,14 +80,14 @@
                     ~@body))]
           (apply fn# args#))))))
 
-(defmacro defnfa [name & remainder]
- `(defnf-* defn ~name true () ~@remainder))
+;(defmacro defnfa [name & remainder]
+; `(defnf-* defn ~name true () ~@remainder))
 
 (defmacro defnf [name & remainder]
  `(defnf-* defn ~name false () ~@remainder))
 
-(defmacro defmethodfa [name dispatcher & remainder]
- `(defnf-* defmethod ~name true (~dispatcher) ~@remainder))
+;(defmacro defmethodfa [name dispatcher & remainder]
+; `(defnf-* defmethod ~name true (~dispatcher) ~@remainder))
 
 (defmacro defmethodf [name dispatcher & remainder]
  `(defnf-* defmethod ~name false (~dispatcher) ~@remainder))

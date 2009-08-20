@@ -36,9 +36,9 @@
 
 (ns clojuratica.CExpr
   (:gen-class
-   :methods [[getExpr [] com.wolfram.jlink.Expr]]
+   :methods [[getExpr  [] com.wolfram.jlink.Expr]
+             [getFlags [] clojure.lang.IPersistentCollection]]
    :extends clojure.lang.ASeq
-   :implements [clojuratica.Flaggable]
    :init init
    :constructors {[Object] [],
                   [Object Integer] [],
