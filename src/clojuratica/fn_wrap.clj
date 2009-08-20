@@ -83,7 +83,8 @@
         parse       (if (flags :parse)
                       (get-parser kernel-link fn-wrap)
                       identity)
-        math        (comp parse evaluate)]
+        math        (comp parse evaluate)
+        sevaluate   (get-evaluator :serial kernel-link)]
     (if-not (or (= "Set"        head)
                 (= "SetDelayed" head)
                 (= "Function"   head)
@@ -99,12 +100,15 @@
               expressed-arg-list (add-head "List" expressed-args)
               fn-call            (add-head "Apply" [expr expressed-arg-list])]
           (apply math assignments fn-call passthrough-flags)))
-      (fn [& args]
-        (let [lhs             (.part expr 1)
-              expressed-args  (map (fn [x] (.getExpr (convert x))) args)
-              name            (if (zero? (count (.args lhs)))
-                                (.toString lhs)
-                                (.toString (.head lhs)))
-              assignments     (vec (concat assignments [name :undefined]))
-              fn-call         (add-head name expressed-args)]
-          (apply math assignments expr fn-call passthrough-flags))))))
+      (do
+        (let [lhs   (.part expr 1)
+              name  (if (zero? (count (.args lhs)))
+                      (.toString lhs)
+                      (.toString (.head lhs)))]
+          (sevaluate assignments expr)
+          (if (evaluate :parallel?)
+            (sevaluate [] (str "DistributeDefinitions[" name "]")))
+          (fn [& args]
+            (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
+                  fn-call         (add-head name expressed-args)]
+              (apply math [] fn-call passthrough-flags))))))))
