@@ -100,15 +100,14 @@
               expressed-arg-list (add-head "List" expressed-args)
               fn-call            (add-head "Apply" [expr expressed-arg-list])]
           (apply math assignments fn-call passthrough-flags)))
-      (do
-        (let [lhs   (.part expr 1)
-              name  (if (zero? (count (.args lhs)))
-                      (.toString lhs)
-                      (.toString (.head lhs)))]
-          (sevaluate assignments expr)
-          (if (evaluate :parallel?)
-            (sevaluate [] (str "DistributeDefinitions[" name "]")))
-          (fn [& args]
-            (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
-                  fn-call         (add-head name expressed-args)]
-              (apply math [] fn-call passthrough-flags))))))))
+      (let [lhs   (.part expr 1)
+            name  (if (zero? (count (.args lhs)))
+                    (.toString lhs)
+                    (.toString (.head lhs)))]
+        (sevaluate assignments expr)
+        (if (evaluate :parallel?)
+          (sevaluate [] (str "DistributeDefinitions[" name "]")))
+        (fn [& args]
+          (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
+                fn-call         (add-head name expressed-args)]
+            (apply math [] fn-call passthrough-flags))))))))
