@@ -3,7 +3,7 @@
    :methods [#^{:static true} [getEvaluator         [Object String]               Object]
              #^{:static true} [getParser            [Object Object String]        Object]
              #^{:static true} [getGlobalSetter      [Object String]               Object]
-             #^{:static true} [getMmafn             [Object String]               Object]])
+             #^{:static true} [getFnWrap             [Object String]               Object]])
   (:import [com.wolfram.jlink StdLink])
   (:use [clojuratica.clojuratica]
         [clojuratica.lib]))
@@ -23,14 +23,14 @@
     (apply get-evaluator kernel-link flags)))
 
 (defn -getParser [& args]
-  (let [[kernel-link mmafn flag-str] (exprs-to-nils args)
+  (let [[kernel-link fn-wrap flag-str] (exprs-to-nils args)
         flags                        (string-to-keywords flag-str)]
-    (apply get-parser kernel-link mmafn flags)))
+    (apply get-parser kernel-link fn-wrap flags)))
 
-(defn -getMmafn [& args]
+(defn -getFnWrap [& args]
   (let [[evaluate flag-str]    (exprs-to-nils args)
         flags                  (string-to-keywords flag-str)]
-    (apply get-mmafn evaluate flags)))
+    (apply get-fn-wrapper evaluate flags)))
 
 (defn -getGlobalSetter [& args]
   (let [[evaluate flag-str]    (exprs-to-nils args)

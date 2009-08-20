@@ -6,19 +6,19 @@
 (.discardAnswer kernel-link)
 
 (def evaluate (get-evaluator kernel-link))
-(def mmafn (get-mmafn evaluate))
-(def parse (get-parser kernel-link mmafn))
+(def fn-wrap (get-fn-wrapper evaluate))
+(def parse (get-parser kernel-link fn-wrap))
 (def math (comp parse evaluate))
 (def global-set (get-global-setter evaluate))
 
 (def pevaluate (get-evaluator kernel-link :parallel))
-(def pmmafn (get-mmafn pevaluate))
-(def pparse (get-parser kernel-link pmmafn))
+(def pfn-wrap (get-fn-wrapper pevaluate))
+(def pparse (get-parser kernel-link pfn-wrap))
 (def pmath (comp pparse pevaluate))
 (def pglobal-set (get-global-setter pevaluate))
 
-(doseq [[evaluate mmafn parse math global-set] [[evaluate  mmafn  parse  math  global-set]
-                                                [pevaluate pmmafn pparse pmath pglobal-set]]]
+(doseq [[evaluate fn-wrap parse math global-set] [[evaluate  fn-wrap  parse  math  global-set]
+                                                [pevaluate pfn-wrap pparse pmath pglobal-set]]]
   (assert (= 2 (math [] "1+1")))
   (assert (= '(1 2 3) (math [] "{1,2,3}" :seqs)))
   (assert (= [1 2 3] (math [] "{1,2,3}" :vectors)))
@@ -46,13 +46,13 @@
                  (do (global-set "obj" obj) (math [] "obj"))
                  (parse (low-level/convert obj))))))
 
-  (def increment-me (mmafn ["one" 1] "Function[{x}, x + one]" :no-parse))
+  (def increment-me (fn-wrap ["one" 1] "Function[{x}, x + one]" :no-parse))
   (assert (= 2 (parse (increment-me 1))))
 
-  (def increment-me (mmafn ["one" 1] "Function[{x}, x + one]" :parse))
+  (def increment-me (fn-wrap ["one" 1] "Function[{x}, x + one]" :parse))
   (assert (= 2 (increment-me 1)))
 
-  (def fn-generating-fn (mmafn [] "Function[{x}, Table[Function[{y}, y+1], {x}]]" :vectors))
+  (def fn-generating-fn (fn-wrap [] "Function[{x}, Table[Function[{y}, y+1], {x}]]" :vectors))
   (def fn-vector (fn-generating-fn 10))
   (assert (= 10 (count fn-vector)))
   (assert (= 0 ((fn-vector 4) -1)))

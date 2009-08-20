@@ -34,9 +34,9 @@
 ; ***** END LICENSE BLOCK *****
 
 (ns clojuratica.clojuratica)
-(declare get-mmafn get-parser)
+(declare get-fn-wrapper get-parser)
 
-(ns clojuratica.mmafn
+(ns clojuratica.fn-wrap
   (:use [clojuratica.core]
         [clojuratica.clojuratica]
         [clojuratica.parser]
@@ -44,51 +44,51 @@
   (:import [clojuratica CExpr]
            [com.wolfram.jlink Expr]))
 
-(defnf mmafn-dispatch [] []
+(defnf fn-wrap-dispatch [] []
   []
   [& args]
   (let [assignments  (first args)
         expression   (second args)]
     (if-not (vector? assignments)
-      (throw (Exception. (str "First argument to mmafn "
+      (throw (Exception. (str "First argument to fn-wrap "
                               "must be a vector of assignments"))))
     (cond (string? expression)          :string
           (instance? Expr expression)   :expr
           (instance? CExpr expression)  :cexpr
-          true (throw (Exception. (str "Second argument to mmafn must be "
+          true (throw (Exception. (str "Second argument to fn-wrap must be "
                                        "string, Expr, or CExpr. You passed an object "
                                        "of class " (class expression)))))))
 
-(defmulti mmafn mmafn-dispatch)
+(defmulti fn-wrap fn-wrap-dispatch)
 
-(defmethodf mmafn :string [] []
+(defmethodf fn-wrap :string [] []
   [_ passthrough-flags]
   [assignments s evaluate]
   (let [kernel-link (evaluate :get-kernel-link)
         expr        (.getExpr (express s kernel-link))]
-    (apply mmafn assignments expr evaluate passthrough-flags)))
+    (apply fn-wrap assignments expr evaluate passthrough-flags)))
 
-(defmethodf mmafn :cexpr [] []
+(defmethodf fn-wrap :cexpr [] []
   [_ passthrough-flags]
   [assignments cexpr evaluate]
   (let [expr (.getExpr cexpr)]
-    (apply mmafn assignments expr evaluate passthrough-flags)))
+    (apply fn-wrap assignments expr evaluate passthrough-flags)))
 
-(defmethodf mmafn :expr [[:parse :no-parse]] [:parse]
+(defmethodf fn-wrap :expr [[:parse :no-parse]] [:parse]
   [flags passthrough-flags]
   [assignments expr evaluate]
   (let [head        (.toString (.part expr 0))
         kernel-link (evaluate :get-kernel-link)
-        mmafn       (apply get-mmafn evaluate flags)
+        fn-wrap     (apply get-fn-wrapper evaluate flags)
         parse       (if (flags :parse)
-                      (get-parser kernel-link mmafn)
+                      (get-parser kernel-link fn-wrap)
                       identity)
         math        (comp parse evaluate)]
     (if-not (or (= "Set"        head)
                 (= "SetDelayed" head)
                 (= "Function"   head)
                 (= "Symbol"     head))
-      (throw (Exception. (str "mmafn must be passed a "
+      (throw (Exception. (str "fn-wrap must be passed a "
                               "string that contains a pure function "
                               "(head Function), a function definition "
                               "(head Set (=) or SetDelayed (:=)), or "

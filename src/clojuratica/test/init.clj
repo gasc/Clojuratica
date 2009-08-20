@@ -8,13 +8,13 @@
 (.discardAnswer kernel-link)
 
 (def evaluate (get-evaluator kernel-link))
-(def mmafn (get-mmafn evaluate))
-(def parse (get-parser kernel-link mmafn))
+(def fn-wrap (get-fn-wrapper evaluate))
+(def parse (get-parser kernel-link fn-wrap))
 (def math (comp parse evaluate))
 (def global-set (get-global-setter evaluate))
 
 (def pevaluate (get-evaluator kernel-link :parallel))
-(def pmmafn (get-mmafn pevaluate))
-(def pparse (get-parser kernel-link pmmafn))
+(def pfn-wrap (get-fn-wrapper pevaluate))
+(def pparse (get-parser kernel-link pfn-wrap))
 (def pmath (comp pparse pevaluate))
 (def pglobal-set (get-global-setter pevaluate))

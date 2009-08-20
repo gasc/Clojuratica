@@ -36,7 +36,7 @@
 (ns clojuratica.clojuratica
   (:require [clojuratica.serial-evaluator   :as serial-evaluator]
             [clojuratica.parallel-evaluator :as parallel-evaluator]
-            [clojuratica.mmafn              :as mmafn]
+            [clojuratica.fn-wrap              :as fn-wrap]
             [clojuratica.parser             :as parser]
             [clojuratica.global-setter      :as global-setter])
   (:use [clojuratica.lib]))
@@ -48,19 +48,19 @@
     (apply parallel-evaluator/get-evaluator passthrough)
     (apply serial-evaluator/get-evaluator passthrough)))
 
-(defnf get-mmafn [] []
+(defnf get-fn-wrapper [] []
   [_ retained-flags]
   [evaluate]
   (when-not (fn? evaluate)
-    (throw (Exception. "First non-flag argument to get-mmafn must be a Clojuratica evaluator.")))
+    (throw (Exception. "First non-flag argument to get-fn-wrapper must be a Clojuratica evaluator.")))
   (fn [& args]
-    (apply mmafn/mmafn (concat args retained-flags [evaluate]))))
+    (apply fn-wrap/fn-wrap (concat args retained-flags [evaluate]))))
 
 (defnf get-parser [] []
   [_ retained-flags]
-  [& [kernel-link mmafn]]
+  [& [kernel-link fn-wrap]]
   (fn [& args]
-    (apply parser/parse (concat args retained-flags [kernel-link mmafn]))))
+    (apply parser/parse (concat args retained-flags [kernel-link fn-wrap]))))
 
 (defn get-global-setter
   [evaluate]

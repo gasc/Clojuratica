@@ -9,7 +9,7 @@
 (defn -increment [obj]
   (map inc obj))
 
-(defn -mIncrement [obj evaluate parse mmafn]
+(defn -mIncrement [obj evaluate parse fn-wrap]
   (parse (evaluate ["obj" obj] "Map[#+1&, obj]" "10+obj")))
 
 (defn -clojureMap [obj1 obj2]

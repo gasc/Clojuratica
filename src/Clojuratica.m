@@ -102,7 +102,7 @@ Clojure@JavaNew[class_String, args___] :=
 		JavaNew[class, convertedArgSeq]];
 
 
-Options[Clojure] = {Mmafn -> False};
+Options[Clojure] = {FnWrap -> False};
 
 
 SetAttributes[Clojure, HoldFirst];
@@ -123,7 +123,7 @@ ClojureConvert[expr_] :=
 		LoadJavaClass["clojuratica.CHelper"];
 		If[JavaObjectQ[expr], 
 			expr,
-			clojuratica`CHelper`convert[expr // MakeJavaExpr, OptionValue[Clojure, Mmafn]] // ReturnAsJavaObject]];
+			clojuratica`CHelper`convert[expr // MakeJavaExpr, OptionValue[Clojure, FnWrap]] // ReturnAsJavaObject]];
 
 
 Begin["`Private`"];

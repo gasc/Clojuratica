@@ -45,11 +45,11 @@
   (:use [clojuratica.clojuratica]
         [clojuratica.low-level]))
 
-(defn -convert [expr mmafn?]
+(defn -convert [expr fn-wrap?]
   (let [kernel-link (StdLink/getLink)
         evaluate    (get-evaluator kernel-link)
-        mmafn       (if mmafn? (get-mmafn evaluate))
-        parse       (get-parser kernel-link mmafn)]
+        fn-wrap       (if fn-wrap? (get-fn-wrapper evaluate))
+        parse       (get-parser kernel-link fn-wrap)]
     (parse expr)))
 
 (defn -parse [obj]

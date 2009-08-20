@@ -177,7 +177,7 @@ Cell[BoxData[
   RowBox[{
    RowBox[{"Options", "[", "Clojure", "]"}], " ", "=", " ", 
    RowBox[{"{", 
-    RowBox[{"Mmafn", " ", "->", " ", "True"}], "}"}]}], ";"}]], "Input",
+    RowBox[{"FnWrap", " ", "->", " ", "True"}], "}"}]}], ";"}]], "Input",
  CellChangeTimes->{{3.4590897743059998`*^9, 3.459089798513*^9}, {
    3.459089978658*^9, 3.45908997912*^9}, {3.459090056843*^9, 
    3.459090072104*^9}, {3.459092233205*^9, 3.45909224617*^9}, {
@@ -290,9 +290,9 @@ Cell[BoxData[
 Cell[CellGroupData[{
 
 Cell[BoxData[
- RowBox[{"mmafn", " ", "=", " ", 
+ RowBox[{"fn-wrap", " ", "=", " ", 
   RowBox[{
-   RowBox[{"CLink`getMmafn", "[", 
+   RowBox[{"CLink`getFnWrap", "[", 
     RowBox[{"evaluate", ",", " ", "\"\<\>\""}], "]"}], "//", 
    "ReturnAsJavaObject"}]}]], "Input",
  CellChangeTimes->{{3.459106845626*^9, 3.459106883255*^9}, 3.45912637201*^9}],
@@ -302,7 +302,7 @@ Cell[BoxData[
   RowBox[{"\[LeftGuillemet]", 
    RowBox[{"JavaObject", "[", 
     RowBox[{
-     RowBox[{"clojuratica", ".", "clojuratica$get_mmafn"}], "__", "558", 
+     RowBox[{"clojuratica", ".", "clojuratica$get_fn-wrap"}], "__", "558", 
      "$fn__", "36", "__auto", "___", "_", "566", "$fn__", "568"}], "]"}], 
    "\[RightGuillemet]"}],
   JLink`Objects`vm1`JavaObject463648682147841]], "Output",
@@ -317,7 +317,7 @@ Cell[BoxData[
  RowBox[{"parse", " ", "=", " ", 
   RowBox[{
    RowBox[{"CLink`getParser", "[", 
-    RowBox[{"kl", ",", "mmafn", ",", " ", "\"\<:vectors\>\""}], "]"}], "//", 
+    RowBox[{"kl", ",", "fn-wrap", ",", " ", "\"\<:vectors\>\""}], "]"}], "//", 
    "ReturnAsJavaObject"}]}]], "Input",
  CellChangeTimes->{{3.459106870611*^9, 3.459106905995*^9}, {3.459126119538*^9,
     3.459126121658*^9}, 3.4591262129230003`*^9}],
@@ -368,7 +368,7 @@ Cell[CellGroupData[{
 Cell[BoxData[
  RowBox[{"Clojure", "@", 
   RowBox[{"SimpleClass`mIncrement", "[", 
-   RowBox[{"1", ",", "evaluate", ",", "parse", ",", "mmafn"}], 
+   RowBox[{"1", ",", "evaluate", ",", "parse", ",", "fn-wrap"}], 
    "]"}]}]], "Input",
  CellChangeTimes->{{3.459107687722*^9, 3.459107705242*^9}, {3.45910774875*^9, 
   3.459107752593*^9}, {3.459107792101*^9, 3.459107832285*^9}, {

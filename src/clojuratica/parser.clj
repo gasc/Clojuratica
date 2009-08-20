@@ -60,35 +60,35 @@
 
 (defmethodf parse :string [] []
   [_ passthrough-flags]
-  [s & [kernel-link mmafn]]
+  [s & [kernel-link fn-wrap]]
   ; Takes a string and a KernelLink instance. Converts s to a CExpr using kernel-link, then parses the
   ; resulting CExpr into a Clojure object. Returns this Clojure object. For details on how CExprs
   ; are parsed see the documentation for the CExpr class.
   (if-not (instance? com.wolfram.jlink.KernelLink kernel-link)
     (throw (Exception. "When argument to parse is a string, the parser must have been created with a kernel-link argument.")))
-  (apply parse (express s kernel-link) kernel-link mmafn passthrough-flags))
+  (apply parse (express s kernel-link) kernel-link fn-wrap passthrough-flags))
 
 (defmethodf parse :expr [] []
   [_ passthrough-flags]
-  [expr & [_ mmafn]]
-  (apply parse (express expr) nil mmafn passthrough-flags))
+  [expr & [_ fn-wrap]]
+  (apply parse (express expr) nil fn-wrap passthrough-flags))
 
 (defmethodf parse :cexpr [[:vectors :seqs]
-                          [:mmafn :no-mmafn]]
+                          [:fn-wrap :no-fn-wrap]]
                          (concat (.getFlags cexpr) [:seqs])
   [flags]
-  [cexpr & [_ mmafn]]
-  (if (and (flags :mmafn) (nil? mmafn))
-    (throw (Exception. "Cannot parse functions using mmafn unless parser was created with an mmafn argument.")))
-  (let [mmafn (if (flags :no-mmafn) nil mmafn)]
+  [cexpr & [_ fn-wrap]]
+  (if (and (flags :fn-wrap) (nil? fn-wrap))
+    (throw (Exception. "Cannot parse functions using fn-wrap unless parser was created with an fn-wrap argument.")))
+  (let [fn-wrap (if (flags :no-fn-wrap) nil fn-wrap)]
     (if (flags :vectors)
-      (parse-to-vectors cexpr mmafn)
-      (parse-to-lazy-seqs cexpr mmafn))))
+      (parse-to-vectors cexpr fn-wrap)
+      (parse-to-lazy-seqs cexpr fn-wrap))))
 
 (defmethod parse :nil [& args]
   nil)
 
-(defn parse-atom [cexpr mmafn]
+(defn parse-atom [cexpr fn-wrap]
   (let [expr (.getExpr cexpr)]
     (cond (.bigIntegerQ expr)                     (.asBigInteger expr)
           (.bigDecimalQ expr)                     (.asBigDecimal expr)
@@ -96,30 +96,30 @@
           (.realQ expr)                           (.asDouble expr)
           (.stringQ expr)                         (.asString expr)
           (= "Null" (.toString expr))             nil
-          (= "Function" (.toString (.head expr))) (if mmafn (mmafn [] expr) cexpr)
+          (= "Function" (.toString (.head expr))) (if fn-wrap (fn-wrap [] expr) cexpr)
           true                                    cexpr)))
 
-(defn parse-to-lazy-seqs [cexpr mmafn]
+(defn parse-to-lazy-seqs [cexpr fn-wrap]
   (if-not (.listQ (.getExpr cexpr))
-    (parse-atom cexpr mmafn)
+    (parse-atom cexpr fn-wrap)
     (let [parse-list-elements
             (fn parse-list-elements [s]
                (when (seq s)
                  (lazy-seq
-                   (cons (parse-to-lazy-seqs (CExpr. (first s)) mmafn)
+                   (cons (parse-to-lazy-seqs (CExpr. (first s)) fn-wrap)
                          (parse-list-elements (rest s))))))]
       (parse-list-elements (rest cexpr)))))
 
-(defn parse-to-vectors [cexpr mmafn]  ; logic courtesy of Meikel Brandmeyer
+(defn parse-to-vectors [cexpr fn-wrap]  ; logic courtesy of Meikel Brandmeyer
   (if-not (.listQ (.getExpr cexpr))
-    (parse-atom cexpr mmafn)
+    (parse-atom cexpr fn-wrap)
     (loop [elements (next cexpr)
            v        []
            stack    nil]
       (if-let [elements (seq elements)]
         (let [first-cexpr (CExpr. (first elements))]
           (if-not (.listQ (.getExpr first-cexpr))
-            (recur (next elements) (conj v (parse-atom first-cexpr mmafn)) stack)
+            (recur (next elements) (conj v (parse-atom first-cexpr fn-wrap)) stack)
             (recur (next first-cexpr) [] (conj stack [(next elements) v]))))
         (if (seq stack)
           (let [[elements prior-v] (peek stack)]
