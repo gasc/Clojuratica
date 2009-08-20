@@ -85,24 +85,26 @@
 (defmethod send-read :string [s kernel-link]
   ; Takes a string and a KernelLink instance. Treats s as a Mathematica expression and evaluates it
   ; using the kernel at the other end of kernel-link. Returns a CExpr containing the output.
-  (locking kernel-link
-    ;(println ">" s)
-    (.evaluate kernel-link s)
-    (.waitForAnswer kernel-link)
-    (let [output (.. kernel-link getExpr)]
-      ;(println output)
-      (express output))))
+  (io! "The Clojuratica function you have called has side effects."
+    (locking kernel-link
+      ;(println ">" s)
+      (.evaluate kernel-link s)
+      (.waitForAnswer kernel-link)
+      (let [output (.. kernel-link getExpr)]
+        ;(println output)
+        (express output)))))
 
 (defmethod send-read :expr [expr kernel-link]
   ; Takes an Expr instance and a KernelLink instance. Evaluates expr using the kernel at the other
   ; end of kernel-link. Returns a CExpr containing the output.
-  (locking kernel-link
-    ;(println ">" expr)
-    (.evaluate kernel-link expr)
-    (.waitForAnswer kernel-link)
-    (let [output (.. kernel-link getExpr)]
-      ;(println output)
-      (express output))))
+  (io! "The Clojuratica function you have called has side effects."
+    (locking kernel-link
+      ;(println ">" expr)
+      (.evaluate kernel-link expr)
+      (.waitForAnswer kernel-link)
+      (let [output (.. kernel-link getExpr)]
+        ;(println output)
+        (express output)))))
 
 (defmethod send-read :cexpr [cexpr kernel-link]
   ; Takes a CExpr instance and a KernelLink instance. Evaluates cexpr using the kernel at the other
@@ -202,17 +204,18 @@
   "Converts a string, s, to a Mathematica expression (i.e. an Expr object). Uses the Mathematica
   kernel on the other end of kernel-link to interpret Mathematica syntax."
   [s kernel-link]
-  (let [held-s (str "HoldComplete[" s "]")]
-    (locking kernel-link
-      ;(println "string-to-expr>" held-s)
-      (.evaluate kernel-link held-s)
-      (.waitForAnswer kernel-link)
-      (let [result (.. kernel-link getExpr args)]
-        (if-not (first result)
-          (throw (Exception. (str "Invalid expression: " s))))
-        (if (next result)
-          (throw (Exception. (str "Invalid expression: " s))))
-        (first result)))))
+  (io! "The Clojuratica function you have called has side effects."
+    (let [held-s (str "HoldComplete[" s "]")]
+      (locking kernel-link
+        ;(println "string-to-expr>" held-s)
+        (.evaluate kernel-link held-s)
+        (.waitForAnswer kernel-link)
+        (let [result (.. kernel-link getExpr args)]
+          (if-not (first result)
+            (throw (Exception. (str "Invalid expression: " s))))
+          (if (next result)
+            (throw (Exception. (str "Invalid expression: " s))))
+          (first result))))))
 
 
 

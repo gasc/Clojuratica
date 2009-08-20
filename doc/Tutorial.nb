@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       145,          7]
-NotebookDataLength[    428777,       8404]
-NotebookOptionsPosition[    413368,       7982]
-NotebookOutlinePosition[    415767,       8044]
-CellTagsIndexPosition[    415673,       8039]
+NotebookDataLength[    430486,       8440]
+NotebookOptionsPosition[    414952,       8014]
+NotebookOutlinePosition[    417351,       8076]
+CellTagsIndexPosition[    417257,       8071]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -4907,8 +4907,7 @@ Cell[CellGroupData[{
 
 Cell["Getting Started", "Section",
  CellChangeTimes->{{3.459688519238*^9, 3.459688521427*^9}, 
-   3.4596885959779997`*^9, 3.459688665209*^9},
- FormatType->"TextForm"],
+   3.4596885959779997`*^9, 3.459688665209*^9}],
 
 Cell[CellGroupData[{
 
@@ -4953,7 +4952,7 @@ Cell[TextData[{
    3.4581754431619997`*^9}, {3.458175591683*^9, 3.4581756005480003`*^9}, {
   3.4581756699379997`*^9, 3.458175691401*^9}, {3.458226945207*^9, 
   3.458226963428*^9}, {3.4596157496540003`*^9, 3.459615761054*^9}}]
-}, Closed]],
+}, Open  ]],
 
 Cell[CellGroupData[{
 
@@ -7675,7 +7674,7 @@ too.\
   3.45972968075*^9, 3.459729691752*^9}, {3.459730365278*^9, 
   3.4597304247390003`*^9}, {3.459730686376*^9, 3.45973069048*^9}},
  FormatType->"TextForm"]
-}, Open  ]],
+}, Closed]],
 
 Cell[CellGroupData[{
 
@@ -7690,15 +7689,21 @@ Cell[TextData[{
 
 Cell[CellGroupData[{
 
-Cell["Context", "Section",
- CellChangeTimes->{{3.4582467488120003`*^9, 3.458246749551*^9}},
+Cell["Getting Started", "Section",
+ CellChangeTimes->{{3.4582467488120003`*^9, 3.458246749551*^9}, 
+   3.459732733774*^9}],
+
+Cell[CellGroupData[{
+
+Cell["Context", "Subsection",
+ CellChangeTimes->{{3.459732745289*^9, 3.459732746014*^9}},
  FormatType->"TextForm"],
 
 Cell[TextData[{
  "The ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
- " package provides a variety of features for working with Clojure. It \
+ " package provides features for calling Java classes written in Clojure. It \
 supports a paradigm wherein the control-flow of your program is written on \
 the ",
  StyleBox["Mathematica",
@@ -7708,59 +7713,85 @@ the ",
  CellChangeTimes->{{3.458246782359*^9, 3.458246810166*^9}, {3.458246843067*^9,
    3.458246869084*^9}, {3.458246948409*^9, 3.458246954409*^9}, {
   3.459628459356*^9, 3.459628459361*^9}, {3.4596455859630003`*^9, 
-  3.4596455862799997`*^9}}],
+  3.4596455862799997`*^9}, {3.4597321489639997`*^9, 3.459732153168*^9}, {
+  3.459732601909*^9, 3.4597326057799997`*^9}}],
 
 Cell[TextData[{
- "There are two ways to call Clojure from ",
- StyleBox["Mathematica",
-  FontSlant->"Italic"],
- "."
-}], "Text",
- CellChangeTimes->{{3.458247472749*^9, 3.458247477598*^9}}],
-
-Cell[TextData[{
- "As we will see, by far the most efficient and clear way is to compile your \
-Clojure code into Java classes using Clojure's gen-class functionality. See \
-the Clojure's ",
+ "Calls to Clojure must take the form of calls to the methods (static methods \
+or instance methods) of Java classes generated using Clojure's gen-class \
+functionality. See the Clojure's ",
  ButtonBox["guide on compilation and class-generation",
   BaseStyle->"Hyperlink",
   ButtonData->{
     URL["http://clojure.org/compilation"], None},
   ButtonNote->"http://clojure.org/compilation"],
- " for more information on how this works. Clojuratica provides a special \
-syntax for calling the methods of classes compiled in this way, such that \
-data-type translation of arguments and return values happens seamlessly. We \
-will discuss some simple examples below."
+ " for more information on how gen-class works. "
+}], "Text",
+ CellChangeTimes->{{3.458246955717*^9, 3.4582470422650003`*^9}, {
+   3.4582471102469997`*^9, 3.458247171449*^9}, {3.4582473279300003`*^9, 
+   3.458247338748*^9}, {3.458247486849*^9, 3.458247511719*^9}, {
+   3.4597317872209997`*^9, 3.4597318451099997`*^9}, {3.4597319870299997`*^9, 
+   3.459732086026*^9}, 3.459732169767*^9, {3.459732621885*^9, 
+   3.459732624835*^9}}],
+
+Cell[TextData[{
+ "Clojuratica does not support the runtime evaluation of arbitrary Clojure \
+expressions (as if a REPL were embedded in ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ "). This is for both technical and performance reasons. Even if there were \
+no technical difficulties with embedding a REPL, method calls to compiled \
+classes would be the way to go for performance reasons alone."
 }], "Text",
  CellChangeTimes->{{3.458246955717*^9, 3.4582470422650003`*^9}, {
   3.4582471102469997`*^9, 3.458247171449*^9}, {3.4582473279300003`*^9, 
-  3.458247338748*^9}, {3.458247486849*^9, 3.458247511719*^9}}],
+  3.458247338748*^9}, {3.458247486849*^9, 3.458247511719*^9}, {
+  3.4597317872209997`*^9, 3.4597318451099997`*^9}, {3.4597319870299997`*^9, 
+  3.459732086026*^9}, {3.459732169767*^9, 3.459732340983*^9}, {
+  3.459732632513*^9, 3.459732683144*^9}}],
 
 Cell[TextData[{
- "A second way to call Clojure from ",
+ "Veteran ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
- " is to use the embedded Clojure REPL provided by Clojuratica. This feature \
-loads the Clojure compiler and all of Clojure's libraries directly into ",
+ " users will note that Clojuratica's interface to Clojure is similar to ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
- ", such that you can execute arbitrary Clojure commands from ",
+ "'s interface to Java. They are both based on method calls to compiled \
+classes. Indeed, the Clojure interface piggy-backs on ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
- " without any thought of Java classes. The drawbacks of this method are felt \
-in performance and elegance. You are encouraged to access Clojure via \
-compiled classes wherever possible, using the REPL for prototyping and \
-experimenting only."
+ "'s existing Java interface, and the syntax is nearly identical. \
+Clojuratica's contribution is merely to ensure that method arguments and \
+return values are translated transparantly between Clojure and ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " data types."
 }], "Text",
- CellChangeTimes->{{3.458247175822*^9, 3.4582473163570004`*^9}, {
-  3.458247527023*^9, 3.458247530012*^9}},
- FormatType->"TextForm"]
+ CellChangeTimes->{{3.458246955717*^9, 3.4582470422650003`*^9}, {
+  3.4582471102469997`*^9, 3.458247171449*^9}, {3.4582473279300003`*^9, 
+  3.458247338748*^9}, {3.458247486849*^9, 3.458247511719*^9}, {
+  3.4597317872209997`*^9, 3.459731961276*^9}, {3.459732093453*^9, 
+  3.459732129193*^9}, {3.45973235544*^9, 3.459732484311*^9}, {
+  3.459732525611*^9, 3.4597325617980003`*^9}, {3.4597327037860003`*^9, 
+  3.459732712257*^9}}],
+
+Cell["\<\
+The following sections illustrate how to use Clojuratica's special syntax for \
+calling Clojure-generated Java classes.\
+\>", "Text",
+ CellChangeTimes->{{3.458246955717*^9, 3.4582470422650003`*^9}, {
+  3.4582471102469997`*^9, 3.458247171449*^9}, {3.4582473279300003`*^9, 
+  3.458247338748*^9}, {3.458247486849*^9, 3.458247511719*^9}, {
+  3.4597317872209997`*^9, 3.459731961276*^9}, {3.459732093453*^9, 
+  3.459732129193*^9}, {3.45973235544*^9, 3.459732588508*^9}}]
 }, Open  ]],
 
 Cell[CellGroupData[{
 
-Cell["Basic Setup", "Section",
- CellChangeTimes->{{3.458247544127*^9, 3.458247545302*^9}}],
+Cell["Basic Setup", "Subsection",
+ CellChangeTimes->{{3.458247544127*^9, 3.458247545302*^9}},
+ FormatType->"TextForm"],
 
 Cell[TextData[{
  "First, make sure that you have followed the installation instructures for \
@@ -7774,28 +7805,29 @@ both the Clojure and ",
  FormatType->"TextForm"],
 
 Cell[TextData[{
- "Now we can get started. First, tell ",
+ "Now we can get started. Tell ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
  " to load the Clojuratica package."
 }], "Text",
- CellChangeTimes->{{3.458247662374*^9, 3.4582476822460003`*^9}},
- FormatType->"TextForm"],
+ CellChangeTimes->{{3.458247662374*^9, 3.4582476822460003`*^9}, {
+  3.459732826799*^9, 3.459732827382*^9}}],
 
 Cell[BoxData[
  RowBox[{"Needs", "[", "\"\<Clojuratica`\>\"", "]"}]], "Input",
- CellChangeTimes->{{3.458247693642*^9, 3.458247699759*^9}}]
-}, Open  ]]
-}, Open  ]],
+ CellChangeTimes->{{3.458247693642*^9, 3.458247699759*^9}}],
 
 Cell[TextData[{
  "\nNeeds will succeed silently if ",
  StyleBox["Mathematica",
   FontSlant->"Italic"],
- " is able to find and load Clojuratica.m."
+ " is able to find and load the package."
 }], "Text",
- CellChangeTimes->{{3.458289925716*^9, 3.458290086325*^9}, {
-  3.4582901209890003`*^9, 3.458290137553*^9}}],
+ CellChangeTimes->{{3.459732791146*^9, 3.459732835024*^9}},
+ FormatType->"TextForm"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
 
 Cell["Accessing a Simple Class", "Section",
  CellChangeTimes->{{3.4582901562460003`*^9, 3.458290164156*^9}}],
@@ -8032,13 +8064,13 @@ StyleDefinitions->Notebook[{
 (*CellTagsOutline
 CellTagsIndex->{
  "Example 1: A Performance Test"->{
-  Cell[372245, 6805, 251, 4, 24, "Subsection",
+  Cell[372220, 6804, 251, 4, 24, "Subsection",
    CellTags->"Example 1: A Performance Test"]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"Example 1: A Performance Test", 415555, 8033}
+ {"Example 1: A Performance Test", 417139, 8065}
  }
 *)
 (*NotebookFileOutline
@@ -8091,318 +8123,322 @@ Cell[288340, 4865, 1102, 29, 68, "Text"]
 Cell[CellGroupData[{
 Cell[289491, 4900, 153, 3, 81, "Title"],
 Cell[CellGroupData[{
-Cell[289669, 4907, 166, 3, 73, "Section"],
+Cell[289669, 4907, 141, 2, 73, "Section"],
 Cell[CellGroupData[{
-Cell[289860, 4914, 191, 3, 24, "Subsection"],
-Cell[290054, 4919, 620, 10, 49, "Text"],
-Cell[290677, 4931, 492, 9, 30, "Text"],
-Cell[291172, 4942, 558, 12, 30, "Text"]
+Cell[289835, 4913, 191, 3, 24, "Subsection"],
+Cell[290029, 4918, 620, 10, 49, "Text"],
+Cell[290652, 4930, 492, 9, 30, "Text"],
+Cell[291147, 4941, 558, 12, 30, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[291742, 4958, 118, 2, 24, "Subsection"],
+Cell[291863, 4962, 176, 2, 30, "Text"],
+Cell[292042, 4966, 123, 4, 56, "Program"],
+Cell[292168, 4972, 624, 10, 87, "Text"],
+Cell[292795, 4984, 578, 14, 200, "Program"],
+Cell[293376, 5000, 629, 11, 87, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[291767, 4959, 118, 2, 24, "Subsection"],
-Cell[291888, 4963, 176, 2, 30, "Text"],
-Cell[292067, 4967, 123, 4, 56, "Program"],
-Cell[292193, 4973, 624, 10, 87, "Text"],
-Cell[292820, 4985, 578, 14, 200, "Program"],
-Cell[293401, 5001, 629, 11, 87, "Text"]
+Cell[294042, 5016, 269, 4, 24, "Subsection"],
+Cell[294314, 5022, 264, 7, 31, "Text"],
+Cell[294581, 5031, 314, 7, 72, "Program"],
+Cell[294898, 5040, 246, 6, 49, "Text"],
+Cell[295147, 5048, 220, 5, 56, "Program"],
+Cell[295370, 5055, 344, 7, 49, "Text"],
+Cell[295717, 5064, 508, 9, 49, "Text"],
+Cell[296228, 5075, 503, 9, 49, "Text"],
+Cell[296734, 5086, 285, 5, 30, "Text"],
+Cell[297022, 5093, 192, 5, 56, "Program"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[294067, 5017, 269, 4, 24, "Subsection"],
-Cell[294339, 5023, 264, 7, 31, "Text"],
-Cell[294606, 5032, 314, 7, 72, "Program"],
-Cell[294923, 5041, 246, 6, 49, "Text"],
-Cell[295172, 5049, 220, 5, 56, "Program"],
-Cell[295395, 5056, 344, 7, 49, "Text"],
-Cell[295742, 5065, 508, 9, 49, "Text"],
-Cell[296253, 5076, 503, 9, 49, "Text"],
-Cell[296759, 5087, 285, 5, 30, "Text"],
-Cell[297047, 5094, 192, 5, 56, "Program"]
-}, Closed]],
-Cell[CellGroupData[{
-Cell[297276, 5104, 250, 4, 24, "Subsection"],
-Cell[297529, 5110, 374, 9, 31, "Text"],
-Cell[297906, 5121, 1136, 28, 280, "Program"],
-Cell[299045, 5151, 845, 16, 106, "Text"],
-Cell[299893, 5169, 345, 6, 56, "Program"],
-Cell[300241, 5177, 878, 16, 68, "Text"],
-Cell[301122, 5195, 406, 11, 104, "Program"],
-Cell[301531, 5208, 339, 8, 49, "Text"],
-Cell[301873, 5218, 399, 7, 30, "Text"],
-Cell[302275, 5227, 309, 9, 104, "Program"],
-Cell[302587, 5238, 257, 6, 49, "Text"],
-Cell[302847, 5246, 235, 8, 104, "Program"],
-Cell[303085, 5256, 246, 7, 49, "Text"],
-Cell[303334, 5265, 279, 9, 104, "Program"]
+Cell[297251, 5103, 250, 4, 24, "Subsection"],
+Cell[297504, 5109, 374, 9, 31, "Text"],
+Cell[297881, 5120, 1136, 28, 280, "Program"],
+Cell[299020, 5150, 845, 16, 106, "Text"],
+Cell[299868, 5168, 345, 6, 56, "Program"],
+Cell[300216, 5176, 878, 16, 68, "Text"],
+Cell[301097, 5194, 406, 11, 104, "Program"],
+Cell[301506, 5207, 339, 8, 49, "Text"],
+Cell[301848, 5217, 399, 7, 30, "Text"],
+Cell[302250, 5226, 309, 9, 104, "Program"],
+Cell[302562, 5237, 257, 6, 49, "Text"],
+Cell[302822, 5245, 235, 8, 104, "Program"],
+Cell[303060, 5255, 246, 7, 49, "Text"],
+Cell[303309, 5264, 279, 9, 104, "Program"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[303662, 5280, 238, 4, 73, "Section"],
+Cell[303637, 5279, 238, 4, 73, "Section"],
 Cell[CellGroupData[{
-Cell[303925, 5288, 398, 6, 24, "Subsection"],
-Cell[304326, 5296, 257, 5, 30, "Text"],
-Cell[304586, 5303, 271, 7, 72, "Program"],
-Cell[304860, 5312, 333, 7, 49, "Text"],
-Cell[305196, 5321, 216, 6, 56, "Program"],
-Cell[305415, 5329, 355, 7, 49, "Text"],
-Cell[305773, 5338, 281, 6, 56, "Program"]
+Cell[303900, 5287, 398, 6, 24, "Subsection"],
+Cell[304301, 5295, 257, 5, 30, "Text"],
+Cell[304561, 5302, 271, 7, 72, "Program"],
+Cell[304835, 5311, 333, 7, 49, "Text"],
+Cell[305171, 5320, 216, 6, 56, "Program"],
+Cell[305390, 5328, 355, 7, 49, "Text"],
+Cell[305748, 5337, 281, 6, 56, "Program"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[306091, 5349, 195, 3, 24, "Subsection"],
-Cell[306289, 5354, 234, 5, 30, "Text"],
-Cell[306526, 5361, 198, 5, 56, "Program"],
-Cell[306727, 5368, 334, 7, 49, "Text"],
-Cell[307064, 5377, 225, 7, 88, "Program"],
-Cell[307292, 5386, 293, 7, 49, "Text"],
-Cell[307588, 5395, 466, 10, 72, "Program"],
-Cell[308057, 5407, 293, 7, 49, "Text"],
-Cell[308353, 5416, 218, 6, 56, "Program"],
-Cell[308574, 5424, 510, 10, 68, "Text"]
+Cell[306066, 5348, 195, 3, 24, "Subsection"],
+Cell[306264, 5353, 234, 5, 30, "Text"],
+Cell[306501, 5360, 198, 5, 56, "Program"],
+Cell[306702, 5367, 334, 7, 49, "Text"],
+Cell[307039, 5376, 225, 7, 88, "Program"],
+Cell[307267, 5385, 293, 7, 49, "Text"],
+Cell[307563, 5394, 466, 10, 72, "Program"],
+Cell[308032, 5406, 293, 7, 49, "Text"],
+Cell[308328, 5415, 218, 6, 56, "Program"],
+Cell[308549, 5423, 510, 10, 68, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[309121, 5439, 309, 5, 24, "Subsection"],
-Cell[309433, 5446, 349, 6, 49, "Text"],
-Cell[309785, 5454, 270, 6, 30, "Text"],
-Cell[310058, 5462, 386, 8, 56, "Program"],
-Cell[310447, 5472, 234, 6, 49, "Text"],
-Cell[310684, 5480, 330, 7, 72, "Program"],
-Cell[311017, 5489, 301, 7, 49, "Text"],
-Cell[311321, 5498, 413, 9, 72, "Program"],
-Cell[311737, 5509, 366, 8, 49, "Text"],
-Cell[312106, 5519, 241, 6, 72, "Program"],
-Cell[312350, 5527, 202, 7, 49, "Text"]
+Cell[309096, 5438, 309, 5, 24, "Subsection"],
+Cell[309408, 5445, 349, 6, 49, "Text"],
+Cell[309760, 5453, 270, 6, 30, "Text"],
+Cell[310033, 5461, 386, 8, 56, "Program"],
+Cell[310422, 5471, 234, 6, 49, "Text"],
+Cell[310659, 5479, 330, 7, 72, "Program"],
+Cell[310992, 5488, 301, 7, 49, "Text"],
+Cell[311296, 5497, 413, 9, 72, "Program"],
+Cell[311712, 5508, 366, 8, 49, "Text"],
+Cell[312081, 5518, 241, 6, 72, "Program"],
+Cell[312325, 5526, 202, 7, 49, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[312589, 5539, 352, 5, 24, "Subsection"],
-Cell[312944, 5546, 724, 11, 49, "Text"],
-Cell[313671, 5559, 1223, 32, 344, "Program"],
-Cell[314897, 5593, 218, 6, 49, "Text"],
-Cell[315118, 5601, 382, 7, 56, "Program"]
+Cell[312564, 5538, 352, 5, 24, "Subsection"],
+Cell[312919, 5545, 724, 11, 49, "Text"],
+Cell[313646, 5558, 1223, 32, 344, "Program"],
+Cell[314872, 5592, 218, 6, 49, "Text"],
+Cell[315093, 5600, 382, 7, 56, "Program"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[315549, 5614, 157, 2, 73, "Section"],
+Cell[315524, 5613, 157, 2, 73, "Section"],
 Cell[CellGroupData[{
-Cell[315731, 5620, 228, 3, 24, "Subsection"],
-Cell[315962, 5625, 484, 9, 49, "Text"],
-Cell[316449, 5636, 471, 9, 50, "Text"],
-Cell[316923, 5647, 224, 3, 40, "Program"],
-Cell[317150, 5652, 251, 6, 49, "Text"],
-Cell[317404, 5660, 191, 3, 40, "Program"],
-Cell[317598, 5665, 357, 9, 49, "Text"],
-Cell[317958, 5676, 285, 7, 56, "Program"],
-Cell[318246, 5685, 591, 12, 68, "Text"],
-Cell[318840, 5699, 646, 16, 152, "Program"],
-Cell[319489, 5717, 343, 7, 50, "Text"],
-Cell[319835, 5726, 204, 5, 30, "Text"],
-Cell[320042, 5733, 149, 4, 56, "Program"]
+Cell[315706, 5619, 228, 3, 24, "Subsection"],
+Cell[315937, 5624, 484, 9, 49, "Text"],
+Cell[316424, 5635, 471, 9, 50, "Text"],
+Cell[316898, 5646, 224, 3, 40, "Program"],
+Cell[317125, 5651, 251, 6, 49, "Text"],
+Cell[317379, 5659, 191, 3, 40, "Program"],
+Cell[317573, 5664, 357, 9, 49, "Text"],
+Cell[317933, 5675, 285, 7, 56, "Program"],
+Cell[318221, 5684, 591, 12, 68, "Text"],
+Cell[318815, 5698, 646, 16, 152, "Program"],
+Cell[319464, 5716, 343, 7, 50, "Text"],
+Cell[319810, 5725, 204, 5, 30, "Text"],
+Cell[320017, 5732, 149, 4, 56, "Program"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[320228, 5742, 310, 5, 24, "Subsection"],
-Cell[320541, 5749, 407, 8, 30, "Text"],
-Cell[320951, 5759, 346, 14, 200, "Program"]
+Cell[320203, 5741, 310, 5, 24, "Subsection"],
+Cell[320516, 5748, 407, 8, 30, "Text"],
+Cell[320926, 5758, 346, 14, 200, "Program"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[321334, 5778, 411, 7, 24, "Subsection"],
-Cell[321748, 5787, 418, 7, 30, "Text"],
-Cell[322169, 5796, 351, 9, 104, "Program"],
-Cell[322523, 5807, 422, 8, 49, "Text"],
-Cell[322948, 5817, 419, 15, 200, "Program"],
-Cell[323370, 5834, 273, 6, 49, "Text"]
+Cell[321309, 5777, 411, 7, 24, "Subsection"],
+Cell[321723, 5786, 418, 7, 30, "Text"],
+Cell[322144, 5795, 351, 9, 104, "Program"],
+Cell[322498, 5806, 422, 8, 49, "Text"],
+Cell[322923, 5816, 419, 15, 200, "Program"],
+Cell[323345, 5833, 273, 6, 49, "Text"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[323692, 5846, 138, 2, 73, "Section"],
+Cell[323667, 5845, 138, 2, 73, "Section"],
 Cell[CellGroupData[{
-Cell[323855, 5852, 181, 3, 24, "Subsection"],
-Cell[324039, 5857, 268, 6, 30, "Text"],
-Cell[324310, 5865, 350, 7, 30, "Text"],
-Cell[324663, 5874, 282, 7, 88, "Program"],
-Cell[324948, 5883, 298, 7, 49, "Text"],
-Cell[325249, 5892, 221, 5, 56, "Program"],
-Cell[325473, 5899, 184, 5, 49, "Text"]
+Cell[323830, 5851, 181, 3, 24, "Subsection"],
+Cell[324014, 5856, 268, 6, 30, "Text"],
+Cell[324285, 5864, 350, 7, 30, "Text"],
+Cell[324638, 5873, 282, 7, 88, "Program"],
+Cell[324923, 5882, 298, 7, 49, "Text"],
+Cell[325224, 5891, 221, 5, 56, "Program"],
+Cell[325448, 5898, 184, 5, 49, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[325694, 5909, 197, 3, 24, "Subsection"],
-Cell[325894, 5914, 376, 7, 49, "Text"],
-Cell[326273, 5923, 599, 16, 168, "Program"],
-Cell[326875, 5941, 479, 10, 50, "Text"],
-Cell[327357, 5953, 249, 6, 56, "Program"],
-Cell[327609, 5961, 394, 8, 49, "Text"],
-Cell[328006, 5971, 210, 8, 104, "Program"],
-Cell[328219, 5981, 493, 9, 68, "Text"],
-Cell[328715, 5992, 327, 8, 104, "Program"],
-Cell[329045, 6002, 419, 8, 68, "Text"]
+Cell[325669, 5908, 197, 3, 24, "Subsection"],
+Cell[325869, 5913, 376, 7, 49, "Text"],
+Cell[326248, 5922, 599, 16, 168, "Program"],
+Cell[326850, 5940, 479, 10, 50, "Text"],
+Cell[327332, 5952, 249, 6, 56, "Program"],
+Cell[327584, 5960, 394, 8, 49, "Text"],
+Cell[327981, 5970, 210, 8, 104, "Program"],
+Cell[328194, 5980, 493, 9, 68, "Text"],
+Cell[328690, 5991, 327, 8, 104, "Program"],
+Cell[329020, 6001, 419, 8, 68, "Text"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[329513, 6016, 175, 3, 73, "Section"],
+Cell[329488, 6015, 175, 3, 73, "Section"],
 Cell[CellGroupData[{
-Cell[329713, 6023, 411, 7, 24, "Subsection"],
-Cell[330127, 6032, 239, 5, 30, "Text"],
-Cell[330369, 6039, 710, 16, 49, "Text"],
-Cell[331082, 6057, 702, 16, 49, "Text"],
-Cell[331787, 6075, 701, 15, 68, "Text"],
-Cell[332491, 6092, 798, 16, 68, "Text"],
-Cell[333292, 6110, 628, 13, 68, "Text"]
+Cell[329688, 6022, 411, 7, 24, "Subsection"],
+Cell[330102, 6031, 239, 5, 30, "Text"],
+Cell[330344, 6038, 710, 16, 49, "Text"],
+Cell[331057, 6056, 702, 16, 49, "Text"],
+Cell[331762, 6074, 701, 15, 68, "Text"],
+Cell[332466, 6091, 798, 16, 68, "Text"],
+Cell[333267, 6109, 628, 13, 68, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[333957, 6128, 165, 3, 24, "Subsection"],
-Cell[334125, 6133, 458, 13, 30, "Text"],
-Cell[334586, 6148, 36238, 600, 633, "Text"],
-Cell[370827, 6750, 225, 6, 49, "Text"]
+Cell[333932, 6127, 165, 3, 24, "Subsection"],
+Cell[334100, 6132, 458, 13, 30, "Text"],
+Cell[334561, 6147, 36238, 600, 633, "Text"],
+Cell[370802, 6749, 225, 6, 49, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[371089, 6761, 134, 2, 24, "Subsection"],
-Cell[371226, 6765, 280, 5, 30, "Text"],
-Cell[371509, 6772, 285, 8, 104, "Program"],
-Cell[371797, 6782, 200, 6, 49, "Text"],
-Cell[372000, 6790, 164, 7, 104, "Program"],
-Cell[372167, 6799, 41, 1, 30, "Text"]
+Cell[371064, 6760, 134, 2, 24, "Subsection"],
+Cell[371201, 6764, 280, 5, 30, "Text"],
+Cell[371484, 6771, 285, 8, 104, "Program"],
+Cell[371772, 6781, 200, 6, 49, "Text"],
+Cell[371975, 6789, 164, 7, 104, "Program"],
+Cell[372142, 6798, 41, 1, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[372245, 6805, 251, 4, 24, "Subsection",
+Cell[372220, 6804, 251, 4, 24, "Subsection",
  CellTags->"Example 1: A Performance Test"],
-Cell[372499, 6811, 290, 6, 30, "Text"],
-Cell[372792, 6819, 664, 14, 49, "Text"],
-Cell[373459, 6835, 262, 6, 72, "Program"],
-Cell[373724, 6843, 389, 8, 49, "Text"],
-Cell[374116, 6853, 485, 14, 168, "Program"],
-Cell[374604, 6869, 568, 10, 68, "Text"],
-Cell[375175, 6881, 405, 9, 72, "Program"],
-Cell[375583, 6892, 523, 9, 68, "Text"],
-Cell[376109, 6903, 419, 9, 88, "Program"],
-Cell[376531, 6914, 381, 8, 49, "Text"],
-Cell[376915, 6924, 264, 5, 30, "Text"],
-Cell[377182, 6931, 206, 5, 30, "Text"]
+Cell[372474, 6810, 290, 6, 30, "Text"],
+Cell[372767, 6818, 664, 14, 49, "Text"],
+Cell[373434, 6834, 262, 6, 72, "Program"],
+Cell[373699, 6842, 389, 8, 49, "Text"],
+Cell[374091, 6852, 485, 14, 168, "Program"],
+Cell[374579, 6868, 568, 10, 68, "Text"],
+Cell[375150, 6880, 405, 9, 72, "Program"],
+Cell[375558, 6891, 523, 9, 68, "Text"],
+Cell[376084, 6902, 419, 9, 88, "Program"],
+Cell[376506, 6913, 381, 8, 49, "Text"],
+Cell[376890, 6923, 264, 5, 30, "Text"],
+Cell[377157, 6930, 206, 5, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[377425, 6941, 203, 2, 24, "Subsection"],
-Cell[377631, 6945, 292, 5, 30, "Text"],
-Cell[377926, 6952, 159, 3, 30, "Text"],
-Cell[378088, 6957, 182, 5, 72, "Program"],
-Cell[378273, 6964, 249, 6, 49, "Text"],
-Cell[378525, 6972, 769, 16, 120, "Program"],
-Cell[379297, 6990, 717, 12, 87, "Text"],
-Cell[380017, 7004, 154, 2, 30, "Text"],
-Cell[380174, 7008, 389, 9, 88, "Program"],
-Cell[380566, 7019, 385, 8, 49, "Text"],
-Cell[380954, 7029, 125, 4, 56, "Program"],
-Cell[381082, 7035, 781, 16, 87, "Text"],
-Cell[381866, 7053, 235, 4, 56, "Program"],
-Cell[382104, 7059, 184, 3, 30, "Text"]
+Cell[377400, 6940, 203, 2, 24, "Subsection"],
+Cell[377606, 6944, 292, 5, 30, "Text"],
+Cell[377901, 6951, 159, 3, 30, "Text"],
+Cell[378063, 6956, 182, 5, 72, "Program"],
+Cell[378248, 6963, 249, 6, 49, "Text"],
+Cell[378500, 6971, 769, 16, 120, "Program"],
+Cell[379272, 6989, 717, 12, 87, "Text"],
+Cell[379992, 7003, 154, 2, 30, "Text"],
+Cell[380149, 7007, 389, 9, 88, "Program"],
+Cell[380541, 7018, 385, 8, 49, "Text"],
+Cell[380929, 7028, 125, 4, 56, "Program"],
+Cell[381057, 7034, 781, 16, 87, "Text"],
+Cell[381841, 7052, 235, 4, 56, "Program"],
+Cell[382079, 7058, 184, 3, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[382325, 7067, 161, 2, 24, "Subsection"],
-Cell[382489, 7071, 325, 6, 30, "Text"],
-Cell[382817, 7079, 410, 10, 136, "Program"],
-Cell[383230, 7091, 41, 1, 30, "Text"]
+Cell[382300, 7066, 161, 2, 24, "Subsection"],
+Cell[382464, 7070, 325, 6, 30, "Text"],
+Cell[382792, 7078, 410, 10, 136, "Program"],
+Cell[383205, 7090, 41, 1, 30, "Text"]
 }, Closed]]
 }, Open  ]],
-Cell[383298, 7096, 234, 6, 73, "Section"],
+Cell[383273, 7095, 234, 6, 73, "Section"],
 Cell[CellGroupData[{
-Cell[383557, 7106, 258, 4, 24, "Subsection"],
-Cell[383818, 7112, 409, 9, 30, "Text"],
-Cell[384230, 7123, 580, 14, 49, "Text"],
-Cell[384813, 7139, 734, 21, 49, "Text"],
-Cell[385550, 7162, 278, 8, 30, "Text"],
-Cell[385831, 7172, 640, 17, 49, "Text"],
-Cell[386474, 7191, 260, 7, 56, "Program"],
-Cell[386737, 7200, 538, 12, 68, "Text"],
-Cell[387278, 7214, 336, 10, 104, "Program"],
-Cell[387617, 7226, 242, 7, 49, "Text"],
-Cell[387862, 7235, 297, 7, 56, "Program"],
-Cell[388162, 7244, 550, 13, 68, "Text"],
-Cell[388715, 7259, 509, 11, 49, "Text"],
-Cell[389227, 7272, 312, 10, 104, "Program"],
-Cell[389542, 7284, 41, 1, 30, "Text"]
+Cell[383532, 7105, 258, 4, 24, "Subsection"],
+Cell[383793, 7111, 409, 9, 30, "Text"],
+Cell[384205, 7122, 580, 14, 49, "Text"],
+Cell[384788, 7138, 734, 21, 49, "Text"],
+Cell[385525, 7161, 278, 8, 30, "Text"],
+Cell[385806, 7171, 640, 17, 49, "Text"],
+Cell[386449, 7190, 260, 7, 56, "Program"],
+Cell[386712, 7199, 538, 12, 68, "Text"],
+Cell[387253, 7213, 336, 10, 104, "Program"],
+Cell[387592, 7225, 242, 7, 49, "Text"],
+Cell[387837, 7234, 297, 7, 56, "Program"],
+Cell[388137, 7243, 550, 13, 68, "Text"],
+Cell[388690, 7258, 509, 11, 49, "Text"],
+Cell[389202, 7271, 312, 10, 104, "Program"],
+Cell[389517, 7283, 41, 1, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[389620, 7290, 129, 2, 24, "Subsection"],
-Cell[389752, 7294, 305, 6, 30, "Text"],
-Cell[390060, 7302, 386, 7, 49, "Text"],
-Cell[390449, 7311, 439, 9, 49, "Text"],
-Cell[390891, 7322, 598, 18, 216, "Program"],
-Cell[391492, 7342, 129, 3, 30, "Text"]
+Cell[389595, 7289, 129, 2, 24, "Subsection"],
+Cell[389727, 7293, 305, 6, 30, "Text"],
+Cell[390035, 7301, 386, 7, 49, "Text"],
+Cell[390424, 7310, 439, 9, 49, "Text"],
+Cell[390866, 7321, 598, 18, 216, "Program"],
+Cell[391467, 7341, 129, 3, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[391658, 7350, 309, 5, 24, "Subsection"],
-Cell[391970, 7357, 602, 11, 49, "Text"],
-Cell[392575, 7370, 830, 15, 68, "Text"],
-Cell[393408, 7387, 376, 11, 104, "Program"],
-Cell[393787, 7400, 770, 17, 68, "Text"],
-Cell[394560, 7419, 506, 15, 152, "Program"],
-Cell[395069, 7436, 861, 20, 68, "Text"],
-Cell[395933, 7458, 690, 16, 49, "Text"],
-Cell[396626, 7476, 596, 17, 152, "Program"],
-Cell[397225, 7495, 365, 8, 49, "Text"],
-Cell[397593, 7505, 325, 13, 152, "Program"],
-Cell[397921, 7520, 374, 9, 49, "Text"],
-Cell[398298, 7531, 229, 3, 30, "Text"],
-Cell[398530, 7536, 513, 15, 152, "Program"],
-Cell[399046, 7553, 41, 1, 30, "Text"]
+Cell[391633, 7349, 309, 5, 24, "Subsection"],
+Cell[391945, 7356, 602, 11, 49, "Text"],
+Cell[392550, 7369, 830, 15, 68, "Text"],
+Cell[393383, 7386, 376, 11, 104, "Program"],
+Cell[393762, 7399, 770, 17, 68, "Text"],
+Cell[394535, 7418, 506, 15, 152, "Program"],
+Cell[395044, 7435, 861, 20, 68, "Text"],
+Cell[395908, 7457, 690, 16, 49, "Text"],
+Cell[396601, 7475, 596, 17, 152, "Program"],
+Cell[397200, 7494, 365, 8, 49, "Text"],
+Cell[397568, 7504, 325, 13, 152, "Program"],
+Cell[397896, 7519, 374, 9, 49, "Text"],
+Cell[398273, 7530, 229, 3, 30, "Text"],
+Cell[398505, 7535, 513, 15, 152, "Program"],
+Cell[399021, 7552, 41, 1, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[399124, 7559, 194, 3, 24, "Subsection"],
-Cell[399321, 7564, 334, 7, 30, "Text"],
-Cell[399658, 7573, 225, 6, 56, "Program"],
-Cell[399886, 7581, 477, 11, 49, "Text"],
-Cell[400366, 7594, 730, 15, 68, "Text"],
-Cell[401099, 7611, 309, 7, 72, "Program"],
-Cell[401411, 7620, 175, 5, 49, "Text"],
-Cell[401589, 7627, 493, 11, 56, "Program"],
-Cell[402085, 7640, 307, 6, 49, "Text"],
-Cell[402395, 7648, 785, 17, 152, "Program"],
-Cell[403183, 7667, 407, 9, 49, "Text"]
+Cell[399099, 7558, 194, 3, 24, "Subsection"],
+Cell[399296, 7563, 334, 7, 30, "Text"],
+Cell[399633, 7572, 225, 6, 56, "Program"],
+Cell[399861, 7580, 477, 11, 49, "Text"],
+Cell[400341, 7593, 730, 15, 68, "Text"],
+Cell[401074, 7610, 309, 7, 72, "Program"],
+Cell[401386, 7619, 175, 5, 49, "Text"],
+Cell[401564, 7626, 493, 11, 56, "Program"],
+Cell[402060, 7639, 307, 6, 49, "Text"],
+Cell[402370, 7647, 785, 17, 152, "Program"],
+Cell[403158, 7666, 407, 9, 49, "Text"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[403602, 7680, 162, 7, 55, "Title"],
+Cell[CellGroupData[{
+Cell[403789, 7691, 122, 2, 73, "Section"],
+Cell[CellGroupData[{
+Cell[403936, 7697, 114, 2, 24, "Subsection"],
+Cell[404053, 7701, 679, 15, 49, "Text"],
+Cell[404735, 7718, 834, 16, 49, "Text"],
+Cell[405572, 7736, 801, 14, 49, "Text"],
+Cell[406376, 7752, 1095, 24, 68, "Text"],
+Cell[407474, 7778, 474, 8, 30, "Text"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[403627, 7681, 162, 7, 81, "Title"],
-Cell[CellGroupData[{
-Cell[403814, 7692, 116, 2, 73, "Section"],
-Cell[403933, 7696, 580, 14, 49, "Text"],
-Cell[404516, 7712, 186, 6, 30, "Text"],
-Cell[404705, 7720, 871, 16, 68, "Text"],
-Cell[405579, 7738, 811, 18, 68, "Text"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[406427, 7761, 90, 1, 73, "Section"],
-Cell[406520, 7764, 323, 9, 30, "Text"],
-Cell[406846, 7775, 244, 7, 30, "Text"],
-Cell[407093, 7784, 137, 2, 40, "Input"]
+Cell[407985, 7791, 118, 2, 24, "Subsection"],
+Cell[408106, 7795, 323, 9, 30, "Text"],
+Cell[408432, 7806, 255, 7, 30, "Text"],
+Cell[408690, 7815, 137, 2, 40, "Input"],
+Cell[408830, 7819, 241, 7, 49, "Text"]
+}, Open  ]]
 }, Open  ]]
 }, Open  ]],
-Cell[407257, 7790, 266, 7, 49, "Text"],
-Cell[407526, 7799, 108, 1, 73, "Section"],
-Cell[407637, 7802, 573, 13, 46, "Text"],
-Cell[408213, 7817, 96, 2, 49, "Text"],
-Cell[408312, 7821, 41, 1, 30, "Text"],
-Cell[408356, 7824, 41, 1, 30, "Text"],
+Cell[409110, 7831, 108, 1, 73, "Section"],
+Cell[409221, 7834, 573, 13, 46, "Text"],
+Cell[409797, 7849, 96, 2, 49, "Text"],
+Cell[409896, 7853, 41, 1, 30, "Text"],
+Cell[409940, 7856, 41, 1, 30, "Text"],
 Cell[CellGroupData[{
-Cell[408422, 7829, 145, 3, 40, "Input"],
-Cell[408570, 7834, 792, 15, 173, "Output"]
+Cell[410006, 7861, 145, 3, 40, "Input"],
+Cell[410154, 7866, 792, 15, 173, "Output"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[409411, 7855, 139, 3, 29, "Subtitle"],
+Cell[410995, 7887, 139, 3, 29, "Subtitle"],
 Cell[CellGroupData[{
-Cell[409575, 7862, 193, 4, 40, "Input"],
-Cell[409771, 7868, 450, 9, 39, "Output"]
+Cell[411159, 7894, 193, 4, 40, "Input"],
+Cell[411355, 7900, 450, 9, 39, "Output"]
 }, Open  ]],
-Cell[410236, 7880, 129, 3, 30, "Text"],
+Cell[411820, 7912, 129, 3, 30, "Text"],
 Cell[CellGroupData[{
-Cell[410390, 7887, 476, 9, 40, "Input"],
-Cell[410869, 7898, 545, 10, 39, "Output"]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[411451, 7913, 243, 6, 40, "Input"],
-Cell[411697, 7921, 313, 8, 39, "Output"]
+Cell[411974, 7919, 476, 9, 40, "Input"],
+Cell[412453, 7930, 545, 10, 39, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[412047, 7934, 366, 9, 40, "Input"],
-Cell[412416, 7945, 167, 4, 39, "Output"]
+Cell[413035, 7945, 243, 6, 40, "Input"],
+Cell[413281, 7953, 313, 8, 39, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[412620, 7954, 362, 10, 40, "Input"],
-Cell[412985, 7966, 343, 11, 42, "Output"]
+Cell[413631, 7966, 366, 9, 40, "Input"],
+Cell[414000, 7977, 167, 4, 39, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[414204, 7986, 362, 10, 40, "Input"],
+Cell[414569, 7998, 343, 11, 42, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
