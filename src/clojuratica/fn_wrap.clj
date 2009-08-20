@@ -110,4 +110,4 @@
         (fn [& args]
           (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
                 fn-call         (add-head name expressed-args)]
-            (apply math [] fn-call passthrough-flags))))))))
+            (apply math [] fn-call passthrough-flags)))))))
