@@ -1,19 +1,22 @@
 (ns clojuratica.test.SimpleClass
   (:gen-class
-     :methods [#^{:static true} [increment   [Object]                             Object]
-               #^{:static true} [mIncrement  [Object Object Object Object]        Object]
-               #^{:static true} [clojureMap  [Object Object]                      Object]])
-  (:import [com.wolfram.jlink StdLink])
-  (:use [clojuratica.clojuratica]))
+     :methods [#^{:static true} [increment     [Object]                             Object]
+                                [decrement     [Object]                             Object]
+               #^{:static true} [pair          [Object Object]                      Object]
+               #^{:static true} [myMap         [Object Object]                      Object]
+               #^{:static true} [mmaIncrement  [Object Object Object]               Object]]))
 
 (defn -increment [obj]
-  (map inc obj))
+  (inc obj))
 
-(defn -mIncrement [obj evaluate parse fn-wrap]
-  (parse (evaluate ["obj" obj] "Map[#+1&, obj]" "10+obj")))
+(defn -decrement [obj]
+  (dec obj))
 
-(defn -clojureMap [obj1 obj2]
-  (map obj1 obj2))
+(defn -pair [coll1 coll2]
+  (partition 2 (interleave coll1 coll2)))
 
-;(defn -simpleInstanceMethod [this obj1 obj2 obj3]
- ; ()
+(defn -myMap [f coll]
+  (map f coll))
+
+(defn -mmaIncrement [obj evaluate parse]
+  (parse (evaluate ["obj" obj] "obj + 1")))
