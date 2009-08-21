@@ -41,33 +41,19 @@
 
 (declare string-to-expr build-set-expr add-head convert)
 
-(defnf common-dispatch [] []
-  "Dispatches to the appropriate method. Used by the following multimethods: express, send-read."
-  []
-  [& args]
-  (let [expression (first args)]
-    (cond (string? expression)          :string
-          (instance? Expr expression)   :expr
-          (instance? CExpr expression)  :cexpr
-          ;(nil? expression)             :nil
-          true  (throw
-                  (Exception. (str "First argument to express or send-read must be "
-                                   "string, Expr, or CExpr. You passed an object "
-                                   "of class " (class expression)))))))
+(defmulti express (fn [expression & _] (class expression)))
 
-(defmulti express common-dispatch)
-
-(defmethod express :string [s kernel-link]
+(defmethod express String [s kernel-link]
   ; Takes a string and a KernelLink instance. Treats s as a Mathematica expression and converts it to
   ; a CExpr object using the kernel at the other end of kernel-link. Does not evaluate s, but merely
   ; converts it to a CExpr object.
-  (CExpr. (string-to-expr s kernel-link)))
+  (convert (string-to-expr s kernel-link)))
 
-(defmethod express :expr [expr & [kernel-link]]
+(defmethod express Expr [expr & [kernel-link]]
   ; Takes an Expr instance and an optional (unused) KernelLink instance. Converts expr to a CExpr.
-  (CExpr. expr))
+  (convert expr))
 
-(defmethod express :cexpr [cexpr & [kernel-link]]
+(defmethod express CExpr [cexpr & [kernel-link]]
   ; Takes a CExpr instance and an optional (unused) KernelLink instance. Simply returns cexpr.
   cexpr)
 
@@ -77,12 +63,9 @@
 
 ; Send-read
 
-(defmulti send-read
-  "Evaluates the first argument as an expression using the KernelLink instance provided in the
-  second argument. First argument can be a string, an Expr, or a CExpr."
-  common-dispatch)
+(defmulti send-read (fn [expression & _] (class expression)))
 
-(defmethod send-read :string [s kernel-link]
+(defmethod send-read String [s kernel-link]
   ; Takes a string and a KernelLink instance. Treats s as a Mathematica expression and evaluates it
   ; using the kernel at the other end of kernel-link. Returns a CExpr containing the output.
   (io! "The Clojuratica function you have called has side effects."
@@ -94,7 +77,7 @@
         ;(println output)
         (express output)))))
 
-(defmethod send-read :expr [expr kernel-link]
+(defmethod send-read Expr [expr kernel-link]
   ; Takes an Expr instance and a KernelLink instance. Evaluates expr using the kernel at the other
   ; end of kernel-link. Returns a CExpr containing the output.
   (io! "The Clojuratica function you have called has side effects."
@@ -106,7 +89,7 @@
         ;(println output)
         (express output)))))
 
-(defmethod send-read :cexpr [cexpr kernel-link]
+(defmethod send-read CExpr [cexpr kernel-link]
   ; Takes a CExpr instance and a KernelLink instance. Evaluates cexpr using the kernel at the other
   ; end of kernel-link. Returns a CExpr containing the output.
   (send-read (.getExpr cexpr) kernel-link))
@@ -118,8 +101,10 @@
 (defn convert
   "Converts any Java object, including any Clojure data structure, to a CExpr. Sequential objects
   are converted to Mathematica lists. See the CExpr class documentation for more information."
-  [obj]
-  (CExpr. obj))
+  [arg1 & [arg2]]
+  (if arg2
+    (CExpr. arg1 arg2)
+    (CExpr. arg1)))
 
 (defn add-head
   "Creates an Expr with head argument as its head and with exprs as its arguments. exprs must be Expr

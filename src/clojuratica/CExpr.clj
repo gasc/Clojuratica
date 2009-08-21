@@ -45,7 +45,7 @@
                   [Object clojure.lang.IPersistentCollection] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
-  (:require [clojuratica.lib :as lib]))
+  (:use [clojuratica.lib]))
 
 (defn -first [this]
   (.head (:expr (.state this))))
@@ -59,46 +59,38 @@
 (defn -getFlags [this]
   (:flags (.state this)))
 
-(defn constructor-dispatch [& args]
-  (letfn [(class-match? [classes] (lib/instances? classes args))]
-    (cond (class-match? [Expr])                                     :expr
-          (class-match? [Expr Integer])                             :expr+integer
-          (class-match? [clojuratica.CExpr])                        :cexpr
-          (class-match? [clojuratica.CExpr
-                         clojure.lang.IPersistentCollection])       :cexpr+coll
-          (class-match? [String])                                   :string
-          (class-match? [Number])                                   :number
-          (class-match? [clojure.lang.IPersistentCollection])       :coll
-          (class-match? [Object])                                   :object
-          (nil? (first args))                                       :nil
-          true (throw (Exception. "Argument of invalid class passed to CExpr constructor: ")))))
+(defmulti construct (fn [& args] (vec (map class args))))
 
-(defmulti construct constructor-dispatch)
-
-(defmethod construct :expr [expr]
+(defmethod construct [Expr]
+  [expr]
   {:expr expr
    :flags '()})
 
-(defmethod construct :expr+integer [expr pos]
+(defmethod construct [Expr Integer]
+  [expr pos]
   {:expr expr
    :flags '()})
 
-(defmethod construct :cexpr [cexpr]
+(defmethod construct [clojuratica.CExpr]
+  [cexpr]
   (let [expr (.getExpr cexpr)]
     {:expr expr
      :flags (.getFlags cexpr)}))
 
-(defmethod construct :cexpr+coll [cexpr coll]
+(defmethod construct [clojuratica.CExpr clojure.lang.IPersistentCollection]
+  [cexpr coll]
   (let [expr (.getExpr cexpr)]
     {:expr expr
      :flags (concat coll (.getFlags cexpr))}))
 
-(defmethod construct :string [s]
+(defmethod construct [String]
+  [s]
   (let [expr (Expr. s)]
     {:expr expr
      :flags '()}))
 
-(defmethod construct :number [n]
+(defmethod construct [Number]
+  [n]
   (let [typed-n (cond (instance? BigInteger n)         n
                       (instance? BigDecimal n)         n
                       (instance? Integer n)            (long n)
@@ -113,7 +105,8 @@
     {:expr expr
      :flags '()}))
 
-(defmethod construct :coll [expression-coll]
+(defmethod construct [clojure.lang.IPersistentCollection]
+  [expression-coll]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putFunction loop "List" (count expression-coll))
     (dorun (for [expression expression-coll] (.put loop (.getExpr (clojuratica.CExpr. expression)))))
@@ -122,7 +115,8 @@
       {:expr expr
        :flags '()})))
 
-(defmethod construct :object [obj]
+(defmethod construct [Object]
+  [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.put loop obj)
     (.endPacket loop)
@@ -130,7 +124,8 @@
       {:expr expr
        :flags '()})))
 
-(defmethod construct :nil [obj]
+(defmethod construct [nil]
+  [_]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putSymbol loop "Null")
     (.endPacket loop)

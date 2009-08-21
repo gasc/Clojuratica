@@ -37,10 +37,6 @@
 (ns clojuratica.lib
   (:import [java.util.regex Pattern]))
 
-(defn instances? [classes instances]
-  (and (== (count classes) (count instances))
-       (every? true? (map instance? classes instances))))
-
 (defn remove-flags [args flagset-coll]
   (remove (set (apply concat flagset-coll)) args))
 

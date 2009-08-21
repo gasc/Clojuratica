@@ -60,4 +60,4 @@
   [_ passthrough-flags passthrough]
   [& args]
   (let [output (send-read (apply build-module passthrough) (last args))]
-    (CExpr. output passthrough-flags)))
+    (convert output passthrough-flags)))

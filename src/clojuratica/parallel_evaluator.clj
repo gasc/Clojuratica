@@ -97,9 +97,9 @@
         (while true (Thread/sleep 10000))
         (catch InterruptedException _))
 
-      (let [output (CExpr. (:output @(get @process-queue pid)))]
+      (let [output (convert (:output @(get @process-queue pid)))]
         (dosync (commute process-queue dissoc pid))
-        (CExpr. output passthrough-flags))))
+        (convert output passthrough-flags))))
 
 (defn waitloop
   [kernel-link process-queue poll-interval]

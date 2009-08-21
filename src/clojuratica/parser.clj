@@ -35,7 +35,8 @@
 
 
 (ns clojuratica.parser
-  (:import [clojuratica CExpr])
+  (:import [clojuratica CExpr]
+           [com.wolfram.jlink Expr])
   (:use [clojuratica.lib]
         [clojuratica.core]))
 
@@ -44,21 +45,13 @@
          parse-to-vectors)
 
 (defnf parse-dispatch [] []
-  "Dispatches to the appropriate method. Used by the following multimethods: express, send-read."
   []
-  [& args]
-  (let [expression (first args)]
-    (cond (string? expression)                                  :string
-          (instance? com.wolfram.jlink.Expr expression)         :expr
-          (instance? CExpr expression)                          :cexpr
-          (nil? expression)                                     :nil
-          true  (throw
-                  (Exception. (str "Argument to parser must be string, Expr, CExpr, or nil."))))))
-; Parse
+  [expression & _]
+  (class expression))
 
 (defmulti parse parse-dispatch)
 
-(defmethodf parse :string [] []
+(defmethodf parse String [] []
   [_ passthrough-flags]
   [s & [kernel-link fn-wrap]]
   ; Takes a string and a KernelLink instance. Converts s to a CExpr using kernel-link, then parses the
@@ -68,14 +61,14 @@
     (throw (Exception. "When argument to parse is a string, the parser must have been created with a kernel-link argument.")))
   (apply parse (express s kernel-link) kernel-link fn-wrap passthrough-flags))
 
-(defmethodf parse :expr [] []
+(defmethodf parse Expr [] []
   [_ passthrough-flags]
   [expr & [_ fn-wrap]]
   (apply parse (express expr) nil fn-wrap passthrough-flags))
 
-(defmethodf parse :cexpr [[:vectors :seqs]
-                          [:fn-wrap :no-fn-wrap]]
-                         (concat (.getFlags cexpr) [:seqs])
+(defmethodf parse CExpr [[:vectors :seqs]
+                         [:fn-wrap :no-fn-wrap]]
+                        (concat (.getFlags cexpr) [:seqs])
   [flags]
   [cexpr & [_ fn-wrap]]
   (if (and (flags :fn-wrap) (nil? fn-wrap))
@@ -85,7 +78,7 @@
       (parse-to-vectors cexpr fn-wrap)
       (parse-to-lazy-seqs cexpr fn-wrap))))
 
-(defmethod parse :nil [& args]
+(defmethod parse nil [& args]
   nil)
 
 (defn parse-atom [cexpr fn-wrap]
@@ -106,7 +99,7 @@
             (fn parse-list-elements [s]
                (when (seq s)
                  (lazy-seq
-                   (cons (parse-to-lazy-seqs (CExpr. (first s)) fn-wrap)
+                   (cons (parse-to-lazy-seqs (convert (first s)) fn-wrap)
                          (parse-list-elements (rest s))))))]
       (parse-list-elements (rest cexpr)))))
 
@@ -117,7 +110,7 @@
            v        []
            stack    nil]
       (if-let [elements (seq elements)]
-        (let [first-cexpr (CExpr. (first elements))]
+        (let [first-cexpr (convert (first elements))]
           (if-not (.listQ (.getExpr first-cexpr))
             (recur (next elements) (conj v (parse-atom first-cexpr fn-wrap)) stack)
             (recur (next first-cexpr) [] (conj stack [(next elements) v]))))

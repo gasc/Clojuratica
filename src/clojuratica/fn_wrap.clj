@@ -46,35 +46,28 @@
 
 (defnf fn-wrap-dispatch [] []
   []
-  [& args]
-  (let [assignments  (first args)
-        expression   (second args)]
-    (if-not (vector? assignments)
-      (throw (Exception. (str "First argument to fn-wrap "
-                              "must be a vector of assignments"))))
-    (cond (string? expression)          :string
-          (instance? Expr expression)   :expr
-          (instance? CExpr expression)  :cexpr
-          true (throw (Exception. (str "Second argument to fn-wrap must be "
-                                       "string, Expr, or CExpr. You passed an object "
-                                       "of class " (class expression)))))))
+  [assignments expression & _]
+  (if-not (vector? assignments)
+    (throw (Exception. (str "First argument to fn-wrap "
+                            "must be a vector of assignments"))))
+  (class expression))
 
 (defmulti fn-wrap fn-wrap-dispatch)
 
-(defmethodf fn-wrap :string [] []
+(defmethodf fn-wrap String [] []
   [_ passthrough-flags]
   [assignments s evaluate]
   (let [kernel-link (evaluate :get-kernel-link)
         expr        (.getExpr (express s kernel-link))]
     (apply fn-wrap assignments expr evaluate passthrough-flags)))
 
-(defmethodf fn-wrap :cexpr [] []
+(defmethodf fn-wrap CExpr [] []
   [_ passthrough-flags]
   [assignments cexpr evaluate]
   (let [expr (.getExpr cexpr)]
     (apply fn-wrap assignments expr evaluate passthrough-flags)))
 
-(defmethodf fn-wrap :expr [[:parse :no-parse]] [:parse]
+(defmethodf fn-wrap Expr [[:parse :no-parse]] [:parse]
   [flags passthrough-flags]
   [assignments expr evaluate]
   (let [head        (.toString (.part expr 0))
