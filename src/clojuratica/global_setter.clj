@@ -38,12 +38,11 @@
 
 (ns clojuratica.global-setter
   (:use [clojuratica.lib]
-        [clojuratica.core]
-        [clojuratica.clojuratica]))
+        [clojuratica.core]))
 
 (defn global-set [lhs rhs evaluate]
-  (let [serial-evaluate (get-evaluator :serial (evaluate :get-kernel-link))
-        result          (serial-evaluate [] (build-set-expr lhs rhs))]
+  (let [kernel-link     (evaluate :get-kernel-link)
+        result          (send-read (build-set-expr lhs rhs) kernel-link)]
     (if (evaluate :parallel?)
-      (serial-evaluate [] (str "DistributeDefinitions[" lhs "]")))
+      (send-read (str "DistributeDefinitions[" lhs "]") kernel-link))
     result))
