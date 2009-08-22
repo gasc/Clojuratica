@@ -9,7 +9,7 @@
 (defn -increment [obj]
   (inc obj))
 
-(defn -decrement [obj]
+(defn -decrement [this obj]
   (dec obj))
 
 (defn -pair [coll1 coll2]
