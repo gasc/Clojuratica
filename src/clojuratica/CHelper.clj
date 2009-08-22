@@ -35,7 +35,7 @@
 
 (ns clojuratica.CHelper
   (:gen-class
-   :methods [#^{:static true} [convert [Object boolean] Object]
+   :methods [#^{:static true} [convert [Object boolean Object] Object]
              #^{:static true} [parse [Object] com.wolfram.jlink.Expr]
              #^{:static true} [mirrorClasspath [] Object]]
    :state state)
@@ -45,11 +45,10 @@
   (:use [clojuratica.clojuratica]
         [clojuratica.low-level]))
 
-(defn -convert [expr fn-wrap?]
-  (let [kernel-link (StdLink/getLink)
-        evaluate    (get-evaluator kernel-link)
-        fn-wrap       (if fn-wrap? (get-fn-wrapper evaluate))
-        parse       (get-parser kernel-link fn-wrap)]
+(defn -convert [expr fn-wrap? evaluate]
+  (let [;evaluate    (or evaluate (get-evaluator (StdLink/getLink)))
+        fn-wrap     (if fn-wrap? (get-fn-wrapper evaluate))
+        parse       (get-parser (evaluate :get-kernel-link) fn-wrap)]
     (parse expr)))
 
 (defn -parse [obj]

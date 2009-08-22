@@ -102,7 +102,12 @@ Clojure@JavaNew[class_String, args___] :=
 		JavaNew[class, convertedArgSeq]];
 
 
-Options[Clojure] = {FnWrap -> False};
+LoadJavaClass["com.wolfram.jlink.StdLink"];
+LoadJavaClass["clojuratica.CLink"];
+
+
+Clojuratica`fnWrap = False;
+Clojuratica`evaluator = CLink`getEvaluator[StdLink`getLink[], ""];
 
 
 SetAttributes[Clojure, HoldFirst];
@@ -123,7 +128,7 @@ ClojureConvert[expr_] :=
 		LoadJavaClass["clojuratica.CHelper"];
 		If[JavaObjectQ[expr], 
 			expr,
-			clojuratica`CHelper`convert[expr // MakeJavaExpr, OptionValue[Clojure, FnWrap]] // ReturnAsJavaObject]];
+			clojuratica`CHelper`convert[expr // MakeJavaExpr, Clojuratica`fnWrap, Clojuratica`evaluator] // ReturnAsJavaObject]];
 
 
 Begin["`Private`"];

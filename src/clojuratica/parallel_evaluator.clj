@@ -63,7 +63,7 @@
     (.start waitloop-thread)
 
     ; This is the anonymous function returned from a call to get-evaluator
-    (fn [& args]
+    (fn parallel-evaluator [& args]
       (cond
         (some #{:get-kernel-link} args)
           kernel-link

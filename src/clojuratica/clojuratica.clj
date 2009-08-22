@@ -53,20 +53,20 @@
   [evaluate]
   (when-not (fn? evaluate)
     (throw (Exception. "First non-flag argument to get-fn-wrapper must be a Clojuratica evaluator.")))
-  (fn [& args]
+  (fn fn-wrapper [& args]
     (apply fn-wrap/fn-wrap (concat args retained-flags [evaluate]))))
 
 (defnf get-parser [] []
   [_ retained-flags]
   [& [kernel-link fn-wrap]]
-  (fn [& args]
+  (fn parser [& args]
     (apply parser/parse (concat args retained-flags [kernel-link fn-wrap]))))
 
 (defn get-global-setter
   [evaluate]
   (when-not (fn? evaluate)
     (throw (Exception. "First non-flag argument to get-global-setter must be a Clojuratica evaluator.")))
-  (fn [lhs rhs]
+  (fn global-setter [lhs rhs]
     (global-setter/global-set lhs rhs evaluate)))
 
 

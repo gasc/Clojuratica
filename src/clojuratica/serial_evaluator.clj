@@ -47,7 +47,7 @@
   (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
     (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
   ; This is the anonymous function returned from a call to get-evaluator
-  (fn [& args]
+  (fn serial-evaluator [& args]
     (cond
       (some #{:get-kernel-link} args)
         kernel-link

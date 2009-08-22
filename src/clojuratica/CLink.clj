@@ -3,7 +3,7 @@
    :methods [#^{:static true} [getEvaluator         [Object String]               Object]
              #^{:static true} [getParser            [Object Object String]        Object]
              #^{:static true} [getGlobalSetter      [Object String]               Object]
-             #^{:static true} [getFnWrap             [Object String]               Object]])
+             #^{:static true} [getFnWrap            [Object String]               Object]])
   (:import [com.wolfram.jlink StdLink])
   (:use [clojuratica.clojuratica]
         [clojuratica.lib]))
@@ -24,7 +24,7 @@
 
 (defn -getParser [& args]
   (let [[kernel-link fn-wrap flag-str] (exprs-to-nils args)
-        flags                        (string-to-keywords flag-str)]
+        flags                          (string-to-keywords flag-str)]
     (apply get-parser kernel-link fn-wrap flags)))
 
 (defn -getFnWrap [& args]

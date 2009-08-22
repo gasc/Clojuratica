@@ -88,7 +88,7 @@
                               "(head Set (=) or SetDelayed (:=)), or "
                               "a symbol (head Symbol)."))))
     (if (or (= "Function" head) (= "Symbol" head))
-      (fn [& args]
+      (fn wrapped-fn [& args]
         (let [expressed-args     (map (fn [x] (.getExpr (convert x))) args)
               expressed-arg-list (add-head "List" expressed-args)
               fn-call            (add-head "Apply" [expr expressed-arg-list])]
@@ -100,7 +100,7 @@
         (sevaluate assignments expr)
         (if (evaluate :parallel?)
           (sevaluate [] (str "DistributeDefinitions[" name "]")))
-        (fn [& args]
+        (fn wrapped-fn [& args]
           (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
                 fn-call         (add-head name expressed-args)]
             (apply math [] fn-call passthrough-flags)))))))

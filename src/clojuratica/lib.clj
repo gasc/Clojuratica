@@ -70,7 +70,7 @@
       (let [args#            (remove keyword? args+flags#)
             flagged-args#    (if ~parse-flaggable? (filter (fn [arg#] (instance? clojuratica.Flaggable arg#)) args#) ())
             arg-flags#       (apply concat (map (fn [arg#] (.getFlags arg#)) flagged-args#))]
-        (letfn [(fn# ~bind
+        (letfn [(flag-parser# ~bind
                   (let [defaults#        (concat arg-flags# ~defaults)
                         [~fb1 ~fb2 ~fb3] (parse-flags args+flags# ~flagset-coll defaults#)]
                     ~@body))]

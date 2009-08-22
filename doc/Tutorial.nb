@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       145,          7]
-NotebookDataLength[    436018,       8573]
-NotebookOptionsPosition[    420171,       8140]
-NotebookOutlinePosition[    422514,       8201]
-CellTagsIndexPosition[    422420,       8196]
+NotebookDataLength[    468079,       9445]
+NotebookOptionsPosition[    449315,       8931]
+NotebookOutlinePosition[    451660,       8992]
+CellTagsIndexPosition[    451566,       8987]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -4438,7 +4438,20 @@ EEIIIYTQ5+2/AfXo+Eg=
  TextAlignment->Center],
 
 Cell["A Tutorial", "Subtitle",
- CellChangeTimes->{{3.459646073079*^9, 3.459646105575*^9}},
+ CellChangeTimes->{{3.459646073079*^9, 3.459646105575*^9}, {
+  3.4598890137901506`*^9, 3.4598890154981503`*^9}},
+ TextAlignment->Center],
+
+Cell["", "Subtitle",
+ TextAlignment->Center,
+ FormatType->"TextForm"],
+
+Cell["\<\
+Expand sections of the tutorial by clicking the small arrow to the left of \
+the section's title.\
+\>", "Department",
+ CellChangeTimes->{{3.4598889398391504`*^9, 3.4598889610541506`*^9}, {
+  3.4598890262421503`*^9, 3.4598890444701505`*^9}},
  TextAlignment->Center,
  FormatType->"TextForm"],
 
@@ -4681,8 +4694,25 @@ statistics, visualization, and image-processing (",
    3.4581688492939997`*^9, 3.458168849425*^9}, 3.458169681035*^9, {
    3.458170236631*^9, 3.458170254854*^9}, 3.458170342389*^9, {
    3.4581709563900003`*^9, 3.4581709701800003`*^9}, {3.459613568553*^9, 
-   3.45961357069*^9}}]
-}, Open  ]],
+   3.45961357069*^9}}],
+
+Cell[TextData[{
+ "The canonical pronunciation of ",
+ StyleBox["Clojuratica",
+  FontSlant->"Italic"],
+ " starts with ",
+ StyleBox["Clojure",
+  FontSlant->"Italic"],
+ " and rhymes with ",
+ StyleBox["erotica",
+  FontSlant->"Italic"],
+ "."
+}], "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.},
+ CellChangeTimes->{{3.4598669088511505`*^9, 3.4598670463141503`*^9}, {
+  3.4598671393701506`*^9, 3.4598671545031505`*^9}},
+ FormatType->"TextForm"]
+}, Closed]],
 
 Cell[CellGroupData[{
 
@@ -4902,7 +4932,7 @@ Cell[TextData[{
   3.4596151008780003`*^9, 3.459615145758*^9}, {3.459615605484*^9, 
   3.459615622368*^9}}]
 }, Closed]]
-}, Open  ]],
+}, Closed]],
 
 Cell[CellGroupData[{
 
@@ -5762,13 +5792,13 @@ Cell["Defaults", "Subsection",
 
 Cell["\<\
 The basic function generators (get-parser, get-evaluator, etc.) all accept \
-flags. Any specified flags will delineate as the default behavior of the \
-generated function.\
+flags. Any flags specified during function generation will be retained and \
+modify the default behavior of the generated function.\
 \>", "Text",
  CellChangeTimes->{{3.459623127144*^9, 3.4596231323780003`*^9}, {
    3.459623390999*^9, 3.4596234588570004`*^9}, 3.459623540916*^9, {
-   3.4596244431470003`*^9, 3.4596244480959997`*^9}},
- FormatType->"TextForm"],
+   3.4596244431470003`*^9, 3.4596244480959997`*^9}, {3.4598881383981504`*^9, 
+   3.4598881515361505`*^9}}],
 
 Cell["\<\
 => (def parse (get-parser :vectors kernel-link))
@@ -7235,8 +7265,7 @@ Cell["\<\
 \>", "Program",
  CellChangeTimes->{{3.459712120502*^9, 3.459712149782*^9}, {3.459713778144*^9,
    3.459713862525*^9}, {3.459714031987*^9, 3.459714033337*^9}, {
-  3.459716934145*^9, 3.4597169345950003`*^9}},
- FormatType->"TextForm"],
+  3.459716934145*^9, 3.4597169345950003`*^9}}],
 
 Cell["\<\
 
@@ -7362,12 +7391,11 @@ Cell["", "Text",
 
 Cell[CellGroupData[{
 
-Cell["Other Ways to Define Functions", "Subsection",
+Cell["Many Ways to Define Functions", "Subsection",
  CellChangeTimes->{{3.459715975102*^9, 3.45971598294*^9}, {3.459716145151*^9, 
   3.459716179258*^9}, {3.459724021829*^9, 3.459724038508*^9}, {
   3.459724385774*^9, 3.4597244032860003`*^9}, {3.459730017858*^9, 
-  3.45973002635*^9}},
- FormatType->"TextForm"],
+  3.45973002635*^9}, {3.4598880401461506`*^9, 3.4598880405071507`*^9}}],
 
 Cell[TextData[{
  StyleBox["Mathematica",
@@ -7571,10 +7599,108 @@ Cell["", "Text",
 
 Cell[CellGroupData[{
 
+Cell["Flags", "Subsection",
+ CellChangeTimes->{{3.4598880632021503`*^9, 3.4598880698191504`*^9}, {
+  3.4598889070941505`*^9, 3.4598889112481503`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+The function wrapper automatically parses the output of the wrapped function. \
+This behavior can be changed with the :no-parse flag.\
+\>", "Text",
+ CellChangeTimes->{{3.45988808154815*^9, 3.4598881154621506`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+=> (def increment (fn-wrap :no-parse [] \"Function[{x}, x + 1]\"))
+#'user/increment
+
+=> (increment 1)
+(#<Expr Integer>)
+
+=> (parse (increment 1))
+2\
+\>", "Program",
+ CellChangeTimes->{{3.4598881753591504`*^9, 3.4598881757791505`*^9}, {
+  3.4598882061541505`*^9, 3.45988823641415*^9}, {3.4598884110951505`*^9, 
+  3.4598884266571503`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+
+As always, flags can be specified to the generator function in order to set \
+defaults.\
+\>", "Text",
+ CellChangeTimes->{{3.4598882477401505`*^9, 3.45988826885715*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+=> (def fn-wrap* (get-fn-wrapper :no-parse evaluate))
+#'user/fn-wrap*
+
+=> (def increment (fn-wrap* [] \"Function[{x}, x + 1]\"))
+#'user/increment
+
+=> (increment 1)
+(#<Expr Integer>)\
+\>", "Program",
+ CellChangeTimes->{{3.45988828145615*^9, 3.4598883594151506`*^9}, {
+  3.4598884176511507`*^9, 3.4598884328381505`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+
+The opposite of :no-parse is :parse.\
+\>", "Text",
+ CellChangeTimes->{{3.4598883741881504`*^9, 3.4598883840681505`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+=> (def increment (fn-wrap* :parse [] \"Function[{x}, x + 1]\"))
+#'user/increment
+
+=> (increment 1)
+2\
+\>", "Program",
+ CellChangeTimes->{{3.45988839660015*^9, 3.4598884015631504`*^9}, {
+  3.4598884789191504`*^9, 3.4598884810581503`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+
+The function wrapper also accepts all evaluator flags (and therefore all \
+parser flags). For example:\
+\>", "Text",
+ CellChangeTimes->{{3.45988851113815*^9, 3.4598885263961506`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+=> (def increment-list (fn-wrap :seqs [] \"Function[{x}, Map[#+1&, x]]\"))    \
+;parsing to seqs
+#'user/increment-list
+
+=> (increment-list [1 2 3])   ;creates a seq
+(2 3 4)
+
+=> (def increment-list* (fn-wrap :vectors [] \"Function[{x}, Map[#+1&, \
+x]]\"))   ;parsing to vectors this time
+#'user/increment-list*
+
+=> (increment-list* [1 2 3])   ;creates a vector
+[2 3 4]\
+\>", "Program",
+ CellChangeTimes->{{3.4598885344621506`*^9, 3.4598886994151506`*^9}},
+ FormatType->"TextForm"],
+
+Cell["", "Text",
+ FormatType->"TextForm"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
 Cell["Parallel Computation Using Wrapped Functions", "Subsection",
  CellChangeTimes->{{3.459724415102*^9, 3.459724424752*^9}, {3.459730142705*^9,
-   3.459730145159*^9}},
- FormatType->"TextForm"],
+   3.459730145159*^9}}],
 
 Cell["\<\
 If you want calls to your wrapped functions to be evaluated in parallel, \
@@ -7590,8 +7716,7 @@ Cell["\<\
 #'user/pfn-wrap\
 \>", "Program",
  CellChangeTimes->{{3.4597245057939997`*^9, 3.459724528651*^9}, {
-  3.4597251086359997`*^9, 3.459725109972*^9}},
- FormatType->"TextForm"],
+  3.4597251086359997`*^9, 3.459725109972*^9}}],
 
 Cell[TextData[{
  "\[LineSeparator]Let's replicate using the function wrapper an example from \
@@ -7687,7 +7812,86 @@ too.\
 \>", "Text",
  CellChangeTimes->{{3.459726436547*^9, 3.4597264942200003`*^9}, {
   3.45972968075*^9, 3.459729691752*^9}, {3.459730365278*^9, 
-  3.4597304247390003`*^9}, {3.459730686376*^9, 3.45973069048*^9}},
+  3.4597304247390003`*^9}, {3.459730686376*^9, 3.45973069048*^9}}]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Wrapping Functions Automatically When Parsing", "Subsection",
+ CellChangeTimes->{{3.45988699623715*^9, 3.4598870074831505`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+The parser knows how to wrap first class functions automatically when it \
+encouters them. To be able to do this, the parser needs to have been called \
+with an optional second argument containing a function wrapper. \
+\>", "Text",
+ CellChangeTimes->{{3.4598871628671503`*^9, 3.4598872549971504`*^9}, {
+  3.4598872936671505`*^9, 3.4598872953471503`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+=> (def pparse (get-parser kernel-link pfn-wrap))
+#'user/pparse
+
+=> (def pmath (comp pparse pevaluate))
+#'user/pmath\
+\>", "Program",
+ CellChangeTimes->{{3.45988727673015*^9, 3.4598873026181507`*^9}, {
+  3.4598873583041506`*^9, 3.4598873920511503`*^9}, {3.4598887436201506`*^9, 
+  3.45988874454815*^9}},
+ FormatType->"TextForm"],
+
+Cell[TextData[{
+ "\nNow the parser will automatically create wrapped functions wherever it \
+encounters first-class ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " functions (i.e. functions defined with Function[] or &, not the \
+pattern-matching syntax)."
+}], "Text",
+ CellChangeTimes->{{3.4598873949061503`*^9, 3.45988745901315*^9}, {
+  3.4598876276481504`*^9, 3.4598876297531505`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+=> (pmath [] \"Function[{x}, x + 1]\")
+#<fn_wrap$fn__478$fn__32__auto____486$wrapped_fn__488 \
+clojuratica.fn_wrap$fn__478$fn__32__auto____486$wrapped_fn__488@1f1235b>
+
+=> (*1 10)
+11
+
+=> (def fn-vector (pmath :vectors [] \"{#+1&, #-1&, #^5&, {{#, 0}, {0, \
+#}}&}\"))
+#'user/fn-vector
+
+=> ((fn-vector 0) 2)
+3
+
+=> ((fn-vector 1) 2)
+1
+
+=> ((fn-vector 2) 2)
+32
+
+=> ((fn-vector 3) 2)
+((2 0) (0 2))\
+\>", "Program",
+ CellChangeTimes->{{3.4598874160701504`*^9, 3.4598874310761504`*^9}, {
+  3.4598874615611506`*^9, 3.4598875266291504`*^9}, {3.4598875782501507`*^9, 
+  3.45988769586915*^9}, {3.4598877436081505`*^9, 3.4598877446951504`*^9}, {
+  3.4598877979531507`*^9, 3.4598878187171507`*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+
+Because we created our parser using pfn-wrap, the parallel function wrapper \
+we generated using pevaluate, any functions created by the parser will \
+automatically be evaluated in parallel when called from different threads. \
+Awesome.\
+\>", "Text",
+ CellChangeTimes->{{3.4598887578181505`*^9, 3.4598888788771505`*^9}},
  FormatType->"TextForm"]
 }, Closed]]
 }, Open  ]]
@@ -7855,8 +8059,7 @@ Cell[CellGroupData[{
 Cell["An Illustrative Clojure Class", "Subsection",
  CellChangeTimes->{{3.4598115623338356`*^9, 3.4598115683228354`*^9}, {
   3.4598118576218357`*^9, 3.4598118585328355`*^9}, {3.459813606608835*^9, 
-  3.4598136330418353`*^9}},
- FormatType->"TextForm"],
+  3.4598136330418353`*^9}}],
 
 Cell[TextData[{
  "To illustrate Clojuratica's features for accessing Clojure, we will create \
@@ -7985,13 +8188,17 @@ Cell[BoxData[
  InterpretationBox[
   RowBox[{"JavaClass", "[", 
    RowBox[{"clojuratica", ".", "test", ".", "SimpleClass"}], ",", "<>", "]"}],
-  JLink`JavaClass["clojuratica.test.SimpleClass", 15, {
+  JLink`JavaClass["clojuratica.test.SimpleClass", 17, {
     JLink`JVM["vm1"], 
     JLink`JVM["vm2"], 
-    JLink`JVM["vm3"]}, 1, "clojuratica`test`SimpleClass`", False, 
+    JLink`JVM["vm3"], 
+    JLink`JVM["vm4"], 
+    JLink`JVM["vm5"]}, 1, "clojuratica`test`SimpleClass`", False, 
    True]]], "Output",
  CellChangeTimes->{3.459812857643835*^9, 3.4598128887048354`*^9, 
-  3.4598137478878355`*^9}],
+  3.4598137478878355`*^9, 3.45986785323015*^9, 3.4598695910851507`*^9, 
+  3.45987108911215*^9, 3.4598720780471506`*^9, 3.4598728372591505`*^9, 
+  3.45988536787615*^9, 3.4598866124031506`*^9}],
 
 Cell["We now have access to any of the class's static methods.", "Text",
  CellChangeTimes->{{3.4598128685398355`*^9, 3.4598128963848352`*^9}},
@@ -8000,12 +8207,12 @@ Cell["We now have access to any of the class's static methods.", "Text",
 
 Cell[CellGroupData[{
 
-Cell["Calling a Clojure Class", "Subsection",
+Cell["Calling Clojure Methods", "Subsection",
  PageWidth->PaperWidth,
  CellChangeTimes->{{3.458167592961*^9, 3.4581675933310003`*^9}, 
    3.4598118705688353`*^9, {3.4598128017048354`*^9, 3.4598128035158353`*^9}, {
-   3.4598145131538353`*^9, 3.4598145174758353`*^9}},
- FormatType->"TextForm"],
+   3.4598145131538353`*^9, 3.4598145174758353`*^9}, {3.45988453020415*^9, 
+   3.45988453194715*^9}}],
 
 Cell[TextData[{
  "If you are familiar with ",
@@ -8058,19 +8265,17 @@ Cell[TextData[{
  "'s prefix notation (@) syntax:"
 }], "Text",
  CellChangeTimes->{{3.4598124695148354`*^9, 3.4598125172508354`*^9}, 
-   3.4598133230228357`*^9},
- FormatType->"TextForm"],
+   3.4598133230228357`*^9}],
 
 Cell[BoxData[
  RowBox[{"Clojure", "@", 
   RowBox[{"ClassName`MethodName", "[", "arguments", "]"}], "        ", 
   RowBox[{"(*", " ", 
-   RowBox[{"preferred", " ", "Clojuratica", " ", "syntax"}], " ", "*)"}], 
-  " "}]], "Code",
+   RowBox[{"canonical", " ", "syntax"}], " ", "*)"}], " "}]], "Code",
  Evaluatable->False,
  CellChangeTimes->{{3.4598125027528353`*^9, 3.459812527931835*^9}, {
   3.459812685339835*^9, 3.459812698518835*^9}, {3.4598137537778354`*^9, 
-  3.4598137546028357`*^9}}],
+  3.4598137546028357`*^9}, {3.45986717527715*^9, 3.4598671817121506`*^9}}],
 
 Cell[TextData[{
  "Methods called in this way will have their arguments automatically \
@@ -8080,14 +8285,12 @@ automatically parsed into a ",
   FontSlant->"Italic"],
  " data type after the method call."
 }], "Text",
- CellChangeTimes->{{3.4598125356808357`*^9, 3.4598125828788357`*^9}},
- FormatType->"TextForm"],
+ CellChangeTimes->{{3.4598125356808357`*^9, 3.4598125828788357`*^9}}],
 
 Cell["Let's try it with the increment method of SimpleClass.", "Text",
  CellChangeTimes->{{3.4598125857958355`*^9, 3.459812592860835*^9}, {
   3.4598127564778357`*^9, 3.4598127580258355`*^9}, {3.4598134204898357`*^9, 
-  3.459813424504835*^9}},
- FormatType->"TextForm"],
+  3.459813424504835*^9}}],
 
 Cell[BoxData[
  RowBox[{"Clojure", "@", 
@@ -8095,7 +8298,9 @@ Cell[BoxData[
  CellChangeTimes->{{3.4598126218998356`*^9, 3.4598126328498354`*^9}}],
 
 Cell[BoxData["2"], "Output",
- CellChangeTimes->{3.4598126336248355`*^9, 3.4598137584068356`*^9}],
+ CellChangeTimes->{3.4598126336248355`*^9, 3.4598137584068356`*^9, 
+  3.4598678577851505`*^9, 3.4598695961561503`*^9, 3.4598710922671504`*^9, 
+  3.4598720809771504`*^9, 3.4598728393711505`*^9, 3.4598866150621505`*^9}],
 
 Cell["It's as easy as that.", "Text",
  CellChangeTimes->{{3.4598126532398357`*^9, 3.4598126562228355`*^9}},
@@ -8110,8 +8315,7 @@ data types of arguments, so we can easily call the method with ",
  " lists."
 }], "Text",
  CellChangeTimes->{{3.4598129308758354`*^9, 3.4598130423578353`*^9}, 
-   3.4598130929368353`*^9, {3.459813436839835*^9, 3.4598134446068354`*^9}},
- FormatType->"TextForm"],
+   3.4598130929368353`*^9, {3.459813436839835*^9, 3.4598134446068354`*^9}}],
 
 Cell[BoxData[
  RowBox[{"Clojure", "@", 
@@ -8132,15 +8336,602 @@ Cell[BoxData[
     RowBox[{"2", ",", "5"}], "}"}], ",", 
    RowBox[{"{", 
     RowBox[{"3", ",", "6"}], "}"}]}], "}"}]], "Output",
- CellChangeTimes->{3.459813065214835*^9, 3.4598137598568354`*^9}]
+ CellChangeTimes->{3.459813065214835*^9, 3.4598137598568354`*^9, 
+  3.4598695982491503`*^9, 3.45987109489515*^9, 3.45987208248215*^9, 
+  3.45987284061415*^9, 3.4598866163321505`*^9}]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Passing ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " Functions to Clojure"
+}], "Subsection",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.45987146233615*^9}},
+ FormatType->"TextForm"],
+
+Cell[TextData[{
+ "By default, if you try to pass a first-class ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " function to Clojure, the function will be received in Clojure as a CExpr \
+object. "
+}], "Text",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.45987147216615*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+We can illustrate using the myMap method of SimpleClass. The method expects \
+to be passed a function and a collection. It maps the function across the \
+collection using Clojure's map, and returns the result. \
+\>", "Text",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.4598714771861506`*^9}},
+ FormatType->"TextForm"],
+
+Cell[TextData[{
+ "If in ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " we attempt to pass MyMap a first-class function we get an error."
+}], "Text",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.45987148420615*^9}},
+ FormatType->"TextForm"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Clojure", "@", 
+  RowBox[{"SimpleClass`myMap", "[", 
+   RowBox[{
+    RowBox[{"Function", "[", 
+     RowBox[{
+      RowBox[{"{", "x", "}"}], ",", " ", 
+      RowBox[{"x", " ", "+", " ", "1"}]}], "]"}], ",", " ", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", " ", "2", ",", " ", "3"}], "}"}]}], "]"}], "        ", 
+  RowBox[{"(*", " ", 
+   RowBox[{"produces", " ", "an", " ", "error"}], " ", "*)"}]}]], "Input",
+ CellChangeTimes->{3.45987152752715*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Java", "::", "\<\"excptn\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"A Java exception occurred: \
+\\\\\\\"\\\", \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"java.lang.\
+RuntimeException: java.lang.ClassCastException: clojuratica.CExpr cannot be \
+cast to clojure.lang.IFn\\\\n\\\\tat \
+clojure.lang.LazySeq.seq(LazySeq.java:46)\\\\n\\\\tat \
+clojure.lang.LazySeq.hashCode(LazySeq.java:93)\\\\nCaused by: \
+java.lang.ClassCastException: clojuratica.CExpr cannot be cast to \
+clojure.lang.IFn\\\\n\\\\tat \
+clojure.core$map__3815$fn__3817.invoke(core.clj:1503)\\\\n\\\\tat \
+clojure.lang.LazySeq.seq(LazySeq.java:41)\\\\n\\\\t... 10 more\\\"\\), \\\"MT\
+\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\".\\\\\\\"\\\", \\\"MT\\\"]\\)\
+\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.4598854459721503`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Java", "::", "\<\"argxs1\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"The static method \\\\\\\"\\\
+\", \\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(clojuratica`CHelper`parse\
+\\), \\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\" was called with \
+an incorrect number or type of arguments. The argument was \\\\\\\"\\\", \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\($Failed\\), \\\"MT\\\"]\\)\
+\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\".\\\\\\\"\\\", \
+\\\"MT\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.4598854459991503`*^9}],
+
+Cell[BoxData["$Failed"], "Output",
+ CellChangeTimes->{{3.4598716551981506`*^9, 3.4598716624111505`*^9}, 
+   3.4598720868061504`*^9, 3.4598728424311504`*^9, {3.4598854379501505`*^9, 
+   3.45988544600115*^9}}]
+}, Open  ]],
+
+Cell[TextData[{
+ "But if we tell it to, Clojuratica will automatically convert first-class ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " functions to Clojure functions. Simply set the Clojuratica`fnWrap global \
+variable to True."
+}], "Text",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.4598714872011504`*^9}, {3.4598715372921505`*^9, 
+  3.4598715592161503`*^9}, {3.45988084692315*^9, 3.45988085250815*^9}},
+ FormatType->"TextForm"],
+
+Cell[BoxData[
+ RowBox[{"Clojuratica`fnWrap", " ", "=", " ", "True"}]], "Input",
+ CellChangeTimes->{
+  3.4598715653121505`*^9, {3.4598716599241505`*^9, 3.4598716647381506`*^9}, {
+   3.45987173215215*^9, 3.4598717337011504`*^9}, {3.4598717971251507`*^9, 
+   3.4598718013991504`*^9}, {3.4598854438741503`*^9, 3.4598854479761505`*^9}}],
+
+Cell[BoxData["True"], "Output",
+ CellChangeTimes->{
+  3.45987180189015*^9, 3.4598728443061504`*^9, {3.45988539352015*^9, 
+   3.4598854031151505`*^9}, {3.45988543648215*^9, 3.4598854482751503`*^9}, 
+   3.4598866186361504`*^9}],
+
+Cell[TextData[{
+ "Now first-class ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " functions passed as arguments will be converted to first-class Clojure \
+functions automatically. "
+}], "Text",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.4598714872011504`*^9}, {3.4598715372921505`*^9, 
+  3.4598715799361506`*^9}},
+ FormatType->"TextForm"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Clojure", "@", 
+  RowBox[{"SimpleClass`myMap", "[", 
+   RowBox[{
+    RowBox[{"Function", "[", 
+     RowBox[{
+      RowBox[{"{", "x", "}"}], ",", " ", 
+      RowBox[{"x", " ", "+", " ", "1"}]}], "]"}], ",", " ", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", " ", "2", ",", " ", "3"}], "}"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{3.4598814211891503`*^9}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"2", ",", "3", ",", "4"}], "}"}]], "Output",
+ CellChangeTimes->{3.4598854043181505`*^9, 3.4598854496491504`*^9, 
+  3.4598866196041503`*^9}]
+}, Open  ]],
+
+Cell[TextData[{
+ "If and when functions converted in this way are called in Clojure, the \
+default behavior is to evaluate the function call using a serial evaluator \
+connected to the ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " kernel that initiated the method call. "
+}], "Text",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.4598714872011504`*^9}, {3.4598715372921505`*^9, 
+  3.45987159785715*^9}, {3.4598808718701506`*^9, 3.45988087707915*^9}, {
+  3.4598812506701508`*^9, 3.45988125367115*^9}},
+ FormatType->"TextForm"],
+
+Cell["\<\
+If you want the converted functions to use a different kernel, or use a \
+parallel evaluator, you will have to create a new evaluator yourself and tell \
+Clojuratica where it is located. To do this, use the Clojuratica`evaluator \
+global variable. \
+\>", "Text",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.4598714872011504`*^9}, {3.4598715372921505`*^9, 
+  3.4598716038611507`*^9}, {3.4598717467731504`*^9, 3.45987177607915*^9}, {
+  3.4598732434001503`*^9, 3.4598732491251507`*^9}, {3.45987330850115*^9, 
+  3.4598733492341504`*^9}, {3.4598734221291504`*^9, 3.4598735180851507`*^9}, {
+  3.45987357158115*^9, 3.45987357319715*^9}, {3.4598808824511504`*^9, 
+  3.4598809168981504`*^9}, {3.4598811091231503`*^9, 3.4598811271131506`*^9}, {
+  3.4598812458091507`*^9, 3.45988126210715*^9}, {3.4598845795691504`*^9, 
+  3.4598845873871503`*^9}},
+ FormatType->"TextForm"],
+
+Cell[TextData[{
+ "Let's try this. Create a new KernelLink and a new parallel evaluator \
+attached to it. We'll store the parallel evaluator in the variable \
+Clojuratica`evaluator. The first three commands below are generic ",
+ StyleBox["J/Link",
+  FontSlant->"Italic"],
+ " commands to create a new KernelLink. The last two create a parallel \
+evaluator. Note that flags must be passed in a (possibly empty) string as the \
+final argument to CLink`getEvaluator[]."
+}], "Text",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.4598714872011504`*^9}, {3.4598715372921505`*^9, 
+  3.4598716038611507`*^9}, {3.4598717467731504`*^9, 3.45987177607915*^9}, {
+  3.4598732434001503`*^9, 3.4598732491251507`*^9}, {3.45987330850115*^9, 
+  3.4598733492341504`*^9}, {3.4598734221291504`*^9, 3.4598735180851507`*^9}, {
+  3.45987357158115*^9, 3.45987357319715*^9}, {3.4598808824511504`*^9, 
+  3.4598809168981504`*^9}, {3.4598812731341505`*^9, 3.4598812752021503`*^9}, {
+  3.4598845980121503`*^9, 3.4598846086551504`*^9}, {3.4598849864011507`*^9, 
+  3.4598850211241503`*^9}},
+ FormatType->"TextForm"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "LoadJavaClass", "[", "\"\<com.wolfram.jlink.MathLinkFactory\>\"", "]"}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"kl", "=", 
+   RowBox[{
+   "MathLinkFactory`createKernelLink", "[", 
+    "\"\<-linkmode launch -linkname 'c:\\\\\\\\program files\\\\\\\\wolfram \
+research\\\\\\\\mathematica\\\\\\\\7.0\\\\\\\\mathkernel.exe'\>\"", "]"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"kl", "@", 
+   RowBox[{"discardAnswer", "[", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"LoadJavaClass", "[", "\"\<clojuratica.CLink\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Clojuratica`evaluator", " ", "=", " ", 
+  RowBox[{"CLink`getEvaluator", "[", 
+   RowBox[{"kl", ",", " ", "\"\<:parallel\>\""}], "]"}]}]}], "Input",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+   3.4598714387491503`*^9, 3.4598714872011504`*^9}, {3.4598715372921505`*^9, 
+   3.4598716020611506`*^9}, 3.45987163922515*^9, {3.4598716920451508`*^9, 
+   3.4598717144771504`*^9}, {3.4598734472311506`*^9, 3.4598734499031506`*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "parallel_evaluator$get"}], "_evaluator", 
+     "__", "339", "$fn__", "32", "__auto", "___", "_", "348", 
+     "$parallel_evaluator", "__", "354"}], "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm5`JavaObject525866702471169]], "Output",
+ CellChangeTimes->{{3.4598717161211505`*^9, 3.4598717217811503`*^9}, 
+   3.45987210123215*^9, 3.4598727917541504`*^9, 3.4598730429671507`*^9, 
+   3.4598735318651505`*^9, 3.4598866240541506`*^9}],
+
+Cell[TextData[{
+ "From this point on, any first-class ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " functions passed as method arguments in a Clojure[] call will be converted \
+to first-class Clojure functions that, when called, are evaluated using a \
+parallel evaluator attached to the newly created kernel."
+}], "Text",
+ CellChangeTimes->{{3.4598736180031505`*^9, 3.45987366294915*^9}, {
+  3.4598737563131504`*^9, 3.4598737665841503`*^9}, {3.4598738139601507`*^9, 
+  3.4598738687191505`*^9}, {3.45988128979615*^9, 3.4598813174721503`*^9}},
+ FormatType->"TextForm"],
+
+Cell[TextData[{
+ "To restore the default evaluator (a serial evaluator connected to the ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " kernel making the method calls) do the following."
+}], "Text",
+ CellChangeTimes->{{3.4598736180031505`*^9, 3.45987366294915*^9}, {
+  3.4598737563131504`*^9, 3.4598737665841503`*^9}, {3.4598738139601507`*^9, 
+  3.4598738740651503`*^9}, {3.4598739169101505`*^9, 3.4598739174441504`*^9}, {
+  3.4598813238981504`*^9, 3.4598813241041503`*^9}},
+ FormatType->"TextForm"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"LoadJavaClass", "[", "\"\<com.wolfram.jlink.StdLink\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Clojuratica`evaluator", " ", "=", " ", 
+  RowBox[{"CLink`getEvaluator", "[", 
+   RowBox[{
+    RowBox[{"StdLink`getLink", "[", "]"}], ",", " ", "\"\<:serial\>\""}], 
+   "]"}]}]}], "Input",
+ CellChangeTimes->{{3.4598735477281504`*^9, 3.4598735588191504`*^9}, {
+  3.4598736685971503`*^9, 3.4598737102171507`*^9}, {3.45987378014515*^9, 
+  3.4598737807571507`*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "serial_evaluator$get"}], "_evaluator", "__",
+      "202", "$fn__", "32", "__auto", "___", "_", "210", "$serial_evaluator", 
+     "__", "212"}], "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm3`JavaObject382102302359553]], "Output",
+ CellChangeTimes->{3.4598737111841507`*^9, 3.4598737815501504`*^9}],
+
+Cell[TextData[{
+ "Warning: You must not try to replace :serial with :parallel in the input \
+above. There is no way to create a ",
+ StyleBox["parallel",
+  FontSlant->"Italic"],
+ " evaluator connected to the ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " kernel making the method calls. Any calls to such an evaluator will cause ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " to freeze up horribly. If you want automatic function-wrapping of method \
+arguments, and you want to have those functions evaluated on a parallel \
+evaluator, you must launch a separate kernel using \
+MathLinkFactory`createKernelLink[] and tie an evaluator to it using \
+CLink`getEvaluator[]."
+}], "Text",
+ CellChangeTimes->{{3.45987388225815*^9, 3.45987412420615*^9}, {
+  3.45987417756015*^9, 3.45987424013815*^9}},
+ FormatType->"TextForm"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Calling Clojure Methods that then Evaluate ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " Expressions"
+}], "Subsection",
+ CellChangeTimes->{{3.4598676954301505`*^9, 3.4598677036801505`*^9}, {
+  3.4598714387491503`*^9, 3.45987146233615*^9}, {3.4598846771031504`*^9, 
+  3.4598846987951508`*^9}, {3.4598860595641503`*^9, 3.4598860599671507`*^9}},
+ FormatType->"TextForm"],
+
+Cell[TextData[{
+ "If you want your Clojure methods to themselves be able to interact with ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ ", you can create any of the the Clojuratica functions (the evaluator, the \
+parser, etc.) in ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " and pass them to your Clojure methods. The last section hinted at how you \
+might do this. Here is some more detail."
+}], "Text",
+ CellChangeTimes->{{3.4598847024781504`*^9, 3.4598848034381504`*^9}, {
+  3.45988607516615*^9, 3.4598861006101503`*^9}},
+ FormatType->"TextForm"],
+
+Cell[TextData[{
+ "Here is how you might create an evaluator and parser that use the active ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " kernel."
+}], "Text",
+ CellChangeTimes->{{3.4598849039881506`*^9, 3.4598849345021505`*^9}, {
+  3.4598850269391503`*^9, 3.4598850309201508`*^9}, {3.4598861102331505`*^9, 
+  3.45988611244715*^9}},
+ FormatType->"TextForm"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"LoadJavaClass", "[", "\"\<com.wolfram.jlink.StdLink\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"LoadJavaClass", "[", "\"\<clojuratica.CLink\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"evaluate", "=", " ", 
+   RowBox[{"CLink`getEvaluator", "[", 
+    RowBox[{
+     RowBox[{"StdLink`getLink", "[", "]"}], ",", " ", "\"\<:serial\>\""}], 
+    "]"}]}], "\[IndentingNewLine]", "  ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+    "first", " ", "argument", " ", "is", " ", "a", " ", "KernelLink"}], ",", 
+    " ", 
+    RowBox[{
+    "second", " ", "argument", " ", "is", " ", "a", " ", "string", " ", 
+     "containing", " ", "flags"}]}], " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{"parse", "=", " ", 
+  RowBox[{"CLink`getParser", "[", 
+   RowBox[{
+    RowBox[{"StdLink`getLink", "[", "]"}], ",", " ", "Null", ",", " ", 
+    "\"\<\>\""}], "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{"  ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+    "first", " ", "argument", " ", "is", " ", "a", " ", "KernelLink"}], ",", 
+    " ", 
+    RowBox[{
+    "second", " ", "argument", " ", "is", " ", "a", " ", "function", " ", 
+     "wrapper", " ", "or", " ", "Null", " ", "third", " ", "argument", " ", 
+     "is", " ", "a", " ", "string", " ", "containing", " ", "flags"}]}], " ", 
+   "*)"}]}]}], "Input",
+ CellChangeTimes->{{3.4598849519081507`*^9, 3.4598849728631506`*^9}, {
+  3.4598850401181507`*^9, 3.4598850558181505`*^9}, {3.4598851214291506`*^9, 
+  3.4598852303051505`*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "serial_evaluator$get"}], "_evaluator", "__",
+      "202", "$fn__", "32", "__auto", "___", "_", "210", "$serial_evaluator", 
+     "__", "212"}], "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm5`JavaObject454825879797761]], "Output",
+ CellChangeTimes->{3.4598852305971503`*^9, 3.45988546242815*^9, 
+  3.4598866338851504`*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "clojuratica$get_parser"}], "__", "550", 
+     "$fn__", "32", "__auto", "___", "_", "559", "$parser__", "562"}], "]"}], 
+   "\[RightGuillemet]"}],
+  JLink`Objects`vm5`JavaObject524203493163009]], "Output",
+ CellChangeTimes->{3.4598852305971503`*^9, 3.45988546242815*^9, 
+  3.4598866339411507`*^9}]
+}, Open  ]],
+
+Cell[TextData[{
+ "You could then pass these functions to a Clojure method that will use them \
+to call back into ",
+ StyleBox["Mathematica.",
+  FontSlant->"Italic"],
+ " The mmaIncrement method of SimpleClass, for instance, expects to be passed \
+an evaluator and parser. It returns its first argument plus one."
+}], "Text",
+ CellChangeTimes->{{3.4598852602461505`*^9, 3.45988532135715*^9}, {
+  3.4598861320291505`*^9, 3.4598861514831505`*^9}, {3.4598864755571504`*^9, 
+  3.4598864797881503`*^9}},
+ FormatType->"TextForm"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Clojure", "@", 
+  RowBox[{"SimpleClass`mmaIncrement", "[", 
+   RowBox[{"8", ",", " ", "evaluate", ",", " ", "parse"}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.4598853407621503`*^9, 3.4598853563701506`*^9}, 
+   3.4598864734641504`*^9}],
+
+Cell[BoxData["9"], "Output",
+ CellChangeTimes->{
+  3.4598853721311502`*^9, {3.45988545424415*^9, 3.4598854635071507`*^9}, 
+   3.4598866354291506`*^9}]
+}, Open  ]],
+
+Cell["\<\
+Instead of tying your methods back into the active kernel, you could instead \
+create a completely new kernel using MathLinkFactory`createKernelLink[] and \
+use that kernel to create an evaluator. We did this in the previous section, \
+and in general it is the better way of doing things. By creating an \
+altogether new kernel you gain the option of using Clojuratica's parallel \
+evaluator. (You should not try to create a parallel evaluator attached to the \
+active kernel. Things will go badly.)\
+\>", "Text",
+ CellChangeTimes->{{3.4598857704971504`*^9, 3.4598858966891503`*^9}, {
+  3.4598862033001504`*^9, 3.4598862526241503`*^9}, {3.4598864980141506`*^9, 
+  3.4598865136791506`*^9}},
+ FormatType->"TextForm"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+  "LoadJavaClass", "[", "\"\<com.wolfram.jlink.MathLinkFactory\>\"", "]"}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"kl", "@", 
+   RowBox[{"terminateKernel", "[", "]"}]}], ";", "    ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+   "unload", " ", "the", " ", "kernel", " ", "we", " ", "launched", " ", "in",
+     " ", "the", " ", "previous", " ", "section"}], " ", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"kl", "=", 
+   RowBox[{
+   "MathLinkFactory`createKernelLink", "[", 
+    "\"\<-linkmode launch -linkname 'c:\\\\\\\\program files\\\\\\\\wolfram \
+research\\\\\\\\mathematica\\\\\\\\7.0\\\\\\\\mathkernel.exe'\>\"", "]"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{"kl", "@", 
+   RowBox[{"discardAnswer", "[", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"LoadJavaClass", "[", "\"\<clojuratica.CLink\>\"", "]"}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"evaluate", "=", " ", 
+   RowBox[{"CLink`getEvaluator", "[", 
+    RowBox[{"kl", ",", " ", "\"\<:parallel\>\""}], "]"}]}], 
+  "\[IndentingNewLine]", "  ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+    "first", " ", "argument", " ", "is", " ", "a", " ", "KernelLink"}], ",", 
+    " ", 
+    RowBox[{
+    "second", " ", "argument", " ", "is", " ", "a", " ", "string", " ", 
+     "containing", " ", "flags"}]}], " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{"parse", "=", " ", 
+  RowBox[{"CLink`getParser", "[", 
+   RowBox[{"kl", ",", " ", "Null", ",", " ", "\"\<\>\""}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{"  ", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+    "first", " ", "argument", " ", "is", " ", "a", " ", "KernelLink"}], ",", 
+    " ", 
+    RowBox[{
+    "second", " ", "argument", " ", "is", " ", "a", " ", "function", " ", 
+     "wrapper", " ", "or", " ", "Null", " ", "third", " ", "argument", " ", 
+     "is", " ", "a", " ", "string", " ", "containing", " ", "flags"}]}], " ", 
+   "*)"}]}]}], "Input",
+ CellChangeTimes->{{3.4598849519081507`*^9, 3.4598849728631506`*^9}, {
+  3.4598850401181507`*^9, 3.4598850558181505`*^9}, {3.4598851214291506`*^9, 
+  3.4598852303051505`*^9}, {3.4598865439901505`*^9, 3.4598865751241503`*^9}, {
+  3.45988664571815*^9, 3.4598866520111504`*^9}, {3.4598866903271503`*^9, 
+  3.4598866956281505`*^9}, {3.4598867419601507`*^9, 3.45988679982215*^9}, {
+  3.4598868501081505`*^9, 3.4598868506701508`*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "parallel_evaluator$get"}], "_evaluator", 
+     "__", "339", "$fn__", "32", "__auto", "___", "_", "348", 
+     "$parallel_evaluator", "__", "354"}], "]"}], "\[RightGuillemet]"}],
+  JLink`Objects`vm5`JavaObject63817593651201]], "Output",
+ CellChangeTimes->{
+  3.4598852305971503`*^9, 3.45988546242815*^9, 3.4598865779131503`*^9, {
+   3.4598866391861506`*^9, 3.4598866529121504`*^9}, 3.4598866977431507`*^9, {
+   3.4598867621511507`*^9, 3.4598867658591504`*^9}, 3.4598868052591505`*^9, 
+   3.4598868526011505`*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\[LeftGuillemet]", 
+   RowBox[{"JavaObject", "[", 
+    RowBox[{
+     RowBox[{"clojuratica", ".", "clojuratica$get_parser"}], "__", "550", 
+     "$fn__", "32", "__auto", "___", "_", "559", "$parser__", "562"}], "]"}], 
+   "\[RightGuillemet]"}],
+  JLink`Objects`vm5`JavaObject162794326458369]], "Output",
+ CellChangeTimes->{
+  3.4598852305971503`*^9, 3.45988546242815*^9, 3.4598865779131503`*^9, {
+   3.4598866391861506`*^9, 3.4598866529121504`*^9}, 3.4598866977431507`*^9, {
+   3.4598867621511507`*^9, 3.4598867658591504`*^9}, 3.4598868052591505`*^9, 
+   3.45988685260515*^9}]
+}, Open  ]],
+
+Cell["\<\
+The following uses the new parallel evaluator running on the newly created \
+kernel.\
+\>", "Text",
+ CellChangeTimes->{{3.4598868153771505`*^9, 3.4598868719511504`*^9}},
+ FormatType->"TextForm"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Clojure", "@", 
+  RowBox[{"SimpleClass`mmaIncrement", "[", 
+   RowBox[{"8", ",", " ", "evaluate", ",", " ", "parse"}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.4598853407621503`*^9, 3.4598853563701506`*^9}, 
+   3.4598864734641504`*^9}],
+
+Cell[BoxData["9"], "Output",
+ CellChangeTimes->{
+  3.4598853721311502`*^9, {3.45988545424415*^9, 3.4598854635071507`*^9}, 
+   3.4598865871741505`*^9, 3.4598868067341504`*^9}],
+
+Cell["That covers the features of Clojuratica. Enjoy!", "Text",
+ CellChangeTimes->{{3.4598869013071504`*^9, 3.4598869083891506`*^9}},
+ FormatType->"TextForm"]
+}, Open  ]]
 }, Closed]]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 },
 CellGrouping->Manual,
-WindowSize->{1264, 774},
-WindowMargins->{{7, Automatic}, {Automatic, 31}},
+WindowSize->{1268, 774},
+WindowMargins->{{Automatic, 69}, {Automatic, -12}},
 PrintingCopies->1,
 PrintingPageRange->{Automatic, Automatic},
 PrintingOptions->{"PrintCellBrackets"->False,
@@ -8189,388 +8980,469 @@ StyleDefinitions->Notebook[{
 (*CellTagsOutline
 CellTagsIndex->{
  "Example 1: A Performance Test"->{
-  Cell[373020, 6818, 251, 4, 24, "Subsection",
+  Cell[373939, 6848, 251, 4, 24, "Subsection",
    CellTags->"Example 1: A Performance Test"]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"Example 1: A Performance Test", 422302, 8190}
+ {"Example 1: A Performance Test", 451448, 8981}
  }
 *)
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
 Cell[567, 22, 268820, 4415, 463, "Title"],
-Cell[269390, 4439, 139, 3, 29, "Subtitle"],
-Cell[269532, 4444, 141, 2, 81, "Title"],
+Cell[269390, 4439, 167, 3, 29, "Subtitle"],
+Cell[269560, 4444, 69, 2, 29, "Subtitle"],
+Cell[269632, 4448, 299, 7, 18, "Department"],
+Cell[269934, 4457, 141, 2, 81, "Title"],
 Cell[CellGroupData[{
-Cell[269698, 4450, 142, 2, 73, "Section",
+Cell[270100, 4463, 142, 2, 73, "Section",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[269843, 4454, 631, 11, 30, "Text",
+Cell[270245, 4467, 631, 11, 30, "Text",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[270477, 4467, 1703, 34, 49, "Text",
+Cell[270879, 4480, 1703, 34, 49, "Text",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[272183, 4503, 558, 8, 30, "Text",
+Cell[272585, 4516, 558, 8, 30, "Text",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[272744, 4513, 1193, 26, 42, "Subitem",
+Cell[273146, 4526, 1193, 26, 42, "Subitem",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[273940, 4541, 1075, 21, 42, "Subitem",
+Cell[274342, 4554, 1075, 21, 42, "Subitem",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[275018, 4564, 1020, 19, 42, "Subitem",
+Cell[275420, 4577, 1020, 19, 42, "Subitem",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[276041, 4585, 1439, 28, 43, "Subitem",
+Cell[276443, 4598, 1439, 28, 43, "Subitem",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[277483, 4615, 1499, 30, 76, "Subitem",
+Cell[277885, 4628, 1499, 30, 76, "Subitem",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}],
-Cell[278985, 4647, 1700, 36, 87, "Text",
+Cell[279387, 4660, 1700, 36, 87, "Text",
+ CellGroupingRules->{GroupTogetherGrouping, 10000.}],
+Cell[281090, 4698, 448, 15, 30, "Text",
  CellGroupingRules->{GroupTogetherGrouping, 10000.}]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[280722, 4688, 96, 1, 73, "Section"],
-Cell[CellGroupData[{
-Cell[280843, 4693, 252, 3, 24, "Subsection"],
-Cell[281098, 4698, 1234, 23, 49, "Text"],
-Cell[282335, 4723, 1029, 18, 33, "Text"],
-Cell[283367, 4743, 1031, 18, 30, "Text"],
-Cell[284401, 4763, 1211, 19, 49, "Text"],
-Cell[285615, 4784, 1308, 27, 68, "Text"],
-Cell[286926, 4813, 430, 8, 30, "Text"],
-Cell[287359, 4823, 494, 8, 38, "SubitemParagraph"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[287890, 4836, 269, 8, 24, "Subsection"],
-Cell[288162, 4846, 447, 14, 30, "Text"],
-Cell[288612, 4862, 380, 9, 30, "Text"],
-Cell[288995, 4873, 1102, 29, 68, "Text"]
+Cell[281575, 4718, 96, 1, 43, "Section"],
+Cell[CellGroupData[{
+Cell[281696, 4723, 252, 3, 24, "Subsection"],
+Cell[281951, 4728, 1234, 23, 49, "Text"],
+Cell[283188, 4753, 1029, 18, 33, "Text"],
+Cell[284220, 4773, 1031, 18, 30, "Text"],
+Cell[285254, 4793, 1211, 19, 49, "Text"],
+Cell[286468, 4814, 1308, 27, 68, "Text"],
+Cell[287779, 4843, 430, 8, 30, "Text"],
+Cell[288212, 4853, 494, 8, 38, "SubitemParagraph"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[288743, 4866, 269, 8, 24, "Subsection"],
+Cell[289015, 4876, 447, 14, 30, "Text"],
+Cell[289465, 4892, 380, 9, 30, "Text"],
+Cell[289848, 4903, 1102, 29, 68, "Text"]
+}, Closed]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[290999, 4938, 153, 3, 55, "Title"],
+Cell[CellGroupData[{
+Cell[291177, 4945, 141, 2, 73, "Section"],
+Cell[CellGroupData[{
+Cell[291343, 4951, 191, 3, 24, "Subsection"],
+Cell[291537, 4956, 620, 10, 49, "Text"],
+Cell[292160, 4968, 492, 9, 30, "Text"],
+Cell[292655, 4979, 558, 12, 30, "Text"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[293250, 4996, 118, 2, 24, "Subsection"],
+Cell[293371, 5000, 176, 2, 30, "Text"],
+Cell[293550, 5004, 123, 4, 56, "Program"],
+Cell[293676, 5010, 624, 10, 87, "Text"],
+Cell[294303, 5022, 578, 14, 200, "Program"],
+Cell[294884, 5038, 629, 11, 87, "Text"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[290146, 4908, 153, 3, 81, "Title"],
+Cell[295562, 5055, 133, 2, 73, "Section"],
 Cell[CellGroupData[{
-Cell[290324, 4915, 141, 2, 73, "Section"],
-Cell[CellGroupData[{
-Cell[290490, 4921, 191, 3, 24, "Subsection"],
-Cell[290684, 4926, 620, 10, 49, "Text"],
-Cell[291307, 4938, 492, 9, 30, "Text"],
-Cell[291802, 4949, 558, 12, 30, "Text"]
+Cell[295720, 5061, 244, 3, 24, "Subsection"],
+Cell[295967, 5066, 264, 7, 31, "Text"],
+Cell[296234, 5075, 314, 7, 72, "Program"],
+Cell[296551, 5084, 246, 6, 49, "Text"],
+Cell[296800, 5092, 220, 5, 56, "Program"],
+Cell[297023, 5099, 344, 7, 49, "Text"],
+Cell[297370, 5108, 508, 9, 49, "Text"],
+Cell[297881, 5119, 503, 9, 49, "Text"],
+Cell[298387, 5130, 285, 5, 30, "Text"],
+Cell[298675, 5137, 192, 5, 56, "Program"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[292397, 4966, 118, 2, 24, "Subsection"],
-Cell[292518, 4970, 176, 2, 30, "Text"],
-Cell[292697, 4974, 123, 4, 56, "Program"],
-Cell[292823, 4980, 624, 10, 87, "Text"],
-Cell[293450, 4992, 578, 14, 200, "Program"],
-Cell[294031, 5008, 629, 11, 87, "Text"]
+Cell[298904, 5147, 250, 4, 24, "Subsection"],
+Cell[299157, 5153, 374, 9, 31, "Text"],
+Cell[299534, 5164, 1136, 28, 280, "Program"],
+Cell[300673, 5194, 845, 16, 106, "Text"],
+Cell[301521, 5212, 345, 6, 56, "Program"],
+Cell[301869, 5220, 878, 16, 68, "Text"],
+Cell[302750, 5238, 406, 11, 104, "Program"],
+Cell[303159, 5251, 339, 8, 49, "Text"],
+Cell[303501, 5261, 399, 7, 30, "Text"],
+Cell[303903, 5270, 309, 9, 104, "Program"],
+Cell[304215, 5281, 257, 6, 49, "Text"],
+Cell[304475, 5289, 235, 8, 104, "Program"],
+Cell[304713, 5299, 246, 7, 49, "Text"],
+Cell[304962, 5308, 279, 9, 104, "Program"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[294709, 5025, 133, 2, 73, "Section"],
+Cell[305290, 5323, 238, 4, 73, "Section"],
 Cell[CellGroupData[{
-Cell[294867, 5031, 244, 3, 24, "Subsection"],
-Cell[295114, 5036, 264, 7, 31, "Text"],
-Cell[295381, 5045, 314, 7, 72, "Program"],
-Cell[295698, 5054, 246, 6, 49, "Text"],
-Cell[295947, 5062, 220, 5, 56, "Program"],
-Cell[296170, 5069, 344, 7, 49, "Text"],
-Cell[296517, 5078, 508, 9, 49, "Text"],
-Cell[297028, 5089, 503, 9, 49, "Text"],
-Cell[297534, 5100, 285, 5, 30, "Text"],
-Cell[297822, 5107, 192, 5, 56, "Program"]
+Cell[305553, 5331, 398, 6, 24, "Subsection"],
+Cell[305954, 5339, 257, 5, 30, "Text"],
+Cell[306214, 5346, 271, 7, 72, "Program"],
+Cell[306488, 5355, 333, 7, 49, "Text"],
+Cell[306824, 5364, 216, 6, 56, "Program"],
+Cell[307043, 5372, 355, 7, 49, "Text"],
+Cell[307401, 5381, 281, 6, 56, "Program"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[298051, 5117, 250, 4, 24, "Subsection"],
-Cell[298304, 5123, 374, 9, 31, "Text"],
-Cell[298681, 5134, 1136, 28, 280, "Program"],
-Cell[299820, 5164, 845, 16, 106, "Text"],
-Cell[300668, 5182, 345, 6, 56, "Program"],
-Cell[301016, 5190, 878, 16, 68, "Text"],
-Cell[301897, 5208, 406, 11, 104, "Program"],
-Cell[302306, 5221, 339, 8, 49, "Text"],
-Cell[302648, 5231, 399, 7, 30, "Text"],
-Cell[303050, 5240, 309, 9, 104, "Program"],
-Cell[303362, 5251, 257, 6, 49, "Text"],
-Cell[303622, 5259, 235, 8, 104, "Program"],
-Cell[303860, 5269, 246, 7, 49, "Text"],
-Cell[304109, 5278, 279, 9, 104, "Program"]
+Cell[307719, 5392, 195, 3, 24, "Subsection"],
+Cell[307917, 5397, 234, 5, 30, "Text"],
+Cell[308154, 5404, 198, 5, 56, "Program"],
+Cell[308355, 5411, 334, 7, 49, "Text"],
+Cell[308692, 5420, 225, 7, 88, "Program"],
+Cell[308920, 5429, 293, 7, 49, "Text"],
+Cell[309216, 5438, 466, 10, 72, "Program"],
+Cell[309685, 5450, 293, 7, 49, "Text"],
+Cell[309981, 5459, 218, 6, 56, "Program"],
+Cell[310202, 5467, 510, 10, 68, "Text"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[310749, 5482, 309, 5, 24, "Subsection"],
+Cell[311061, 5489, 349, 6, 49, "Text"],
+Cell[311413, 5497, 270, 6, 30, "Text"],
+Cell[311686, 5505, 386, 8, 56, "Program"],
+Cell[312075, 5515, 234, 6, 49, "Text"],
+Cell[312312, 5523, 330, 7, 72, "Program"],
+Cell[312645, 5532, 301, 7, 49, "Text"],
+Cell[312949, 5541, 413, 9, 72, "Program"],
+Cell[313365, 5552, 366, 8, 49, "Text"],
+Cell[313734, 5562, 241, 6, 72, "Program"],
+Cell[313978, 5570, 202, 7, 49, "Text"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[314217, 5582, 352, 5, 24, "Subsection"],
+Cell[314572, 5589, 724, 11, 49, "Text"],
+Cell[315299, 5602, 1223, 32, 344, "Program"],
+Cell[316525, 5636, 218, 6, 49, "Text"],
+Cell[316746, 5644, 382, 7, 56, "Program"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[304437, 5293, 238, 4, 73, "Section"],
+Cell[317177, 5657, 157, 2, 73, "Section"],
 Cell[CellGroupData[{
-Cell[304700, 5301, 398, 6, 24, "Subsection"],
-Cell[305101, 5309, 257, 5, 30, "Text"],
-Cell[305361, 5316, 271, 7, 72, "Program"],
-Cell[305635, 5325, 333, 7, 49, "Text"],
-Cell[305971, 5334, 216, 6, 56, "Program"],
-Cell[306190, 5342, 355, 7, 49, "Text"],
-Cell[306548, 5351, 281, 6, 56, "Program"]
+Cell[317359, 5663, 228, 3, 24, "Subsection"],
+Cell[317590, 5668, 484, 9, 49, "Text"],
+Cell[318077, 5679, 471, 9, 50, "Text"],
+Cell[318551, 5690, 224, 3, 40, "Program"],
+Cell[318778, 5695, 251, 6, 49, "Text"],
+Cell[319032, 5703, 191, 3, 40, "Program"],
+Cell[319226, 5708, 357, 9, 49, "Text"],
+Cell[319586, 5719, 285, 7, 56, "Program"],
+Cell[319874, 5728, 591, 12, 68, "Text"],
+Cell[320468, 5742, 646, 16, 152, "Program"],
+Cell[321117, 5760, 343, 7, 50, "Text"],
+Cell[321463, 5769, 204, 5, 30, "Text"],
+Cell[321670, 5776, 149, 4, 56, "Program"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[306866, 5362, 195, 3, 24, "Subsection"],
-Cell[307064, 5367, 234, 5, 30, "Text"],
-Cell[307301, 5374, 198, 5, 56, "Program"],
-Cell[307502, 5381, 334, 7, 49, "Text"],
-Cell[307839, 5390, 225, 7, 88, "Program"],
-Cell[308067, 5399, 293, 7, 49, "Text"],
-Cell[308363, 5408, 466, 10, 72, "Program"],
-Cell[308832, 5420, 293, 7, 49, "Text"],
-Cell[309128, 5429, 218, 6, 56, "Program"],
-Cell[309349, 5437, 510, 10, 68, "Text"]
+Cell[321856, 5785, 310, 5, 24, "Subsection"],
+Cell[322169, 5792, 473, 8, 30, "Text"],
+Cell[322645, 5802, 346, 14, 200, "Program"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[309896, 5452, 309, 5, 24, "Subsection"],
-Cell[310208, 5459, 349, 6, 49, "Text"],
-Cell[310560, 5467, 270, 6, 30, "Text"],
-Cell[310833, 5475, 386, 8, 56, "Program"],
-Cell[311222, 5485, 234, 6, 49, "Text"],
-Cell[311459, 5493, 330, 7, 72, "Program"],
-Cell[311792, 5502, 301, 7, 49, "Text"],
-Cell[312096, 5511, 413, 9, 72, "Program"],
-Cell[312512, 5522, 366, 8, 49, "Text"],
-Cell[312881, 5532, 241, 6, 72, "Program"],
-Cell[313125, 5540, 202, 7, 49, "Text"]
-}, Closed]],
-Cell[CellGroupData[{
-Cell[313364, 5552, 352, 5, 24, "Subsection"],
-Cell[313719, 5559, 724, 11, 49, "Text"],
-Cell[314446, 5572, 1223, 32, 344, "Program"],
-Cell[315672, 5606, 218, 6, 49, "Text"],
-Cell[315893, 5614, 382, 7, 56, "Program"]
+Cell[323028, 5821, 411, 7, 24, "Subsection"],
+Cell[323442, 5830, 418, 7, 30, "Text"],
+Cell[323863, 5839, 351, 9, 104, "Program"],
+Cell[324217, 5850, 422, 8, 49, "Text"],
+Cell[324642, 5860, 419, 15, 200, "Program"],
+Cell[325064, 5877, 273, 6, 49, "Text"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[316324, 5627, 157, 2, 73, "Section"],
+Cell[325386, 5889, 138, 2, 73, "Section"],
 Cell[CellGroupData[{
-Cell[316506, 5633, 228, 3, 24, "Subsection"],
-Cell[316737, 5638, 484, 9, 49, "Text"],
-Cell[317224, 5649, 471, 9, 50, "Text"],
-Cell[317698, 5660, 224, 3, 40, "Program"],
-Cell[317925, 5665, 251, 6, 49, "Text"],
-Cell[318179, 5673, 191, 3, 40, "Program"],
-Cell[318373, 5678, 357, 9, 49, "Text"],
-Cell[318733, 5689, 285, 7, 56, "Program"],
-Cell[319021, 5698, 591, 12, 68, "Text"],
-Cell[319615, 5712, 646, 16, 152, "Program"],
-Cell[320264, 5730, 343, 7, 50, "Text"],
-Cell[320610, 5739, 204, 5, 30, "Text"],
-Cell[320817, 5746, 149, 4, 56, "Program"]
+Cell[325549, 5895, 181, 3, 24, "Subsection"],
+Cell[325733, 5900, 268, 6, 30, "Text"],
+Cell[326004, 5908, 350, 7, 30, "Text"],
+Cell[326357, 5917, 282, 7, 88, "Program"],
+Cell[326642, 5926, 298, 7, 49, "Text"],
+Cell[326943, 5935, 221, 5, 56, "Program"],
+Cell[327167, 5942, 184, 5, 49, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[321003, 5755, 310, 5, 24, "Subsection"],
-Cell[321316, 5762, 407, 8, 30, "Text"],
-Cell[321726, 5772, 346, 14, 200, "Program"]
-}, Closed]],
-Cell[CellGroupData[{
-Cell[322109, 5791, 411, 7, 24, "Subsection"],
-Cell[322523, 5800, 418, 7, 30, "Text"],
-Cell[322944, 5809, 351, 9, 104, "Program"],
-Cell[323298, 5820, 422, 8, 49, "Text"],
-Cell[323723, 5830, 419, 15, 200, "Program"],
-Cell[324145, 5847, 273, 6, 49, "Text"]
+Cell[327388, 5952, 197, 3, 24, "Subsection"],
+Cell[327588, 5957, 376, 7, 49, "Text"],
+Cell[327967, 5966, 599, 16, 168, "Program"],
+Cell[328569, 5984, 479, 10, 50, "Text"],
+Cell[329051, 5996, 249, 6, 56, "Program"],
+Cell[329303, 6004, 394, 8, 49, "Text"],
+Cell[329700, 6014, 210, 8, 104, "Program"],
+Cell[329913, 6024, 493, 9, 68, "Text"],
+Cell[330409, 6035, 327, 8, 104, "Program"],
+Cell[330739, 6045, 419, 8, 68, "Text"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[324467, 5859, 138, 2, 73, "Section"],
+Cell[331207, 6059, 175, 3, 73, "Section"],
 Cell[CellGroupData[{
-Cell[324630, 5865, 181, 3, 24, "Subsection"],
-Cell[324814, 5870, 268, 6, 30, "Text"],
-Cell[325085, 5878, 350, 7, 30, "Text"],
-Cell[325438, 5887, 282, 7, 88, "Program"],
-Cell[325723, 5896, 298, 7, 49, "Text"],
-Cell[326024, 5905, 221, 5, 56, "Program"],
-Cell[326248, 5912, 184, 5, 49, "Text"]
+Cell[331407, 6066, 411, 7, 24, "Subsection"],
+Cell[331821, 6075, 239, 5, 30, "Text"],
+Cell[332063, 6082, 710, 16, 49, "Text"],
+Cell[332776, 6100, 702, 16, 49, "Text"],
+Cell[333481, 6118, 701, 15, 68, "Text"],
+Cell[334185, 6135, 798, 16, 68, "Text"],
+Cell[334986, 6153, 628, 13, 68, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[326469, 5922, 197, 3, 24, "Subsection"],
-Cell[326669, 5927, 376, 7, 49, "Text"],
-Cell[327048, 5936, 599, 16, 168, "Program"],
-Cell[327650, 5954, 479, 10, 50, "Text"],
-Cell[328132, 5966, 249, 6, 56, "Program"],
-Cell[328384, 5974, 394, 8, 49, "Text"],
-Cell[328781, 5984, 210, 8, 104, "Program"],
-Cell[328994, 5994, 493, 9, 68, "Text"],
-Cell[329490, 6005, 327, 8, 104, "Program"],
-Cell[329820, 6015, 419, 8, 68, "Text"]
-}, Closed]]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[330288, 6029, 175, 3, 73, "Section"],
-Cell[CellGroupData[{
-Cell[330488, 6036, 411, 7, 24, "Subsection"],
-Cell[330902, 6045, 239, 5, 30, "Text"],
-Cell[331144, 6052, 710, 16, 49, "Text"],
-Cell[331857, 6070, 702, 16, 49, "Text"],
-Cell[332562, 6088, 701, 15, 68, "Text"],
-Cell[333266, 6105, 798, 16, 68, "Text"],
-Cell[334067, 6123, 628, 13, 68, "Text"]
+Cell[335651, 6171, 165, 3, 24, "Subsection"],
+Cell[335819, 6176, 458, 13, 30, "Text"],
+Cell[336280, 6191, 36238, 600, 633, "Text"],
+Cell[372521, 6793, 225, 6, 49, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[334732, 6141, 165, 3, 24, "Subsection"],
-Cell[334900, 6146, 458, 13, 30, "Text"],
-Cell[335361, 6161, 36238, 600, 633, "Text"],
-Cell[371602, 6763, 225, 6, 49, "Text"]
+Cell[372783, 6804, 134, 2, 24, "Subsection"],
+Cell[372920, 6808, 280, 5, 30, "Text"],
+Cell[373203, 6815, 285, 8, 104, "Program"],
+Cell[373491, 6825, 200, 6, 49, "Text"],
+Cell[373694, 6833, 164, 7, 104, "Program"],
+Cell[373861, 6842, 41, 1, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[371864, 6774, 134, 2, 24, "Subsection"],
-Cell[372001, 6778, 280, 5, 30, "Text"],
-Cell[372284, 6785, 285, 8, 104, "Program"],
-Cell[372572, 6795, 200, 6, 49, "Text"],
-Cell[372775, 6803, 164, 7, 104, "Program"],
-Cell[372942, 6812, 41, 1, 30, "Text"]
-}, Closed]],
-Cell[CellGroupData[{
-Cell[373020, 6818, 251, 4, 24, "Subsection",
+Cell[373939, 6848, 251, 4, 24, "Subsection",
  CellTags->"Example 1: A Performance Test"],
-Cell[373274, 6824, 290, 6, 30, "Text"],
-Cell[373567, 6832, 664, 14, 49, "Text"],
-Cell[374234, 6848, 262, 6, 72, "Program"],
-Cell[374499, 6856, 389, 8, 49, "Text"],
-Cell[374891, 6866, 485, 14, 168, "Program"],
-Cell[375379, 6882, 568, 10, 68, "Text"],
-Cell[375950, 6894, 405, 9, 72, "Program"],
-Cell[376358, 6905, 523, 9, 68, "Text"],
-Cell[376884, 6916, 419, 9, 88, "Program"],
-Cell[377306, 6927, 381, 8, 49, "Text"],
-Cell[377690, 6937, 264, 5, 30, "Text"],
-Cell[377957, 6944, 206, 5, 30, "Text"]
+Cell[374193, 6854, 290, 6, 30, "Text"],
+Cell[374486, 6862, 664, 14, 49, "Text"],
+Cell[375153, 6878, 262, 6, 72, "Program"],
+Cell[375418, 6886, 389, 8, 49, "Text"],
+Cell[375810, 6896, 485, 14, 168, "Program"],
+Cell[376298, 6912, 568, 10, 68, "Text"],
+Cell[376869, 6924, 405, 9, 72, "Program"],
+Cell[377277, 6935, 523, 9, 68, "Text"],
+Cell[377803, 6946, 419, 9, 88, "Program"],
+Cell[378225, 6957, 381, 8, 49, "Text"],
+Cell[378609, 6967, 264, 5, 30, "Text"],
+Cell[378876, 6974, 206, 5, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[378200, 6954, 203, 2, 24, "Subsection"],
-Cell[378406, 6958, 292, 5, 30, "Text"],
-Cell[378701, 6965, 159, 3, 30, "Text"],
-Cell[378863, 6970, 182, 5, 72, "Program"],
-Cell[379048, 6977, 249, 6, 49, "Text"],
-Cell[379300, 6985, 769, 16, 120, "Program"],
-Cell[380072, 7003, 717, 12, 87, "Text"],
-Cell[380792, 7017, 154, 2, 30, "Text"],
-Cell[380949, 7021, 389, 9, 88, "Program"],
-Cell[381341, 7032, 385, 8, 49, "Text"],
-Cell[381729, 7042, 125, 4, 56, "Program"],
-Cell[381857, 7048, 781, 16, 87, "Text"],
-Cell[382641, 7066, 235, 4, 56, "Program"],
-Cell[382879, 7072, 184, 3, 30, "Text"]
+Cell[379119, 6984, 203, 2, 24, "Subsection"],
+Cell[379325, 6988, 292, 5, 30, "Text"],
+Cell[379620, 6995, 159, 3, 30, "Text"],
+Cell[379782, 7000, 182, 5, 72, "Program"],
+Cell[379967, 7007, 249, 6, 49, "Text"],
+Cell[380219, 7015, 769, 16, 120, "Program"],
+Cell[380991, 7033, 717, 12, 87, "Text"],
+Cell[381711, 7047, 154, 2, 30, "Text"],
+Cell[381868, 7051, 389, 9, 88, "Program"],
+Cell[382260, 7062, 385, 8, 49, "Text"],
+Cell[382648, 7072, 125, 4, 56, "Program"],
+Cell[382776, 7078, 781, 16, 87, "Text"],
+Cell[383560, 7096, 235, 4, 56, "Program"],
+Cell[383798, 7102, 184, 3, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[383100, 7080, 161, 2, 24, "Subsection"],
-Cell[383264, 7084, 325, 6, 30, "Text"],
-Cell[383592, 7092, 410, 10, 136, "Program"],
-Cell[384005, 7104, 41, 1, 30, "Text"]
+Cell[384019, 7110, 161, 2, 24, "Subsection"],
+Cell[384183, 7114, 325, 6, 30, "Text"],
+Cell[384511, 7122, 410, 10, 136, "Program"],
+Cell[384924, 7134, 41, 1, 30, "Text"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[384095, 7111, 234, 6, 73, "Section"],
+Cell[385014, 7141, 234, 6, 73, "Section"],
 Cell[CellGroupData[{
-Cell[384354, 7121, 233, 3, 24, "Subsection"],
-Cell[384590, 7126, 409, 9, 30, "Text"],
-Cell[385002, 7137, 580, 14, 49, "Text"],
-Cell[385585, 7153, 734, 21, 49, "Text"],
-Cell[386322, 7176, 278, 8, 30, "Text"],
-Cell[386603, 7186, 640, 17, 49, "Text"],
-Cell[387246, 7205, 260, 7, 56, "Program"],
-Cell[387509, 7214, 538, 12, 68, "Text"],
-Cell[388050, 7228, 336, 10, 104, "Program"],
-Cell[388389, 7240, 242, 7, 49, "Text"],
-Cell[388634, 7249, 297, 7, 56, "Program"],
-Cell[388934, 7258, 550, 13, 68, "Text"],
-Cell[389487, 7273, 509, 11, 49, "Text"],
-Cell[389999, 7286, 312, 10, 104, "Program"],
-Cell[390314, 7298, 41, 1, 30, "Text"]
+Cell[385273, 7151, 233, 3, 24, "Subsection"],
+Cell[385509, 7156, 409, 9, 30, "Text"],
+Cell[385921, 7167, 580, 14, 49, "Text"],
+Cell[386504, 7183, 734, 21, 49, "Text"],
+Cell[387241, 7206, 278, 8, 30, "Text"],
+Cell[387522, 7216, 640, 17, 49, "Text"],
+Cell[388165, 7235, 260, 7, 56, "Program"],
+Cell[388428, 7244, 538, 12, 68, "Text"],
+Cell[388969, 7258, 311, 9, 104, "Program"],
+Cell[389283, 7269, 242, 7, 49, "Text"],
+Cell[389528, 7278, 297, 7, 56, "Program"],
+Cell[389828, 7287, 550, 13, 68, "Text"],
+Cell[390381, 7302, 509, 11, 49, "Text"],
+Cell[390893, 7315, 312, 10, 104, "Program"],
+Cell[391208, 7327, 41, 1, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[390392, 7304, 129, 2, 24, "Subsection"],
-Cell[390524, 7308, 305, 6, 30, "Text"],
-Cell[390832, 7316, 386, 7, 49, "Text"],
-Cell[391221, 7325, 439, 9, 49, "Text"],
-Cell[391663, 7336, 598, 18, 216, "Program"],
-Cell[392264, 7356, 129, 3, 30, "Text"]
+Cell[391286, 7333, 129, 2, 24, "Subsection"],
+Cell[391418, 7337, 305, 6, 30, "Text"],
+Cell[391726, 7345, 386, 7, 49, "Text"],
+Cell[392115, 7354, 439, 9, 49, "Text"],
+Cell[392557, 7365, 598, 18, 216, "Program"],
+Cell[393158, 7385, 129, 3, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[392430, 7364, 309, 5, 24, "Subsection"],
-Cell[392742, 7371, 602, 11, 49, "Text"],
-Cell[393347, 7384, 830, 15, 68, "Text"],
-Cell[394180, 7401, 376, 11, 104, "Program"],
-Cell[394559, 7414, 770, 17, 68, "Text"],
-Cell[395332, 7433, 506, 15, 152, "Program"],
-Cell[395841, 7450, 861, 20, 68, "Text"],
-Cell[396705, 7472, 690, 16, 49, "Text"],
-Cell[397398, 7490, 596, 17, 152, "Program"],
-Cell[397997, 7509, 365, 8, 49, "Text"],
-Cell[398365, 7519, 325, 13, 152, "Program"],
-Cell[398693, 7534, 374, 9, 49, "Text"],
-Cell[399070, 7545, 229, 3, 30, "Text"],
-Cell[399302, 7550, 513, 15, 152, "Program"],
-Cell[399818, 7567, 41, 1, 30, "Text"]
+Cell[393324, 7393, 333, 4, 24, "Subsection"],
+Cell[393660, 7399, 602, 11, 49, "Text"],
+Cell[394265, 7412, 830, 15, 68, "Text"],
+Cell[395098, 7429, 376, 11, 104, "Program"],
+Cell[395477, 7442, 770, 17, 68, "Text"],
+Cell[396250, 7461, 506, 15, 152, "Program"],
+Cell[396759, 7478, 861, 20, 68, "Text"],
+Cell[397623, 7500, 690, 16, 49, "Text"],
+Cell[398316, 7518, 596, 17, 152, "Program"],
+Cell[398915, 7537, 365, 8, 49, "Text"],
+Cell[399283, 7547, 325, 13, 152, "Program"],
+Cell[399611, 7562, 374, 9, 49, "Text"],
+Cell[399988, 7573, 229, 3, 30, "Text"],
+Cell[400220, 7578, 513, 15, 152, "Program"],
+Cell[400736, 7595, 41, 1, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[399896, 7573, 194, 3, 24, "Subsection"],
-Cell[400093, 7578, 334, 7, 30, "Text"],
-Cell[400430, 7587, 225, 6, 56, "Program"],
-Cell[400658, 7595, 477, 11, 49, "Text"],
-Cell[401138, 7608, 730, 15, 68, "Text"],
-Cell[401871, 7625, 309, 7, 72, "Program"],
-Cell[402183, 7634, 175, 5, 49, "Text"],
-Cell[402361, 7641, 493, 11, 56, "Program"],
-Cell[402857, 7654, 307, 6, 49, "Text"],
-Cell[403167, 7662, 785, 17, 152, "Program"],
-Cell[403955, 7681, 407, 9, 49, "Text"]
+Cell[400814, 7601, 175, 3, 24, "Subsection"],
+Cell[400992, 7606, 249, 5, 30, "Text"],
+Cell[401244, 7613, 372, 13, 152, "Program"],
+Cell[401619, 7628, 204, 6, 49, "Text"],
+Cell[401826, 7636, 353, 12, 152, "Program"],
+Cell[402182, 7650, 156, 5, 49, "Text"],
+Cell[402341, 7657, 273, 9, 104, "Program"],
+Cell[402617, 7668, 219, 6, 49, "Text"],
+Cell[402839, 7676, 489, 16, 200, "Program"],
+Cell[403331, 7694, 41, 1, 30, "Text"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[403409, 7700, 169, 2, 24, "Subsection"],
+Cell[403581, 7704, 334, 7, 30, "Text"],
+Cell[403918, 7713, 200, 5, 56, "Program"],
+Cell[404121, 7720, 477, 11, 49, "Text"],
+Cell[404601, 7733, 730, 15, 68, "Text"],
+Cell[405334, 7750, 309, 7, 72, "Program"],
+Cell[405646, 7759, 175, 5, 49, "Text"],
+Cell[405824, 7766, 493, 11, 56, "Program"],
+Cell[406320, 7779, 307, 6, 49, "Text"],
+Cell[406630, 7787, 785, 17, 152, "Program"],
+Cell[407418, 7806, 382, 8, 49, "Text"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[407837, 7819, 159, 2, 24, "Subsection"],
+Cell[407999, 7823, 389, 7, 49, "Text"],
+Cell[408391, 7832, 338, 10, 104, "Program"],
+Cell[408732, 7844, 420, 10, 49, "Text"],
+Cell[409155, 7856, 720, 28, 344, "Program"],
+Cell[409878, 7886, 356, 8, 68, "Text"]
 }, Closed]]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[404423, 7697, 137, 6, 81, "Title"],
+Cell[410295, 7901, 137, 6, 81, "Title"],
 Cell[CellGroupData[{
-Cell[404585, 7707, 122, 2, 73, "Section"],
+Cell[410457, 7911, 122, 2, 73, "Section"],
 Cell[CellGroupData[{
-Cell[404732, 7713, 114, 2, 24, "Subsection"],
-Cell[404849, 7717, 679, 15, 49, "Text"],
-Cell[405531, 7734, 834, 16, 49, "Text"],
-Cell[406368, 7752, 880, 16, 49, "Text"],
-Cell[407251, 7770, 1153, 24, 68, "Text"],
-Cell[408407, 7796, 474, 8, 30, "Text"]
+Cell[410604, 7917, 114, 2, 24, "Subsection"],
+Cell[410721, 7921, 679, 15, 49, "Text"],
+Cell[411403, 7938, 834, 16, 49, "Text"],
+Cell[412240, 7956, 880, 16, 49, "Text"],
+Cell[413123, 7974, 1153, 24, 68, "Text"],
+Cell[414279, 8000, 474, 8, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[408918, 7809, 93, 1, 24, "Subsection"],
-Cell[409014, 7812, 298, 8, 30, "Text"],
-Cell[409315, 7822, 255, 7, 30, "Text"],
-Cell[409573, 7831, 137, 2, 40, "Input"],
-Cell[409713, 7835, 276, 7, 49, "Text"]
+Cell[414790, 8013, 93, 1, 24, "Subsection"],
+Cell[414886, 8016, 298, 8, 30, "Text"],
+Cell[415187, 8026, 255, 7, 30, "Text"],
+Cell[415445, 8035, 137, 2, 40, "Input"],
+Cell[415585, 8039, 276, 7, 49, "Text"]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[410038, 7848, 152, 2, 73, "Section"],
+Cell[415910, 8052, 152, 2, 73, "Section"],
 Cell[CellGroupData[{
-Cell[410215, 7854, 250, 4, 24, "Subsection"],
-Cell[410468, 7860, 602, 13, 49, "Text"],
-Cell[411073, 7875, 1017, 32, 376, "Program"],
-Cell[412093, 7909, 448, 8, 49, "Text"],
-Cell[412544, 7919, 632, 12, 49, "Text"],
-Cell[413179, 7933, 505, 12, 30, "Text"],
-Cell[413687, 7947, 677, 19, 49, "Text"],
-Cell[414367, 7968, 263, 8, 30, "Text"],
-Cell[414633, 7978, 148, 3, 40, "Input"],
-Cell[414784, 7983, 425, 10, 39, "Output"],
-Cell[415212, 7995, 167, 2, 30, "Text"]
+Cell[416087, 8058, 225, 3, 24, "Subsection"],
+Cell[416315, 8063, 602, 13, 49, "Text"],
+Cell[416920, 8078, 1017, 32, 376, "Program"],
+Cell[417940, 8112, 448, 8, 49, "Text"],
+Cell[418391, 8122, 632, 12, 49, "Text"],
+Cell[419026, 8136, 505, 12, 30, "Text"],
+Cell[419534, 8150, 677, 19, 49, "Text"],
+Cell[420214, 8171, 263, 8, 30, "Text"],
+Cell[420480, 8181, 148, 3, 40, "Input"],
+Cell[420631, 8186, 636, 14, 39, "Output"],
+Cell[421270, 8202, 167, 2, 30, "Text"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[415416, 8002, 291, 5, 24, "Subsection"],
-Cell[415710, 8009, 374, 12, 30, "Text"],
-Cell[416087, 8023, 362, 8, 47, "Code",
+Cell[421474, 8209, 314, 5, 24, "Subsection"],
+Cell[421791, 8216, 374, 12, 30, "Text"],
+Cell[422168, 8230, 362, 8, 47, "Code",
  Evaluatable->False],
-Cell[416452, 8033, 400, 7, 49, "Text"],
-Cell[416855, 8042, 389, 9, 47, "Code",
+Cell[422533, 8240, 400, 7, 49, "Text"],
+Cell[422936, 8249, 389, 9, 47, "Code",
  Evaluatable->False],
-Cell[417247, 8053, 273, 8, 30, "Text"],
-Cell[417523, 8063, 417, 9, 47, "Code",
+Cell[423328, 8260, 248, 7, 30, "Text"],
+Cell[423579, 8269, 441, 8, 47, "Code",
  Evaluatable->False],
-Cell[417943, 8074, 390, 9, 49, "Text"],
-Cell[418336, 8085, 267, 4, 30, "Text"],
-Cell[418606, 8091, 173, 3, 40, "Input"],
-Cell[418782, 8096, 96, 1, 39, "Output"],
-Cell[418881, 8099, 132, 2, 30, "Text"],
-Cell[419016, 8103, 482, 10, 49, "Text"],
-Cell[419501, 8115, 319, 8, 40, "Input"],
-Cell[419823, 8125, 296, 9, 39, "Output"]
+Cell[424023, 8279, 365, 8, 49, "Text"],
+Cell[424391, 8289, 242, 3, 30, "Text"],
+Cell[424636, 8294, 173, 3, 40, "Input"],
+Cell[424812, 8299, 246, 3, 39, "Output"],
+Cell[425061, 8304, 132, 2, 30, "Text"],
+Cell[425196, 8308, 457, 9, 49, "Text"],
+Cell[425656, 8319, 319, 8, 40, "Input"],
+Cell[425978, 8329, 413, 11, 39, "Output"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[426428, 8345, 265, 8, 24, "Subsection"],
+Cell[426696, 8355, 359, 9, 30, "Text"],
+Cell[427058, 8366, 382, 7, 49, "Text"],
+Cell[427443, 8375, 301, 8, 30, "Text"],
+Cell[CellGroupData[{
+Cell[427769, 8387, 470, 12, 40, "Input"],
+Cell[428242, 8401, 871, 17, 124, "Message"],
+Cell[429116, 8420, 609, 11, 21, "Message"],
+Cell[429728, 8433, 207, 3, 39, "Output"]
+}, Open  ]],
+Cell[429950, 8439, 496, 10, 30, "Text"],
+Cell[430449, 8451, 331, 5, 40, "Input"],
+Cell[430783, 8458, 225, 4, 39, "Output"],
+Cell[431011, 8464, 401, 10, 30, "Text"],
+Cell[CellGroupData[{
+Cell[431437, 8478, 375, 10, 40, "Input"],
+Cell[431815, 8490, 178, 4, 39, "Output"]
+}, Open  ]],
+Cell[432008, 8497, 587, 12, 49, "Text"],
+Cell[432598, 8511, 926, 15, 49, "Text"],
+Cell[433527, 8528, 1133, 19, 49, "Text"],
+Cell[434663, 8549, 1050, 24, 121, "Input"],
+Cell[435716, 8575, 574, 11, 39, "Output"],
+Cell[436293, 8588, 576, 11, 49, "Text"],
+Cell[436872, 8601, 506, 10, 30, "Text"],
+Cell[437381, 8613, 505, 11, 61, "Input"],
+Cell[437889, 8626, 443, 9, 39, "Output"],
+Cell[438335, 8637, 833, 19, 68, "Text"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[439205, 8661, 394, 9, 24, "Subsection"],
+Cell[439602, 8672, 566, 13, 49, "Text"],
+Cell[440171, 8687, 364, 9, 30, "Text"],
+Cell[CellGroupData[{
+Cell[440560, 8700, 1551, 39, 141, "Input"],
+Cell[442114, 8741, 467, 10, 39, "Output"],
+Cell[442584, 8753, 439, 10, 39, "Output"]
+}, Open  ]],
+Cell[443038, 8766, 521, 11, 49, "Text"],
+Cell[CellGroupData[{
+Cell[443584, 8781, 259, 5, 40, "Input"],
+Cell[443846, 8788, 150, 3, 39, "Output"]
+}, Open  ]],
+Cell[444011, 8794, 724, 12, 68, "Text"],
+Cell[CellGroupData[{
+Cell[444760, 8810, 2371, 58, 201, "Input"],
+Cell[447134, 8870, 654, 13, 39, "Output"],
+Cell[447791, 8885, 620, 13, 39, "Output"]
+}, Open  ]],
+Cell[448426, 8901, 203, 5, 30, "Text"],
+Cell[CellGroupData[{
+Cell[448654, 8910, 259, 5, 40, "Input"],
+Cell[448916, 8917, 174, 3, 39, "Output"],
+Cell[449093, 8922, 158, 2, 30, "Text"]
+}, Open  ]]
 }, Closed]]
 }, Open  ]]
 }, Open  ]]

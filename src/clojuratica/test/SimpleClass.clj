@@ -1,10 +1,10 @@
 (ns clojuratica.test.SimpleClass
   (:gen-class
-     :methods [#^{:static true} [increment     [Object]                             Object]
-                                [decrement     [Object]                             Object]
-               #^{:static true} [pair          [Object Object]                      Object]
-               #^{:static true} [myMap         [Object Object]                      Object]
-               #^{:static true} [mmaIncrement  [Object Object Object]               Object]]))
+     :methods [#^{:static true} [increment          [Object]                 Object]
+                                [decrement          [Object]                 Object]
+               #^{:static true} [pair               [Object Object]          Object]
+               #^{:static true} [myMap              [Object Object]          Object]
+               #^{:static true} [mmaIncrement       [Object Object Object]   Object]]))
 
 (defn -increment [obj]
   (inc obj))
