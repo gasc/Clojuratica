@@ -74,7 +74,7 @@
                   (let [defaults#        (concat arg-flags# ~defaults)
                         [~fb1 ~fb2 ~fb3] (parse-flags args+flags# ~flagset-coll defaults#)]
                     ~@body))]
-          (apply fn# args#))))))
+          (apply flag-parser# args#))))))
 
 ;(defmacro defnfa [name & remainder]
 ; `(defnf-* defn ~name true () ~@remainder))
