@@ -102,6 +102,7 @@ Clojure@JavaNew[class_String, args___] :=
 		JavaNew[class, convertedArgSeq]];
 
 
+InstallJava[];
 LoadJavaClass["com.wolfram.jlink.StdLink"];
 LoadJavaClass["clojuratica.CLink"];
 
