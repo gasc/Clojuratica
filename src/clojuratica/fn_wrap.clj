@@ -78,7 +78,7 @@
                       identity)
         math        (comp parse evaluate)
         sevaluate   (get-evaluator :serial kernel-link)]
-    (if-not (or (= "Set"        head)
+    (comment (if-not (or (= "Set"        head)
                 (= "SetDelayed" head)
                 (= "Function"   head)
                 (= "Symbol"     head))
@@ -86,13 +86,8 @@
                               "string that contains a pure function "
                               "(head Function), a function definition "
                               "(head Set (=) or SetDelayed (:=)), or "
-                              "a symbol (head Symbol)."))))
-    (if (or (= "Function" head) (= "Symbol" head))
-      (fn wrapped-fn [& args]
-        (let [expressed-args     (map (fn [x] (.getExpr (convert x))) args)
-              expressed-arg-list (add-head "List" expressed-args)
-              fn-call            (add-head "Apply" [expr expressed-arg-list])]
-          (apply math assignments fn-call passthrough-flags)))
+                              "a symbol (head Symbol).")))))
+    (if (or (= "Set" head) (= "SetDelayed" head))
       (let [lhs   (.part expr 1)
             name  (if (zero? (count (.args lhs)))
                     (.toString lhs)
@@ -103,4 +98,9 @@
         (fn wrapped-fn [& args]
           (let [expressed-args  (map (fn [x] (.getExpr (convert x))) args)
                 fn-call         (add-head name expressed-args)]
-            (apply math [] fn-call passthrough-flags)))))))
+            (apply math [] fn-call passthrough-flags))))
+      (fn wrapped-fn [& args]
+        (let [expressed-args     (map (fn [x] (.getExpr (convert x))) args)
+              expressed-arg-list (add-head "List" expressed-args)
+              fn-call            (add-head "Apply" [expr expressed-arg-list])]
+          (apply math assignments fn-call passthrough-flags))))))

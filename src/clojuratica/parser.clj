@@ -81,16 +81,24 @@
 (defmethod parse nil [& args]
   nil)
 
+(defn parse-hash-map [cexpr fn-wrap]
+  (into {} ((fn-wrap :vectors ["hashmap" cexpr] "Apply[List, hashmap[], 1] &"))))
+
 (defn parse-atom [cexpr fn-wrap]
   (let [expr (.getExpr cexpr)]
-    (cond (.bigIntegerQ expr)                     (.asBigInteger expr)
-          (.bigDecimalQ expr)                     (.asBigDecimal expr)
-          (.integerQ expr)                        (.asLong expr)
-          (.realQ expr)                           (.asDouble expr)
-          (.stringQ expr)                         (.asString expr)
-          (= "Null" (.toString expr))             nil
-          (= "Function" (.toString (.head expr))) (if fn-wrap (fn-wrap [] expr) cexpr)
-          true                                    cexpr)))
+    (cond (.bigIntegerQ expr)                          (.asBigInteger expr)
+          (.bigDecimalQ expr)                          (.asBigDecimal expr)
+          (.integerQ expr)                             (let [i (.asLong expr)]
+                                                         (if (and (<= i Integer/MAX_VALUE)
+                                                                  (>= i Integer/MIN_VALUE))
+                                                           (int i)
+                                                           (long i)))
+          (.realQ expr)                                (.asDouble expr)
+          (.stringQ expr)                              (.asString expr)
+          (= "Null" (.toString expr))                  nil
+          (= "Function" (.toString (.head expr)))      (if fn-wrap (fn-wrap [] expr) cexpr)
+          (= "HashMapObject" (.toString (.head expr))) (if fn-wrap (parse-hash-map cexpr fn-wrap) cexpr)
+          true                                         cexpr)))
 
 (defn parse-to-lazy-seqs [cexpr fn-wrap]
   (if-not (.listQ (.getExpr cexpr))

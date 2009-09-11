@@ -46,6 +46,9 @@
   [kernel-link]
   (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
     (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
+
+  (send-read "Needs[\"GascLibrary`\"]" kernel-link)
+
   ; This is the anonymous function returned from a call to get-evaluator
   (fn serial-evaluator [& args]
     (cond

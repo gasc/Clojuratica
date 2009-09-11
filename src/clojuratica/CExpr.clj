@@ -105,11 +105,25 @@
     {:expr expr
      :flags '()}))
 
-(defmethod construct [clojure.lang.IPersistentCollection]
+(defmethod construct [clojure.lang.IPersistentMap]
+  [expression-map]
+  (let [loop (MathLinkFactory/createLoopbackLink)]
+    (.putFunction loop "HashMap" (count expression-map))
+    (doseq [[key value] expression-map]
+      (.putFunction loop "Rule" 2)
+      (.put loop (.getExpr (clojuratica.CExpr. key)))
+      (.put loop (.getExpr (clojuratica.CExpr. value))))
+    (.endPacket loop)
+    (let [expr (.getExpr loop)]
+      {:expr expr
+       :flags '()})))
+
+(defmethod construct [clojure.lang.Sequential]
   [expression-coll]
   (let [loop (MathLinkFactory/createLoopbackLink)]
     (.putFunction loop "List" (count expression-coll))
-    (dorun (for [expression expression-coll] (.put loop (.getExpr (clojuratica.CExpr. expression)))))
+    (doseq [expression expression-coll]
+      (.put loop (.getExpr (clojuratica.CExpr. expression))))
     (.endPacket loop)
     (let [expr (.getExpr loop)]
       {:expr expr
