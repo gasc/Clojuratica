@@ -3,12 +3,13 @@
 BeginPackage["GascLibrary`"];
 
 
+SetAttributes[Let, HoldAllComplete];
+
 Let[{firstassignment_, restassignments__}, body_] := 
 	With[{firstassignment}, 
 		Let[{restassignments}, body]];
 Let[{assignment_}, body_] := 
 	With[{assignment}, body];
-SetAttributes[Let, HoldAll];
 
 Let::usage = "Let[{varname = value, ...}, body] is identical to With[{varname = value, ...}, body] except " <>
              "later assignments can \"see\" earlier assignments; no nesting required.";

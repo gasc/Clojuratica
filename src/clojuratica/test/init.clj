@@ -7,6 +7,8 @@
           "-linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
 (.discardAnswer kernel-link)
 
+(def display (get-displayer kernel-link))
+
 (def evaluate (get-evaluator kernel-link))
 (def fn-wrap (get-fn-wrapper evaluate))
 (def parse (get-parser kernel-link fn-wrap))

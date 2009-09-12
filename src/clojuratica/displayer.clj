@@ -33,46 +33,33 @@
 ;
 ; ***** END LICENSE BLOCK *****
 
-(ns clojuratica.clojuratica
-  (:require [clojuratica.serial-evaluator   :as serial-evaluator]
-            [clojuratica.parallel-evaluator :as parallel-evaluator]
-            [clojuratica.fn-wrap            :as fn-wrap]
-            [clojuratica.parser             :as parser]
-            [clojuratica.global-setter      :as global-setter]
-            [clojuratica.displayer          :as displayer])
-  (:use [clojuratica.lib]))
+(ns clojuratica.displayer
+  (:use [clojuratica.core]
+        [clojuratica.clojuratica]
+        [clojuratica.parser]
+        [clojuratica.lib])
+  (:import [clojuratica CExpr]
+           [com.wolfram.jlink Expr]))
 
-(defnf get-evaluator [[:parallel :serial]] []
-  [flags _ passthrough]
-  [& _]
-  (if (flags :parallel)
-    (apply parallel-evaluator/get-evaluator passthrough)
-    (apply serial-evaluator/get-evaluator passthrough)))
+(defn display-fn [s w h]
+  (str "frame = JavaNew[\"com.wolfram.jlink.MathFrame\"];
+        frame@setTitle[\"Graphics Display - Clojuratica\"];
+        frame@setLayout[JavaNew[\"java.awt.BorderLayout\"]];
+        mathCanvas = JavaNew[\"com.wolfram.jlink.MathCanvas\"];
+        frame@add[\"Center\", mathCanvas];
+        frame@setSize[" w ", " h "];
+        frame@validate[];
+        mathCanvas@setMathCommand[\"" s "\"];
+        JavaShow[frame];"))
 
-(defnf get-fn-wrapper [] []
-  [_ retained-flags]
-  [evaluate]
-  (when-not (fn? evaluate)
-    (throw (Exception. "First non-flag argument to get-fn-wrapper must be a Clojuratica evaluator.")))
-  (fn fn-wrapper [& args]
-    (apply fn-wrap/fn-wrap (concat args retained-flags [evaluate]))))
+(defmulti display (fn [expression _ _ _] (class expression)))
 
-(defnf get-parser [] []
-  [_ retained-flags]
-  [& [kernel-link fn-wrap]]
-  (fn parser [& args]
-    (apply parser/parse (concat args retained-flags [kernel-link fn-wrap]))))
+(defmethod display Expr [expr w h kernel-link]
+  (display (.toString expr) w h))
 
-(defn get-global-setter
-  [evaluate]
-  (when-not (fn? evaluate)
-    (throw (Exception. "First non-flag argument to get-global-setter must be a Clojuratica evaluator.")))
-  (fn global-setter [lhs rhs]
-    (global-setter/global-set lhs rhs evaluate)))
+(defmethod display CExpr [cexpr w h kernel-link]
+  (display (.getExpr cexpr) w h))
 
-(defn get-displayer
-  [kernel-link]
-  (if-not (instance? com.wolfram.jlink.KernelLink kernel-link)
-    (throw (Exception. "First non-flag argument to get-displayer must be a KernelLink instance.")))
-  (fn displayer [expression w h]
-    (displayer/display expression w h kernel-link)))
+(defmethod display String [s w h kernel-link]
+  (let [evaluate (get-evaluator :serial kernel-link)]
+    (evaluate [] (display-fn s w h))))
