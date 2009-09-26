@@ -1,5 +1,4 @@
 .idea/
 *.iml
-build/
-dist/
+classes/
 clojuratica.jar
