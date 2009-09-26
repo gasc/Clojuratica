@@ -1,33 +1,6 @@
 (* ::Package:: *)
 
-BeginPackage["GascLibrary`"];
-
-
-SetAttributes[Let, HoldAllComplete];
-
-Let[{firstassignment_, restassignments__}, body_] := 
-	With[{firstassignment}, 
-		Let[{restassignments}, body]];
-Let[{assignment_}, body_] := 
-	With[{assignment}, body];
-
-Let::usage = "Let[{varname = value, ...}, body] is identical to With[{varname = value, ...}, body] except " <>
-             "later assignments can \"see\" earlier assignments; no nesting required.";
-
-
-Every[pred_, list_] := 
-	Apply[And, Map[pred, list]];
-
-Every::usage = "Every[pred, list] returns True if and only if pred is True for every element in list.";
-
-
-Some[pred_, list_] := 
-	Apply[Or, Map[pred, list]];
-
-Some::usage = "Some[pred, list] returns True if and only if pred is True for at least one element in list.";
-
-
-(* Begin hash map code *)
+BeginPackage["HashMaps`", {"FunctionalExtras`"}];
 
 
 (* Return all pairs *)
@@ -101,9 +74,6 @@ ZipMap[keys_, values_] :=
 	HashMap[MapThread[Rule, {keys, values}]];
 
 ZipMap::usage = "ZipMap[keys, values] returns a new hashmap with the elements of list keys mapped to the elements of list values.";
-
-
-(* End hash map code *)
 
 
 EndPackage[];

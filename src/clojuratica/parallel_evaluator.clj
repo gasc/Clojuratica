@@ -56,7 +56,7 @@
     (when-not (instance? com.wolfram.jlink.KernelLink kernel-link)
       (throw (Exception. "First non-flag argument to get-evaluator must be a KernelLink object.")))
 
-    (send-read "Needs[\"GascLibrary`\"]" kernel-link)
+    (send-read "Needs[\"FunctionalExtras`\"]" kernel-link)
     (send-read "Needs[\"Parallel`Developer`\"]" kernel-link)
     (send-read "QueueRun[]" kernel-link)
 
