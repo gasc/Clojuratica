@@ -46,12 +46,12 @@ DissociateFrom::usage = "DissociateFrom[hashmap, key, ...] removes key(s) and as
 
 
 HashMapObject /: Format[HashMapObject[data_Symbol]] :=
-	"<<HashMapObject[" <> ToString[HashMapObject[data][]] <> "]>>";
+	"<<HashMapObject[data]>>";
 
 HashMapObject /: MakeBoxes[HashMapObject[data_Symbol], format_] := 
 	Let[{databox = ToBoxes[HashMapObject[data][]]},
 		InterpretationBox[
-			RowBox[{"\[LeftGuillemet]", RowBox[{"HashMapObject", "[", databox, "]"}], "\[RightGuillemet]"}], 
+			RowBox[{"\[LeftGuillemet]", RowBox[{"HashMapObject", "[", "data", "]"}], "\[RightGuillemet]"}], 
 			HashMapObject[data]]];
 
 
