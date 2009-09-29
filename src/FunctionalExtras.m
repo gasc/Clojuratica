@@ -1,6 +1,12 @@
 (* ::Package:: *)
 
-BeginPackage["FunctionalExtras`"];
+BeginPackage["FunctionalExtras`", {"JLink`"}];
+
+
+Assert; Let; Every; Some; Second; Reshape; FullTranspose; WithAll;
+
+
+Begin["`Private`"];
 
 
 SetAttributes[Assert, HoldAllComplete];
@@ -19,15 +25,18 @@ Asserting[bool_, body_] :=
 
 SetAttributes[Let, HoldAllComplete];
 
-Let[{firstassignment_, restassignments__}, body_] := 
-	With[{firstassignment}, 
-		Let[{restassignments}, body]];
-Let[{assignment_}, body_] := 
-	With[{assignment}, body];
-Let[{}, body_] := body;
+Let[assignments_List, body_] :=
+	JavaBlock[WithAll[assignments, body]]
 
-Let::usage = "Let[{varname = value, ...}, body] is identical to With[{varname = value, ...}, body] except " <>
-             "later assignments can \"see\" earlier assignments; no nesting required.";
+SetAttributes[WithAll, HoldAllComplete];
+
+WithAll[{firstassignment_, restassignments___}, body_] := 
+	With[{firstassignment}, 
+		WithAll[{restassignments}, body]];
+WithAll[{}, body_] := body;
+
+WithAll::usage = "WithAll[{varname = value, ...}, body] is identical to With[{varname = value, ...}, body] except " <>
+                 "later assignments can \"see\" earlier assignments; no nesting required.";
 
 
 Every[pred_, list_List] := 
@@ -57,6 +66,9 @@ Reshape[list_List, dimensions : {__}] :=
 
 FullTranspose[list_List] :=
 	Transpose[list, Reverse[Table[i, {i, 1, ArrayDepth[list]}]]];
+
+
+End[];
 
 
 EndPackage[];
