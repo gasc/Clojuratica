@@ -33,6 +33,9 @@ Let[{markedRules = Map[First[#] -> HashMapValue[Last[#]]&, rules]},
 HashMapObject[Dispatch[markedRules]]]
 
 
+HashMap[rules___Rule] := HashMap[{rules}]
+
+
 HashMap[dispatch_Dispatch] :=
 HashMap[Extract[dispatch, {1}]]
 

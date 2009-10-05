@@ -41,7 +41,6 @@
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] [],
-                  [Object Integer] [],
                   [Object clojure.lang.IPersistentCollection] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
@@ -66,44 +65,41 @@
   {:expr expr
    :flags '()})
 
-(defmethod construct [Expr Integer]
-  [expr pos]
-  {:expr expr
-   :flags '()})
-
 (defmethod construct [clojuratica.CExpr]
   [cexpr]
-  (let [expr (.getExpr cexpr)]
-    {:expr expr
-     :flags (.getFlags cexpr)}))
+  {:expr (.getExpr cexpr)
+   :flags (.getFlags cexpr)})
 
 (defmethod construct [clojuratica.CExpr clojure.lang.IPersistentCollection]
   [cexpr coll]
-  (let [expr (.getExpr cexpr)]
-    {:expr expr
-     :flags (concat coll (.getFlags cexpr))}))
+  {:expr (.getExpr cexpr)
+   :flags (concat coll (.getFlags cexpr))})
 
-(defmethod construct [String]
-  [s]
-  (let [expr (Expr. s)]
-    {:expr expr
-     :flags '()}))
+;(defmethod construct [String]
+;  [s]
+;  (let [expr (Expr. s)]
+;    {:expr expr
+;     :flags '()}))
 
-(defmethod construct [Number]
+(defmethod construct [clojure.lang.Ratio]
   [n]
-  (let [typed-n (cond (instance? BigInteger n)         n
-                      (instance? BigDecimal n)         n
-                      (instance? Integer n)            (long n)
-                      (instance? Short n)              (long n)
-                      (instance? Long n)               n
-                      (instance? Byte n)               (long n)
-                      (instance? Double n)             n
-                      (instance? Float n)              (double n)
-                      (instance? clojure.lang.Ratio n) (double n)
-                      true (throw (Exception. (str "CExpr constructor does not know how to handle number of class " (class n)))))
-        expr          (Expr. typed-n)]
-    {:expr expr
-     :flags '()}))
+  (construct (double n)))
+
+;(defmethod construct [Number]
+;  [n]
+;  (let [typed-n (cond (instance? BigInteger n)         n
+;                      (instance? BigDecimal n)         n
+;                      (instance? Integer n)            (long n)
+;                      (instance? Short n)              (long n)
+;                      (instance? Long n)               n
+;                      (instance? Byte n)               (long n)
+;                      (instance? Double n)             n
+;                      (instance? Float n)              (double n)
+;                      (instance? clojure.lang.Ratio n) (double n)
+;                      true (throw (Exception. (str "CExpr constructor does not know how to handle number of class " (class n)))))
+;        expr          (Expr. typed-n)]
+;    {:expr expr
+;     :flags '()}))
 
 (defmethod construct [clojure.lang.IPersistentMap]
   [expression-map]
@@ -120,16 +116,30 @@
 
 (defmethod construct [clojure.lang.Sequential]
   [expression-coll]
-  (let [loop (MathLinkFactory/createLoopbackLink)]
-    (.putFunction loop "List" (count expression-coll))
-    (doseq [expression expression-coll]
-      (.put loop (.getExpr (clojuratica.CExpr. expression))))
-    (.endPacket loop)
-    (let [expr (.getExpr loop)]
-      {:expr expr
-       :flags '()})))
+  (construct (to-array (map #(.getExpr (clojuratica.CExpr. %)) expression-coll))))
 
-(defmethod construct [])
+;(defmethod construct [clojure.lang.Sequential]
+;  [expression-coll]
+;  (let [loop (MathLinkFactory/createLoopbackLink)]
+;    (.putFunction loop "List" (count expression-coll))
+;    (doseq [expression expression-coll]
+;      (.put loop (.getExpr (clojuratica.CExpr. expression))))
+;    (.endPacket loop)
+;    (let [expr (.getExpr loop)]
+;      {:expr expr
+;       :flags '()})))
+
+;(defmethod construct [(class (double-array [1.0]))]
+;  [expression-array]
+;  (println "double constructor")
+;  {:expr (Expr. expression-array)
+;   :flags '()})
+
+;(defmethod construct [(class (int-array [1]))]
+;  [expression-array]
+;  (println "int constructor")
+;  {:expr (Expr. expression-array)
+;   :flags '()})
 
 (defmethod construct [Object]
   [obj]
