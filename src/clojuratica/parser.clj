@@ -76,11 +76,11 @@
   (if (and (flags :fn-wrap) (nil? fn-wrap))
     (throw (Exception. "Cannot parse functions using fn-wrap unless parser was created with a fn-wrap argument.")))
   (let [fn-wrap    (if (flags :no-fn-wrap) nil fn-wrap)]
-    (cond (not (.listQ (.getExpr cexpr)))                       (parse-atom cexpr fn-wrap)
-          (and (uniform-vector-type cexpr) (flags :vectors))    (vec (parse-uniform-vector cexpr))
-          (uniform-vector-type cexpr)                           (seq (parse-uniform-vector cexpr))
-          (flags :vectors)                                      (parse-to-vectors cexpr fn-wrap)
-          true                                                  (parse-to-lazy-seqs cexpr fn-wrap))))
+    (cond (not (.listQ (.getExpr cexpr)))                      (parse-atom cexpr fn-wrap)
+          (and (uniform-vector-type cexpr) (flags :vectors))   (vec (parse-uniform-vector cexpr))
+          (uniform-vector-type cexpr)                          (seq (parse-uniform-vector cexpr))
+          (flags :vectors)                                     (parse-to-vectors cexpr fn-wrap)
+          true                                                 (parse-to-lazy-seqs cexpr fn-wrap))))
 
 (defmethod parse nil [& args]
   nil)
