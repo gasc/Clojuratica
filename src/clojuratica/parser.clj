@@ -40,14 +40,15 @@
   (:use [clojuratica.lib]
         [clojuratica.core]))
 
-(declare parse-atom
+(declare atom?
+         parse-atom
          parse-hash-map
          parse-to-lazy-seqs
          parse-to-vectors
-         numeric-vector?
-         numeric-matrix?
-         parse-numeric-vector
-         parse-numeric-matrix)
+         primitive-vector?
+         primitive-matrix?
+         parse-primitive-vector
+         parse-primitive-matrix)
 
 (defnf parse-dispatch [] []
   []
@@ -80,55 +81,71 @@
     (throw (Exception. "Cannot parse functions using fn-wrap unless parser was created with a fn-wrap argument.")))
   (let [fn-wrap    (if (flags :no-fn-wrap) nil fn-wrap)
         expr       (.getExpr cexpr)]
-    (cond (not (.listQ (.getExpr cexpr))) (parse-atom cexpr fn-wrap)
+    (cond (atom? cexpr) (parse-atom cexpr fn-wrap)
           (flags :seqs)
-            (cond (numeric-vector? expr)  (parse-numeric-vector expr seq)
-                  (numeric-matrix? expr)  (parse-numeric-matrix expr seq)
-                  true                    (parse-to-lazy-seqs cexpr fn-wrap))
+            (cond (primitive-vector? expr)  (parse-primitive-vector expr seq)
+                  (primitive-matrix? expr)  (parse-primitive-matrix expr seq)
+                  true                      (parse-to-lazy-seqs cexpr fn-wrap))
           (flags :vectors)
-            (cond (numeric-vector? expr)  (parse-numeric-vector expr vec)
-                  (numeric-matrix? expr)  (parse-numeric-matrix expr vec)
-                  true                    (parse-to-vectors cexpr fn-wrap)))))
+            (cond (primitive-vector? expr)  (parse-primitive-vector expr vec)
+                  (primitive-matrix? expr)  (parse-primitive-matrix expr vec)
+                  true                      (parse-to-vectors cexpr fn-wrap)))))
 
 (defmethod parse nil [& args]
   nil)
 
-(defn numeric-array? [expr]
-  (or (numeric-vector? expr) (numeric-matrix? expr)))
+(defn parse-integer [expr]
+  (let [i (.asLong expr)]
+    (if (and (<= i Integer/MAX_VALUE)
+             (>= i Integer/MIN_VALUE))
+      (int i)
+      (long i))))
 
-(defn numeric-vector? [expr]
-  (cond (.vectorQ expr Expr/INTEGER) Expr/INTEGER
-        (.vectorQ expr Expr/REAL)    Expr/REAL
-        true                         false))
+(defn parse-primitive-atom [expr type]
+  (cond (= type Expr/BIGINTEGER)      (.asBigInteger expr)
+        (= type Expr/BIGDECIMAL)      (.asBigDecimal expr)
+        (= type Expr/INTEGER)         (parse-integer expr)
+        (= type Expr/REAL)            (.asDouble expr)
+        (= type Expr/STRING)          (.asString expr)))
 
-(defn numeric-matrix? [expr]
-  (cond (.matrixQ expr Expr/INTEGER) Expr/INTEGER
-        (.matrixQ expr Expr/REAL)    Expr/REAL
-        true                         false))
+(defn primitive-vector? [expr]
+  (cond (.vectorQ expr Expr/INTEGER)     Expr/INTEGER
+        (.vectorQ expr Expr/BIGINTEGER)  Expr/BIGINTEGER
+        (.vectorQ expr Expr/REAL)        Expr/REAL
+        (.vectorQ expr Expr/BIGDECIMAL)  Expr/BIGDECIMAL
+        true                             false))
 
-(defn parse-numeric-vector
-  [expr coll-fn & [type]]
-  (let [type (or type (numeric-vector? expr))
-        v    (.asArray expr type 1)]
+(defn primitive-matrix? [expr]
+  (cond (.matrixQ expr Expr/INTEGER)     Expr/INTEGER
+        (.matrixQ expr Expr/BIGINTEGER)  Expr/BIGINTEGER
+        (.matrixQ expr Expr/REAL)        Expr/REAL
+        (.matrixQ expr Expr/BIGDECIMAL)  Expr/BIGDECIMAL
+        true                             false))
+
+(defn primitive-array? [expr]
+  (or (primitive-vector? expr) (primitive-matrix? expr)))
+
+(defn parse-primitive-vector [expr coll-fn & [type]]
+  (let [type (or type (primitive-vector? expr))
+        v    (map #(parse-primitive-atom % type) (.args expr))]
     (coll-fn v)))
 
-(defn parse-numeric-matrix
-  [expr coll-fn & [type]]
-  (let [type (or type (numeric-matrix? expr))
-        m    (map #(parse-numeric-vector % coll-fn type) (.args expr))]
+(defn parse-primitive-matrix [expr coll-fn & [type]]
+  (let [type (or type (primitive-matrix? expr))
+        m    (map #(parse-primitive-vector % coll-fn type) (.args expr))]
     (coll-fn m)))
+
+(defn atom? [cexpr] (not (.listQ (.getExpr cexpr))))
 
 (defn parse-atom [cexpr fn-wrap]
   (let [expr (.getExpr cexpr)]
     (cond (.bigIntegerQ expr)                          (.asBigInteger expr)
           (.bigDecimalQ expr)                          (.asBigDecimal expr)
-          (.integerQ expr)                             (let [i (.asLong expr)]
-                                                         (if (and (<= i Integer/MAX_VALUE)
-                                                                  (>= i Integer/MIN_VALUE))
-                                                           (int i)
-                                                           (long i)))
+          (.integerQ expr)                             (parse-integer expr)
           (.realQ expr)                                (.asDouble expr)
           (.stringQ expr)                              (.asString expr)
+          (= "True" (.toString expr))                  true
+          (= "False" (.toString expr))                 false
           (= "Null" (.toString expr))                  nil
           (= "Function" (.toString (.head expr)))      (if fn-wrap (fn-wrap [] expr) cexpr)
           (= "HashMapObject" (.toString (.head expr))) (if fn-wrap (parse-hash-map cexpr fn-wrap) cexpr)
@@ -156,8 +173,8 @@
     (if-let [elements (seq elements)]
       (let [first-cexpr (convert (first elements))
             first-expr  (.getExpr first-cexpr)]
-        (if (or (numeric-array? first-expr)
-                (not (.listQ first-expr)))
+        (if (or (primitive-array? first-expr)
+                (atom? first-cexpr))
             (recur (next elements) (conj v (parse :vectors first-cexpr nil fn-wrap)) stack)
             (recur (next first-cexpr) [] (conj stack [(next elements) v]))))
       (if (seq stack)
