@@ -41,6 +41,7 @@
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] [],
+                  [Object Integer] [],
                   [Object clojure.lang.IPersistentCollection] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
@@ -50,7 +51,16 @@
   (.head (:expr (.state this))))
 
 (defn -next [this]
-  (seq (.args (:expr (.state this)))))
+  (let [expr   (.getExpr this)
+        pos    (.getPos this)
+        length (.length expr)]
+    (if-not (== length pos)
+      (clojuratica.CExpr. expr
+                          (inc pos)))))
+
+
+
+  ;(seq (.args (:expr (.state this)))))
 
 (defn -getExpr [this]
   (:expr (.state this)))
@@ -58,16 +68,27 @@
 (defn -getFlags [this]
   (:flags (.state this)))
 
+(defn -getPos [this]
+  (:pos (.state this)))
+
 (defmulti construct (fn [& args] (vec (map class args))))
 
 (defmethod construct [Expr]
   [expr]
   {:expr expr
+   :pos 0
+   :flags '()})
+
+(defmethod construct [Expr Integer]
+  [expr pos]
+  {:expr expr
+   :pos pos
    :flags '()})
 
 (defmethod construct [clojuratica.CExpr]
   [cexpr]
   {:expr (.getExpr cexpr)
+   :pos (.getPos cexpr)
    :flags (.getFlags cexpr)})
 
 (defmethod construct [clojuratica.CExpr clojure.lang.IPersistentCollection]
