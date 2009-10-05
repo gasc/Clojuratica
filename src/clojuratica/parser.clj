@@ -42,7 +42,9 @@
 
 (declare parse-atom
          parse-to-lazy-seqs
-         parse-to-vectors)
+         parse-to-vectors
+         uniform-vector-type
+         parse-uniform-vector)
 
 (defnf parse-dispatch [] []
   []
@@ -72,14 +74,36 @@
   [flags]
   [cexpr & [_ fn-wrap]]
   (if (and (flags :fn-wrap) (nil? fn-wrap))
-    (throw (Exception. "Cannot parse functions using fn-wrap unless parser was created with an fn-wrap argument.")))
-  (let [fn-wrap (if (flags :no-fn-wrap) nil fn-wrap)]
-    (if (flags :vectors)
-      (parse-to-vectors cexpr fn-wrap)
-      (parse-to-lazy-seqs cexpr fn-wrap))))
+    (throw (Exception. "Cannot parse functions using fn-wrap unless parser was created with a fn-wrap argument.")))
+  (let [fn-wrap    (if (flags :no-fn-wrap) nil fn-wrap)]
+    (cond (not (.listQ (.getExpr cexpr)))                       (parse-atom cexpr fn-wrap)
+          (and (uniform-vector-type cexpr) (flags :vectors))    (vec (parse-uniform-vector cexpr))
+          (uniform-vector-type cexpr)                           (seq (parse-uniform-vector cexpr))
+          (flags :vectors)                                      (parse-to-vectors cexpr fn-wrap)
+          true                                                  (parse-to-lazy-seqs cexpr fn-wrap))))
 
 (defmethod parse nil [& args]
   nil)
+
+(def uniform-vector-type
+  (memoize
+    (fn [cexpr]
+      (let [atom-types [Expr/INTEGER Expr/REAL]
+            expr       (.getExpr cexpr)]
+        (first (filter #(.vectorQ (.getExpr cexpr) %) atom-types))))))
+
+;(def uniform-matrix-type
+;  (memoize
+;    (fn [cexpr]
+;      (let [atom-types [Expr/INTEGER Expr/REAL]
+;            expr       (.getExpr cexpr)]
+;        (first (filter #(.matrixQ (.getExpr cexpr) %) atom-types))))))
+
+(defn parse-uniform-vector [cexpr]
+  (.asArray (.getExpr cexpr) (uniform-vector-type cexpr) 1))
+
+;(defn parse-uniform-matrix [cexpr]
+;  (.asArray (.getExpr cexpr) (uniform-matrix-type cexpr) 2))
 
 (defn parse-hash-map [cexpr fn-wrap]
   (into {} ((fn-wrap :vectors ["hashmap" cexpr] "Apply[List, hashmap[], 1] &"))))
@@ -101,29 +125,26 @@
           true                                         cexpr)))
 
 (defn parse-to-lazy-seqs [cexpr fn-wrap]
-  (if-not (.listQ (.getExpr cexpr))
-    (parse-atom cexpr fn-wrap)
-    (let [parse-list-elements
-            (fn parse-list-elements [s]
-               (when (seq s)
-                 (lazy-seq
-                   (cons (parse-to-lazy-seqs (convert (first s)) fn-wrap)
-                         (parse-list-elements (rest s))))))]
-      (parse-list-elements (rest cexpr)))))
+  (let [parse-list-elements
+          (fn parse-list-elements [s]
+             (when (seq s)
+               (lazy-seq
+                 (cons (parse :seqs (convert (first s)) fn-wrap)
+                       (parse-list-elements (rest s))))))]
+    (parse-list-elements (rest cexpr))))
 
 (defn parse-to-vectors [cexpr fn-wrap]  ; logic courtesy of Meikel Brandmeyer
-  (if-not (.listQ (.getExpr cexpr))
-    (parse-atom cexpr fn-wrap)
-    (loop [elements (next cexpr)
-           v        []
-           stack    nil]
-      (if-let [elements (seq elements)]
-        (let [first-cexpr (convert (first elements))]
-          (if-not (.listQ (.getExpr first-cexpr))
-            (recur (next elements) (conj v (parse-atom first-cexpr fn-wrap)) stack)
+  (loop [elements (next cexpr)
+         v        []
+         stack    nil]
+    (if-let [elements (seq elements)]
+      (let [first-cexpr (convert (first elements))]
+        (if (or (uniform-vector-type first-cexpr)
+                (not (.listQ (.getExpr first-cexpr))))
+            (recur (next elements) (conj v (parse :vectors first-cexpr fn-wrap)) stack)
             (recur (next first-cexpr) [] (conj stack [(next elements) v]))))
-        (if (seq stack)
-          (let [[elements prior-v] (peek stack)]
-            (recur elements (conj prior-v v) (pop stack)))
-          v)))))
+      (if (seq stack)
+        (let [[elements prior-v] (peek stack)]
+          (recur elements (conj prior-v v) (pop stack)))
+        v))))
 

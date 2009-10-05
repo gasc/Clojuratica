@@ -129,6 +129,8 @@
       {:expr expr
        :flags '()})))
 
+(defmethod construct [])
+
 (defmethod construct [Object]
   [obj]
   (let [loop (MathLinkFactory/createLoopbackLink)]

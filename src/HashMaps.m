@@ -44,6 +44,10 @@ Null,
 Extract[value,{1}]]]
 
 
+HashMapObject[rules_][] :=
+Rules[HashMapObject[rules]]
+
+
 Rules[HashMapObject[dispatch_Dispatch]] := StripTags[Extract[dispatch, {1}]]
 
 
