@@ -6,7 +6,6 @@
          (. (. #^String % trim) split "\\s+"))
        (read-lines filename)))
 
-
 (defn sparse-eigensystem [indices vals m n]
   "Given 3 vectors and the matrix dimensions, returns the eigenvalues and eigenvectors using mathematica."
   (math ["vals" vals
@@ -20,10 +19,8 @@
 
 (def rows (map first m))
 (def cols (map second m))
-(def values (double-array (map #(nth % 2) m)))
-(def indices (to-array-2d (map list rows cols)))
+(def values (doall (map #(nth % 2) m)))
+(def indices (doall (map list rows cols)))
 
 (time (def es (sparse-eigensystem indices values 2856 2856)))
-;(def es (sparse-eigensystem (map first m) (map second m) (map #(nth % 2) m) 2856 2856))
-
 

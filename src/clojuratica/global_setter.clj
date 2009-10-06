@@ -45,4 +45,4 @@
         result          (send-read (build-set-expr lhs rhs) kernel-link)]
     (if (evaluate :parallel?)
       (send-read (str "DistributeDefinitions[" lhs "]") kernel-link))
-    result))
+    (convert result)))

@@ -125,11 +125,13 @@
   (or (primitive-vector? expr) (primitive-matrix? expr)))
 
 (defn parse-primitive-vector [expr coll-fn & [type]]
+  (if (nil? type) (println "Parsing vector..."))
   (let [type (or type (primitive-vector? expr))
         v    (map #(parse-primitive-atom % type) (.args expr))]
     (coll-fn v)))
 
 (defn parse-primitive-matrix [expr coll-fn & [type]]
+  (println "Parsing matrix...")
   (let [type (or type (primitive-matrix? expr))
         m    (map #(parse-primitive-vector % coll-fn type) (.args expr))]
     (coll-fn m)))

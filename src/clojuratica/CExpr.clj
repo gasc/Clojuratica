@@ -38,29 +38,24 @@
   (:gen-class
    :methods [[getExpr  [] com.wolfram.jlink.Expr]
              [getFlags [] clojure.lang.IPersistentCollection]]
-             ;[getPos   [] Integer]]
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] [],
-                  ;[Object Integer] [],
                   [Object clojure.lang.IPersistentCollection] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
   (:use [clojuratica.lib]))
 
+(declare construct)
+
+(defn -init [& args]
+  [[] (apply construct args)])
+
 (defn -first [this]
   (.head (:expr (.state this))))
-;  (.. this getExpr (part (int-array (list (.getPos this))))))
 
 (defn -next [this]
-  (lazy-seq (.args (:expr (.state this)))))
-;  (let [expr   (.getExpr this)
-;       pos    (.getPos this)
-;        length (.length expr)]
-;    (if-not (== length pos)
-;      (clojuratica.CExpr. expr
-;                          (inc pos)))))
-
+  (seq (.args (:expr (.state this)))))
 
 (defn -getExpr [this]
   (:expr (.state this)))
@@ -68,44 +63,81 @@
 (defn -getFlags [this]
   (:flags (.state this)))
 
-;(defn -getPos [this]
-;  (:pos (.state this)))
-
 (defmulti construct (fn [& args] (vec (map class args))))
 
 (defmethod construct [Expr]
   [expr]
   {:expr expr
-   ;:pos 0
-   :flags '()})
-
-(defmethod construct [Expr Integer]
-  [expr pos]
-  {:expr expr
-   ;:pos pos
    :flags '()})
 
 (defmethod construct [clojuratica.CExpr]
   [cexpr]
-  {:expr (.getExpr cexpr)
-   ;:pos (.getPos cexpr)
-   :flags (.getFlags cexpr)})
+  {:expr (-getExpr cexpr)
+   :flags (-getFlags cexpr)})
 
 (defmethod construct [clojuratica.CExpr clojure.lang.IPersistentCollection]
   [cexpr coll]
-  {:expr (.getExpr cexpr)
-   ;:pos (.getPos cexpr)
-   :flags (concat coll (.getFlags cexpr))})
+  {:expr (-getExpr cexpr)
+   :flags (concat coll (-getFlags cexpr))})
 
-;(defmethod construct [String]
-;  [s]
-;  (let [expr (Expr. s)]
-;    {:expr expr
-;     :flags '()}))
+(defmethod construct [Object]
+  [obj]
+  (let [loop (MathLinkFactory/createLoopbackLink)]
+    (.put loop obj)
+    (.endPacket loop)
+    (let [expr (.getExpr loop)]
+      (construct expr))))
+
+(defn needs-special-constructor? [element]
+  (or (instance? clojure.lang.Ratio element)
+      (instance? clojure.lang.IPersistentMap element)
+      (instance? clojure.lang.Sequential element)
+      (nil? element)))
 
 (defmethod construct [clojure.lang.Ratio]
   [n]
   (construct (double n)))
+
+(defmethod construct [clojure.lang.IPersistentMap]
+  [expression-map]
+  (let [loop (MathLinkFactory/createLoopbackLink)]
+    (.putFunction loop "HashMap" (count expression-map))
+    (doseq [[key value] expression-map]
+      (.putFunction loop "Rule" 2)
+      (.put loop (:expr (construct key)))
+      (.put loop (:expr (construct value))))
+    (.endPacket loop)
+    (let [expr (.getExpr loop)]
+      (construct expr))))
+
+(defn mvector? [coll]
+  (and (sequential? coll)
+       (not-any? needs-special-constructor? coll)))
+
+(defn mmatrix? [coll]
+  (and (sequential? coll)
+       (every? mvector? coll)))
+
+(defn sequential-to-array [coll]
+  (cond (mmatrix? coll)  (do (println "Converting matrix...") (to-array-2d coll))
+        (mvector? coll)  (do (println "Converting vector...") (to-array coll))
+        true             (to-array
+                           (map #(cond (sequential? %)                (sequential-to-array %)
+                                       (needs-special-constructor? %) (:expr (construct %))
+                                       true                           %)
+                                coll))))
+
+(defmethod construct [clojure.lang.Sequential]
+  [expression-coll]
+  (construct (sequential-to-array expression-coll)))
+
+(defmethod construct [nil]
+  [_]
+  (let [loop (MathLinkFactory/createLoopbackLink)]
+    (.putSymbol loop "Null")
+    (.endPacket loop)
+    (let [expr (.getExpr loop)]
+      (construct expr))))
 
 ;(defmethod construct [Number]
 ;  [n]
@@ -122,22 +154,6 @@
 ;        expr          (Expr. typed-n)]
 ;    {:expr expr
 ;     :flags '()}))
-
-(defmethod construct [clojure.lang.IPersistentMap]
-  [expression-map]
-  (let [loop (MathLinkFactory/createLoopbackLink)]
-    (.putFunction loop "HashMap" (count expression-map))
-    (doseq [[key value] expression-map]
-      (.putFunction loop "Rule" 2)
-      (.put loop (.getExpr (clojuratica.CExpr. key)))
-      (.put loop (.getExpr (clojuratica.CExpr. value))))
-    (.endPacket loop)
-    (let [expr (.getExpr loop)]
-      (construct expr))))
-
-(defmethod construct [clojure.lang.Sequential]
-  [expression-coll]
-  (construct (to-array (map #(.getExpr (clojuratica.CExpr. %)) expression-coll))))
 
 ;(defmethod construct [clojure.lang.Sequential]
 ;  [expression-coll]
@@ -162,21 +178,10 @@
 ;  {:expr (Expr. expression-array)
 ;   :flags '()})
 
-(defmethod construct [Object]
-  [obj]
-  (let [loop (MathLinkFactory/createLoopbackLink)]
-    (.put loop obj)
-    (.endPacket loop)
-    (let [expr (.getExpr loop)]
-      (construct expr))))
 
-(defmethod construct [nil]
-  [_]
-  (let [loop (MathLinkFactory/createLoopbackLink)]
-    (.putSymbol loop "Null")
-    (.endPacket loop)
-    (let [expr (.getExpr loop)]
-      (construct expr))))
+;(defmethod construct [String]
+;  [s]
+;  (let [expr (Expr. s)]
+;    {:expr expr
+;     :flags '()}))
 
-(defn -init [& args]
-  [[] (apply construct args)])

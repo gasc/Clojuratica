@@ -75,7 +75,7 @@
       (.waitForAnswer kernel-link)
       (let [output (.. kernel-link getExpr)]
         ;(println output)
-        (express output)))))
+        (convert output)))))
 
 (defmethod send-read Expr [expr kernel-link]
   ; Takes an Expr instance and a KernelLink instance. Evaluates expr using the kernel at the other
@@ -87,7 +87,7 @@
       (.waitForAnswer kernel-link)
       (let [output (.. kernel-link getExpr)]
         ;(println output)
-        (express output)))))
+        (convert output)))))
 
 (defmethod send-read CExpr [cexpr kernel-link]
   ; Takes a CExpr instance and a KernelLink instance. Evaluates cexpr using the kernel at the other
