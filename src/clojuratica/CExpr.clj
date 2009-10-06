@@ -38,10 +38,11 @@
   (:gen-class
    :methods [[getExpr  [] com.wolfram.jlink.Expr]
              [getFlags [] clojure.lang.IPersistentCollection]]
+             ;[getPos   [] Integer]]
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] [],
-                  [Object Integer] [],
+                  ;[Object Integer] [],
                   [Object clojure.lang.IPersistentCollection] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
@@ -49,18 +50,17 @@
 
 (defn -first [this]
   (.head (:expr (.state this))))
+;  (.. this getExpr (part (int-array (list (.getPos this))))))
 
 (defn -next [this]
-  (let [expr   (.getExpr this)
-        pos    (.getPos this)
-        length (.length expr)]
-    (if-not (== length pos)
-      (clojuratica.CExpr. expr
-                          (inc pos)))))
+  (lazy-seq (.args (:expr (.state this)))))
+;  (let [expr   (.getExpr this)
+;       pos    (.getPos this)
+;        length (.length expr)]
+;    (if-not (== length pos)
+;      (clojuratica.CExpr. expr
+;                          (inc pos)))))
 
-
-
-  ;(seq (.args (:expr (.state this)))))
 
 (defn -getExpr [this]
   (:expr (.state this)))
@@ -68,32 +68,33 @@
 (defn -getFlags [this]
   (:flags (.state this)))
 
-(defn -getPos [this]
-  (:pos (.state this)))
+;(defn -getPos [this]
+;  (:pos (.state this)))
 
 (defmulti construct (fn [& args] (vec (map class args))))
 
 (defmethod construct [Expr]
   [expr]
   {:expr expr
-   :pos 0
+   ;:pos 0
    :flags '()})
 
 (defmethod construct [Expr Integer]
   [expr pos]
   {:expr expr
-   :pos pos
+   ;:pos pos
    :flags '()})
 
 (defmethod construct [clojuratica.CExpr]
   [cexpr]
   {:expr (.getExpr cexpr)
-   :pos (.getPos cexpr)
+   ;:pos (.getPos cexpr)
    :flags (.getFlags cexpr)})
 
 (defmethod construct [clojuratica.CExpr clojure.lang.IPersistentCollection]
   [cexpr coll]
   {:expr (.getExpr cexpr)
+   ;:pos (.getPos cexpr)
    :flags (concat coll (.getFlags cexpr))})
 
 ;(defmethod construct [String]
@@ -132,8 +133,7 @@
       (.put loop (.getExpr (clojuratica.CExpr. value))))
     (.endPacket loop)
     (let [expr (.getExpr loop)]
-      {:expr expr
-       :flags '()})))
+      (construct expr))))
 
 (defmethod construct [clojure.lang.Sequential]
   [expression-coll]
@@ -168,8 +168,7 @@
     (.put loop obj)
     (.endPacket loop)
     (let [expr (.getExpr loop)]
-      {:expr expr
-       :flags '()})))
+      (construct expr))))
 
 (defmethod construct [nil]
   [_]
@@ -177,8 +176,7 @@
     (.putSymbol loop "Null")
     (.endPacket loop)
     (let [expr (.getExpr loop)]
-      {:expr expr
-       :flags '()})))
+      (construct expr))))
 
 (defn -init [& args]
   [[] (apply construct args)])

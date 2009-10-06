@@ -73,7 +73,7 @@
   (apply parse (.getExpr cexpr) nil fn-wrap (concat passthrough-flags (.getFlags cexpr))))
 
 (defmethodf parse Expr [[:vectors :seqs]
-                         [:fn-wrap :no-fn-wrap]]
+                        [:fn-wrap :no-fn-wrap]]
                        [:seqs]
   [flags]
   [expr & [_ fn-wrap]]
@@ -82,8 +82,8 @@
   (let [fn-wrap    (if (flags :no-fn-wrap) nil fn-wrap)]
     (cond (atom? expr) (parse-atom expr fn-wrap)
           (flags :seqs)
-            (cond (primitive-vector? expr)  (parse-primitive-vector expr seq)
-                  (primitive-matrix? expr)  (parse-primitive-matrix expr seq)
+            (cond (primitive-vector? expr)  (parse-primitive-vector expr identity)
+                  (primitive-matrix? expr)  (parse-primitive-matrix expr identity)
                   true                      (parse-to-lazy-seqs expr fn-wrap))
           (flags :vectors)
             (cond (primitive-vector? expr)  (parse-primitive-vector expr vec)
