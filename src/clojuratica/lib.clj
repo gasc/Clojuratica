@@ -61,32 +61,23 @@
   ([#^Pattern pattern string limit] (seq (. pattern (split string limit)))))
 
 (defmacro defnf-*
-[macro name parse-flaggable? dispatcher-list flagset-coll defaults doc?-flagbind? flagbind?-bind? & bind?+body]
+  [macro name dispatcher-list flagset-coll defaults doc?-flagbind? flagbind?-bind? & bind?+body]
   (let [[doc-list [fb1 fb2 fb3] bind body] (if (string? doc?-flagbind?)
                                              [(list doc?-flagbind?) flagbind?-bind? (first bind?+body) (rest bind?+body)]
                                              ['() doc?-flagbind? flagbind?-bind? bind?+body])
         [fb1 fb2 fb3]                      (map #(or % `_#) [fb1 fb2 fb3])]
    `(~macro ~name ~@dispatcher-list ~@doc-list [& args+flags#]
-      (let [args#            (remove keyword? args+flags#)
-            flagged-args#    (if ~parse-flaggable? (filter (fn [arg#] (instance? clojuratica.Flaggable arg#)) args#) ())
-            arg-flags#       (apply concat (map (fn [arg#] (.getFlags arg#)) flagged-args#))]
+      (let [args#            (remove keyword? args+flags#)]
         (letfn [(flag-parser# ~bind
-                  (let [defaults#        (concat arg-flags# ~defaults)
-                        [~fb1 ~fb2 ~fb3] (parse-flags args+flags# ~flagset-coll defaults#)]
+                  (let [[~fb1 ~fb2 ~fb3] (parse-flags args+flags# ~flagset-coll ~defaults)]
                     ~@body))]
           (apply flag-parser# args#))))))
 
-;(defmacro defnfa [name & remainder]
-; `(defnf-* defn ~name true () ~@remainder))
-
 (defmacro defnf [name & remainder]
- `(defnf-* defn ~name false () ~@remainder))
-
-;(defmacro defmethodfa [name dispatcher & remainder]
-; `(defnf-* defmethod ~name true (~dispatcher) ~@remainder))
+ `(defnf-* defn ~name () ~@remainder))
 
 (defmacro defmethodf [name dispatcher & remainder]
- `(defnf-* defmethod ~name false (~dispatcher) ~@remainder))
+ `(defnf-* defmethod ~name (~dispatcher) ~@remainder))
 
 (defmacro with-debug-message [bool msg & body]
  `(if-not ~bool

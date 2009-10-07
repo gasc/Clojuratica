@@ -78,3 +78,77 @@
     (throw (Exception. "First non-flag argument to get-displayer must be a KernelLink instance.")))
   (fn displayer [expression w h]
     (displayer/display expression w h kernel-link)))
+
+
+(comment
+  
+(import '[clojuratica CExpr])
+
+
+
+(defnf sexpr-convert [[:output :no-output]]
+                     [:output]
+  [flags]
+  [s-expr]
+  (let [s-expr (if (flags :no-output)
+                 (concat '(CompoundExpression) (list s-expr) '(Null))
+                 s-expr)]
+    (cond (not (seq? s-expr))                        (CExpr. s-expr)
+          (= (first s-expr) 'clojure.core/unquote)   (CExpr. (eval (second s-expr)))
+          (= (first s-expr) 'clojure.core/quote)     (CExpr. (eval (second s-expr)))
+          (= (first s-expr) 'do)                     (sexpr-convert (cons 'CompoundExpression (rest s-expr)))
+          true                                       (CExpr. (map sexpr-convert s-expr) true))))
+
+(defmacro mathematica [math & body]
+ `(let [first-results# (dorun
+                         (map (fn [cexpr#] (math [] cexpr#))
+                              (map (fn [s-expr#] (sexpr-convert :no-output s-expr#)) (drop-last '~body))))
+        last-result#   (math [] (sexpr-convert :output (last '~body)))]
+   last-result#))
+
+(defmacro cexpr-apply [& parts]
+  (if (symbol? (first parts))
+    (let [head (symbol (apply str (map #(if (= % \/) \` %) (str (first parts)))))
+          args (rest parts)]
+      `(CExpr. '~head (list ~@args)))
+    `((cexpr-apply ~@(first parts)) ~@(rest parts))))
+
+
+
+(defmacro expression-convert [expression]
+  (cond (and (seq? expression) (= (first expression) 'quote))
+          `(eval ~(second expression))
+        (symbol? expression)
+          `(CExpr. (quote ~expression))
+        (seq? expression)
+          (cons 'cexpr-apply
+                (map #(if (seq? %)
+                       (cons 'expression-convert (list %))
+                       %)
+                     expression))
+        true
+          (do (println 1) `(CExpr. ~expression))))
+
+(defmacro multiple-expression-convert [& expressions]
+  (if (seq expressions)
+    `(cons (expression-convert ~(first expressions))
+           (multiple-expression-convert ~@(rest expressions)))))
+
+(defmacro with-math [math & body]
+  `(apply ~math [] (multiple-expression-convert ~@body)))
+
+(defmacro testio [code]
+  `(do
+      (defmacro silly# [] ''(~@code))
+      (silly#)))
+
+
+(defmacro with-math [math & body]
+ (do
+   (defmacro mathmacro [body] `'(~body))
+   `(mathmacro ~body)))
+
+(defmacro foo []
+  `'((Plus 1 1) (Times 2 (clojure.core/unquote (+ 1 1)))))
+
+)

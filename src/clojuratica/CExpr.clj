@@ -41,7 +41,9 @@
    :extends clojure.lang.ASeq
    :init init
    :constructors {[Object] [],
-                  [Object clojure.lang.IPersistentCollection] []}
+                  [clojure.lang.Symbol clojure.lang.Sequential] []
+                  [clojure.lang.ASeq clojure.lang.Sequential] []
+                  [clojure.lang.Sequential Boolean] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
   (:use [clojuratica.lib]
@@ -75,10 +77,19 @@
   [cexpr]
   (.state cexpr))
 
-(defmethod construct [clojuratica.CExpr clojure.lang.IPersistentCollection]
+(defmethod construct [clojuratica.CExpr clojure.lang.Sequential]
   [cexpr coll]
   {:expr (-getExpr cexpr)
    :flags (concat coll (-getFlags cexpr))})
+
+(defmethod construct [clojure.lang.Sequential Boolean]
+  [coll cexpr-list?]
+  (if-not cexpr-list?
+    (construct coll)
+    (if (not-every? #(or (instance? Expr %) (instance? clojuratica.CExpr %)) coll)
+      (throw (Exception. "Every element of coll must be CExpr or Expr."))
+      (let [exprs (map #(if (instance? Expr %) % (-getExpr %)) coll)]
+        (construct (Expr. (first exprs) (into-array (rest exprs))))))))
 
 (defmethod construct [Object]
   [obj]
@@ -89,7 +100,9 @@
       (construct expr))))
 
 (defn needs-special-constructor? [element]
-  (or (instance? clojure.lang.Ratio element)
+  (or (instance? Expr element)
+      (instance? clojuratica.CExpr element)
+      (instance? clojure.lang.Ratio element)
       (instance? clojure.lang.IPersistentMap element)
       (instance? clojure.lang.Sequential element)
       (instance? clojure.lang.Symbol element)
@@ -151,6 +164,16 @@
     (.endPacket loop)
     (let [expr (.getExpr loop)]
       (construct expr))))
+
+(defmethod construct [clojure.lang.Symbol clojure.lang.Sequential]
+  [head args]
+  (construct (Expr. (:expr (construct head))
+                    (into-array (map :expr (map construct args))))))
+
+(defmethod construct [Boolean clojure.lang.Sequential]
+  [head args]
+  (construct (Expr. (:expr (construct head))
+                    (into-array (map :expr (map construct args))))))
 
 ;(defmethod construct [Number]
 ;  [n]

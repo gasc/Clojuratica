@@ -54,7 +54,8 @@
          parse-list-to-vectors
          parse-primitive-atom
          parse-primitive-vector
-         parse-primitive-matrix)
+         parse-primitive-matrix
+         parse-generic-expression)
 
 (defnf parse-dispatch [] []
   []
@@ -183,17 +184,21 @@
 (defnf parse-atom [] []
   [_ passthrough-flags]
   [expr fn-wrap]
-  (cond (.bigIntegerQ expr)                          (.asBigInteger expr)
-        (.bigDecimalQ expr)                          (.asBigDecimal expr)
-        (.integerQ expr)                             (parse-integer expr)
-        (.realQ expr)                                (.asDouble expr)
-        (.stringQ expr)                              (.asString expr)
-        (.rationalQ expr)                            (parse-rational expr)
-        (= "Symbol" (.toString (.head expr)))        (parse-symbol expr)
-        (= "Function" (.toString (.head expr)))      (if fn-wrap (apply fn-wrap [] expr passthrough-flags) expr)
-        (= "HashMapObject" (.toString (.head expr))) (if fn-wrap (apply parse-hash-map expr fn-wrap passthrough-flags) expr)
-        (= "Plus" (.toString (.head expr)))          (cons '+ (apply parse (add-head "List" (.args expr)) nil fn-wrap passthrough-flags))
-        true                                         expr))
+  (let [head (.toString (.head expr))]
+    (cond (.bigIntegerQ expr)      (.asBigInteger expr)
+          (.bigDecimalQ expr)      (.asBigDecimal expr)
+          (.integerQ expr)         (parse-integer expr)
+          (.realQ expr)            (.asDouble expr)
+          (.stringQ expr)          (.asString expr)
+          (.rationalQ expr)        (parse-rational expr)
+          (.symbolQ expr)          (parse-symbol expr)
+          (= "Function" head)      (if fn-wrap
+                                     (apply fn-wrap [] expr passthrough-flags)
+                                     (apply parse-generic-expression expr fn-wrap passthrough-flags))
+          (= "HashMapObject" head) (if fn-wrap
+                                     (apply parse-hash-map expr fn-wrap passthrough-flags)
+                                     (apply parse-generic-expression expr fn-wrap passthrough-flags))
+          true                     (apply parse-generic-expression expr fn-wrap passthrough-flags))))
 
 (defn parse-integer [expr]
   (let [i (.asLong expr)]
@@ -212,3 +217,12 @@
         (= "False" (.toString expr))  false
         (= "Null" (.toString expr))   nil
         true                          (symbol (.toString expr))))
+
+(defnf parse-generic-expression [] []
+  [_ passthrough-flags]
+  [expr fn-wrap]
+  (cons (symbol (.toString (.head expr)))
+        (apply parse (add-head "List" (.args expr))
+                     nil
+                     fn-wrap
+                     passthrough-flags)))
