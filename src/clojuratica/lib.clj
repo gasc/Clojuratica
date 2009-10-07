@@ -87,3 +87,21 @@
 
 (defmacro defmethodf [name dispatcher & remainder]
  `(defnf-* defmethod ~name false (~dispatcher) ~@remainder))
+
+(defmacro with-debug-message [bool msg & body]
+ `(if-not ~bool
+    (do ~@body)
+    (do
+      (println "Starting" (str ~msg "..."))
+      (let [result# (do ~@body)]
+        (println "Done" (str ~msg "."))
+        result#))))
+
+;(defn with-debug-message [bool msg body]
+; (if-not bool
+;    body
+;    (do
+;      (println "Starting" (str msg "..."))
+;      (let [result body]
+;        (println "Done" (str msg "."))
+;        result))))

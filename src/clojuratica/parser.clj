@@ -38,15 +38,21 @@
   (:import [clojuratica CExpr]
            [com.wolfram.jlink Expr])
   (:use [clojuratica.lib]
-        [clojuratica.core]))
+        [clojuratica.core]
+        [clojuratica.debug]))
 
 (declare atom?
-         parse-atom
-         parse-hash-map
-         parse-to-lazy-seqs
-         parse-to-vectors
+         primitive-array?
          primitive-vector?
          primitive-matrix?
+         parse-atom
+         parse-integer
+         parse-rational
+         parse-symbol
+         parse-hash-map
+         parse-list-to-lazy-seqs
+         parse-list-to-vectors
+         parse-primitive-atom
          parse-primitive-vector
          parse-primitive-matrix)
 
@@ -56,6 +62,9 @@
   (class expression))
 
 (defmulti parse parse-dispatch)
+
+(defmethod parse nil [& args]
+  nil)
 
 (defmethodf parse String [] []
   [_ passthrough-flags]
@@ -73,25 +82,118 @@
   (apply parse (.getExpr cexpr) nil fn-wrap (concat passthrough-flags (.getFlags cexpr))))
 
 (defmethodf parse Expr [[:vectors :seqs]
-                        [:fn-wrap :no-fn-wrap]]
-                       [:seqs]
+                        [:fn-wrap :no-fn-wrap :auto-fn-wrap]]
+                       [:seqs :auto-fn-wrap]
   [flags]
   [expr & [_ fn-wrap]]
   (if (and (flags :fn-wrap) (nil? fn-wrap))
     (throw (Exception. "Cannot parse functions using fn-wrap unless parser was created with a fn-wrap argument.")))
   (let [fn-wrap    (if (flags :no-fn-wrap) nil fn-wrap)]
-    (cond (atom? expr) (parse-atom expr fn-wrap)
+    (cond (atom? expr) (apply parse-atom expr fn-wrap flags)
           (flags :seqs)
             (cond (primitive-vector? expr)  (parse-primitive-vector expr identity)
                   (primitive-matrix? expr)  (parse-primitive-matrix expr identity)
-                  true                      (parse-to-lazy-seqs expr fn-wrap))
+                  true                      (apply parse-list-to-lazy-seqs expr fn-wrap flags))
           (flags :vectors)
             (cond (primitive-vector? expr)  (parse-primitive-vector expr vec)
                   (primitive-matrix? expr)  (parse-primitive-matrix expr vec)
-                  true                      (parse-to-vectors expr fn-wrap)))))
+                  true                      (apply parse-list-to-vectors expr fn-wrap flags)))))
 
-(defmethod parse nil [& args]
-  nil)
+(defn needs-special-parser? [expr]
+  (or (atom? expr) (primitive-array? expr)))
+
+(defn atom? [expr] (not (.listQ expr)))
+
+(defn primitive-array? [expr]
+  (or (primitive-vector? expr) (primitive-matrix? expr)))
+
+(defn primitive-vector? [expr]
+  (cond (.vectorQ expr Expr/INTEGER)     Expr/INTEGER
+        (.vectorQ expr Expr/BIGINTEGER)  Expr/BIGINTEGER
+        (.vectorQ expr Expr/REAL)        Expr/REAL
+        (.vectorQ expr Expr/BIGDECIMAL)  Expr/BIGDECIMAL
+        (.vectorQ expr Expr/STRING)      Expr/STRING
+        (.vectorQ expr Expr/RATIONAL)    Expr/RATIONAL
+        (.vectorQ expr Expr/SYMBOL)      Expr/SYMBOL
+        true                             false))
+
+(defn primitive-matrix? [expr]
+  (cond (.matrixQ expr Expr/INTEGER)     Expr/INTEGER
+        (.matrixQ expr Expr/BIGINTEGER)  Expr/BIGINTEGER
+        (.matrixQ expr Expr/REAL)        Expr/REAL
+        (.matrixQ expr Expr/BIGDECIMAL)  Expr/BIGDECIMAL
+        (.matrixQ expr Expr/STRING)      Expr/STRING
+        (.matrixQ expr Expr/RATIONAL)    Expr/RATIONAL
+        (.matrixQ expr Expr/SYMBOL)      Expr/SYMBOL
+        true                             false))
+
+(defn parse-primitive-vector [expr coll-fn & [type]]
+  (with-debug-message (and debug (nil? type)) "vector parse"
+    (let [type  (or type (primitive-vector? expr))
+          v     (map #(parse-primitive-atom % type) (.args expr))]
+      (coll-fn v))))
+
+(defn parse-primitive-matrix [expr coll-fn & [type]]
+  (with-debug-message debug "matrix parse"
+    (let [type  (or type (primitive-matrix? expr))
+          m     (map #(parse-primitive-vector % coll-fn type) (.args expr))]
+      (coll-fn m))))
+
+(defn parse-primitive-atom [expr type]
+  (cond (= type Expr/BIGINTEGER)      (.asBigInteger expr)
+        (= type Expr/BIGDECIMAL)      (.asBigDecimal expr)
+        (= type Expr/INTEGER)         (parse-integer expr)
+        (= type Expr/REAL)            (.asDouble expr)
+        (= type Expr/STRING)          (.asString expr)
+        (= type Expr/RATIONAL)        (parse-rational expr)
+        (= type Expr/SYMBOL)          (parse-symbol expr)))
+
+(defnf parse-hash-map [] []
+  [_ passthrough-flags]
+  [expr fn-wrap]
+  (with-debug-message debug "hash-map parse"
+    (let [[keys values] ((apply fn-wrap ["hm" expr] "Transpose[Apply[List, hm[], {1}]] &" passthrough-flags))]
+      (zipmap keys values))))
+
+(defnf parse-list-to-lazy-seqs [] []
+  [_ passthrough-flags]
+  [expr fn-wrap]
+  (with-debug-message debug "parse of generic list into lazy-seq"
+    (let [cexpr (convert expr)]
+      (map #(apply parse % nil fn-wrap passthrough-flags) (rest cexpr)))))
+
+(defnf parse-list-to-vectors [] []
+  [_ passthrough-flags]
+  [expr fn-wrap]
+  (with-debug-message debug "parse of generic list into vector"
+    (let [cexpr (convert expr)]
+      (loop [elements (next cexpr)
+             v        []
+             stack    nil]
+        (if-let [elements (seq elements)]
+          (let [first-expr (first elements)]
+            (if (needs-special-parser? first-expr)
+              (recur (next elements) (conj v (apply parse first-expr nil fn-wrap passthrough-flags)) stack)
+              (recur (next (convert first-expr)) [] (conj stack [(next elements) v]))))
+          (if (seq stack)
+            (let [[elements prior-v] (peek stack)]
+              (recur elements (conj prior-v v) (pop stack)))
+            v))))))
+
+(defnf parse-atom [] []
+  [_ passthrough-flags]
+  [expr fn-wrap]
+  (cond (.bigIntegerQ expr)                          (.asBigInteger expr)
+        (.bigDecimalQ expr)                          (.asBigDecimal expr)
+        (.integerQ expr)                             (parse-integer expr)
+        (.realQ expr)                                (.asDouble expr)
+        (.stringQ expr)                              (.asString expr)
+        (.rationalQ expr)                            (parse-rational expr)
+        (= "Symbol" (.toString (.head expr)))        (parse-symbol expr)
+        (= "Function" (.toString (.head expr)))      (if fn-wrap (apply fn-wrap [] expr passthrough-flags) expr)
+        (= "HashMapObject" (.toString (.head expr))) (if fn-wrap (apply parse-hash-map expr fn-wrap passthrough-flags) expr)
+        (= "Plus" (.toString (.head expr)))          (cons '+ (apply parse (add-head "List" (.args expr)) nil fn-wrap passthrough-flags))
+        true                                         expr))
 
 (defn parse-integer [expr]
   (let [i (.asLong expr)]
@@ -100,86 +202,13 @@
       (int i)
       (long i))))
 
-(defn parse-primitive-atom [expr type]
-  (cond (= type Expr/BIGINTEGER)      (.asBigInteger expr)
-        (= type Expr/BIGDECIMAL)      (.asBigDecimal expr)
-        (= type Expr/INTEGER)         (parse-integer expr)
-        (= type Expr/REAL)            (.asDouble expr)
-        (= type Expr/STRING)          (.asString expr)))
+(defn parse-rational [expr]
+  (let [numer (parse-integer (.part expr 1))
+        denom (parse-integer (.part expr 2))]
+    (/ numer denom)))
 
-(defn primitive-vector? [expr]
-  (cond (.vectorQ expr Expr/INTEGER)     Expr/INTEGER
-        (.vectorQ expr Expr/BIGINTEGER)  Expr/BIGINTEGER
-        (.vectorQ expr Expr/REAL)        Expr/REAL
-        (.vectorQ expr Expr/BIGDECIMAL)  Expr/BIGDECIMAL
-        true                             false))
-
-(defn primitive-matrix? [expr]
-  (cond (.matrixQ expr Expr/INTEGER)     Expr/INTEGER
-        (.matrixQ expr Expr/BIGINTEGER)  Expr/BIGINTEGER
-        (.matrixQ expr Expr/REAL)        Expr/REAL
-        (.matrixQ expr Expr/BIGDECIMAL)  Expr/BIGDECIMAL
-        true                             false))
-
-(defn primitive-array? [expr]
-  (or (primitive-vector? expr) (primitive-matrix? expr)))
-
-(defn parse-primitive-vector [expr coll-fn & [type]]
-  (if (nil? type) (println "Parsing vector..."))
-  (let [type (or type (primitive-vector? expr))
-        v    (map #(parse-primitive-atom % type) (.args expr))]
-    (coll-fn v)))
-
-(defn parse-primitive-matrix [expr coll-fn & [type]]
-  (println "Parsing matrix...")
-  (let [type (or type (primitive-matrix? expr))
-        m    (map #(parse-primitive-vector % coll-fn type) (.args expr))]
-    (coll-fn m)))
-
-(defn atom? [expr] (not (.listQ expr)))
-
-(defn parse-atom [expr fn-wrap]
-  (cond (.bigIntegerQ expr)                          (.asBigInteger expr)
-        (.bigDecimalQ expr)                          (.asBigDecimal expr)
-        (.integerQ expr)                             (parse-integer expr)
-        (.realQ expr)                                (.asDouble expr)
-        (.stringQ expr)                              (.asString expr)
-        (= "True" (.toString expr))                  true
-        (= "False" (.toString expr))                 false
-        (= "Null" (.toString expr))                  nil
-        (= "Function" (.toString (.head expr)))      (if fn-wrap (fn-wrap [] expr) expr)
-        (= "HashMapObject" (.toString (.head expr))) (if fn-wrap (parse-hash-map expr fn-wrap) expr)
-        true                                         expr))
-
-(defn parse-hash-map [expr fn-wrap]
-  (into {} ((fn-wrap :vectors ["hm" expr] "Apply[List, hm[], 1] &"))))
-
-(defn parse-to-lazy-seqs [expr fn-wrap]
-  (let [cexpr (convert expr)]
-    (map #(parse :seqs % nil fn-wrap) (rest cexpr))))
-
-;(defn parse-to-lazy-seqs [cexpr fn-wrap]
-;  (let [parse-list-elements
-;          (fn parse-list-elements [s]
-;             (when (seq s)
-;               (lazy-seq
-;                 (cons (parse :seqs (convert (first s)) fn-wrap)
-;                       (parse-list-elements (rest s))))))]
-;    (parse-list-elements (rest cexpr))))
-
-(defn parse-to-vectors [expr fn-wrap]  ; logic courtesy of Meikel Brandmeyer
-  (let [cexpr (convert expr)]
-    (loop [elements (next cexpr)
-           v        []
-           stack    nil]
-      (if-let [elements (seq elements)]
-        (let [first-expr  (first elements)]
-          (if (or (primitive-array? first-expr)
-                  (atom? first-expr))
-              (recur (next elements) (conj v (parse :vectors first-expr nil fn-wrap)) stack)
-              (recur (next (convert first-expr)) [] (conj stack [(next elements) v]))))
-        (if (seq stack)
-          (let [[elements prior-v] (peek stack)]
-            (recur elements (conj prior-v v) (pop stack)))
-          v)))))
-
+(defn parse-symbol [expr]
+  (cond (= "True" (.toString expr))   true
+        (= "False" (.toString expr))  false
+        (= "Null" (.toString expr))   nil
+        true                          (symbol (.toString expr))))

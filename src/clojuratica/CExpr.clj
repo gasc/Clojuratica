@@ -44,7 +44,8 @@
                   [Object clojure.lang.IPersistentCollection] []}
    :state state)
   (:import [com.wolfram.jlink Expr MathLinkFactory])
-  (:use [clojuratica.lib]))
+  (:use [clojuratica.lib]
+        [clojuratica.debug]))
 
 (declare construct)
 
@@ -72,8 +73,7 @@
 
 (defmethod construct [clojuratica.CExpr]
   [cexpr]
-  {:expr (-getExpr cexpr)
-   :flags (-getFlags cexpr)})
+  (.state cexpr))
 
 (defmethod construct [clojuratica.CExpr clojure.lang.IPersistentCollection]
   [cexpr coll]
@@ -92,11 +92,18 @@
   (or (instance? clojure.lang.Ratio element)
       (instance? clojure.lang.IPersistentMap element)
       (instance? clojure.lang.Sequential element)
+      (instance? clojure.lang.Symbol element)
       (nil? element)))
 
 (defmethod construct [clojure.lang.Ratio]
   [n]
-  (construct (double n)))
+  (let [loop (MathLinkFactory/createLoopbackLink)]
+    (.putFunction loop "Rational" 2)
+    (.put loop (.numerator n))
+    (.put loop (.denominator n))
+    (.endPacket loop)
+    (let [expr (.getExpr loop)]
+      (construct expr))))
 
 (defmethod construct [clojure.lang.IPersistentMap]
   [expression-map]
@@ -110,6 +117,12 @@
     (let [expr (.getExpr loop)]
       (construct expr))))
 
+(defmethod construct [clojure.lang.Symbol]
+  [expression-symbol]
+  (if (re-find #"[^a-zA-Z0-9`]" (name expression-symbol))
+    (throw (Exception. "Symbols passed to Mathematica must be alphanumeric (apart from backticks)")))
+  (construct (Expr. Expr/SYMBOL (name expression-symbol))))
+
 (defn mvector? [coll]
   (and (sequential? coll)
        (not-any? needs-special-constructor? coll)))
@@ -119,8 +132,8 @@
        (every? mvector? coll)))
 
 (defn sequential-to-array [coll]
-  (cond (mmatrix? coll)  (do (println "Converting matrix...") (to-array-2d coll))
-        (mvector? coll)  (do (println "Converting vector...") (to-array coll))
+  (cond (mmatrix? coll)  (do (if debug (println "Converting matrix...")) (to-array-2d coll))
+        (mvector? coll)  (do (if debug (println "Converting vector...")) (to-array coll))
         true             (to-array
                            (map #(cond (sequential? %)                (sequential-to-array %)
                                        (needs-special-constructor? %) (:expr (construct %))

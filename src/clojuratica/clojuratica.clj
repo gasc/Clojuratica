@@ -42,6 +42,8 @@
             [clojuratica.displayer          :as displayer])
   (:use [clojuratica.lib]))
 
+(def debug false)
+
 (defnf get-evaluator [[:parallel :serial]] []
   [flags _ passthrough]
   [& _]

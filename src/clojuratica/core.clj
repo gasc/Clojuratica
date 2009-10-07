@@ -37,78 +37,54 @@
 (ns clojuratica.core
   (:import  [clojuratica CExpr]
             [com.wolfram.jlink Expr])
-  (:use     [clojuratica.lib]))
+  (:use     [clojuratica.lib]
+            [clojuratica.debug]))
 
 (declare string-to-expr build-set-expr add-head convert)
 
 (defmulti express (fn [expression & _] (class expression)))
 
 (defmethod express String [s kernel-link]
-  ; Takes a string and a KernelLink instance. Treats s as a Mathematica expression and converts it to
-  ; a CExpr object using the kernel at the other end of kernel-link. Does not evaluate s, but merely
-  ; converts it to a CExpr object.
   (convert (string-to-expr s kernel-link)))
 
 (defmethod express Expr [expr & [kernel-link]]
-  ; Takes an Expr instance and an optional (unused) KernelLink instance. Converts expr to a CExpr.
   (convert expr))
 
 (defmethod express CExpr [cexpr & [kernel-link]]
-  ; Takes a CExpr instance and an optional (unused) KernelLink instance. Simply returns cexpr.
   cexpr)
-
-;(defmethod express :nil [& args]
-;  ; Express returns nil if passed nil.
-;  nil)
-
-; Send-read
 
 (defmulti send-read (fn [expression & _] (class expression)))
 
 (defmethod send-read String [s kernel-link]
-  ; Takes a string and a KernelLink instance. Treats s as a Mathematica expression and evaluates it
-  ; using the kernel at the other end of kernel-link. Returns a CExpr containing the output.
   (io! "The Clojuratica function you have called has side effects."
     (locking kernel-link
-      ;(println ">" s)
+      (if debug (println "send-read String>" s))
       (.evaluate kernel-link s)
       (.waitForAnswer kernel-link)
       (let [output (.. kernel-link getExpr)]
-        ;(println output)
+        (if debug (println "output>" output))
         (convert output)))))
 
 (defmethod send-read Expr [expr kernel-link]
-  ; Takes an Expr instance and a KernelLink instance. Evaluates expr using the kernel at the other
-  ; end of kernel-link. Returns a CExpr containing the output.
   (io! "The Clojuratica function you have called has side effects."
     (locking kernel-link
-      ;(println ">" expr)
+      (if debug (println "send-read Expr>" expr))
       (.evaluate kernel-link expr)
       (.waitForAnswer kernel-link)
       (let [output (.. kernel-link getExpr)]
-        ;(println output)
+        (if debug (println "output>" output))
         (convert output)))))
 
 (defmethod send-read CExpr [cexpr kernel-link]
-  ; Takes a CExpr instance and a KernelLink instance. Evaluates cexpr using the kernel at the other
-  ; end of kernel-link. Returns a CExpr containing the output.
   (send-read (.getExpr cexpr) kernel-link))
 
-;(defmethod send-read :nil [& args]
-;  ; Send-read returns nil if passed nil.
-;  nil)
-
 (defn convert
-  "Converts any Java object, including any Clojure data structure, to a CExpr. Sequential objects
-  are converted to Mathematica lists. See the CExpr class documentation for more information."
   [arg1 & [arg2]]
   (if arg2
     (CExpr. arg1 arg2)
     (CExpr. arg1)))
 
 (defn add-head
-  "Creates an Expr with head argument as its head and with exprs as its arguments. exprs must be Expr
-  instances."
   [head exprs]
   (let [loop (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)]
     (.putFunction loop head (count exprs))
@@ -172,15 +148,16 @@
   "Creates an Expr containing a Mathematica Set[] expression. The righthand side (rhs) of the assignment
   is converted to a CExpr and then an Expr using the convert function."
   [lhs rhs]
-  (let [loop (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)]
+  (let [loop (com.wolfram.jlink.MathLinkFactory/createLoopbackLink)
+        lhs  (.getExpr (convert (symbol lhs)))]
     (if (= rhs :undefined)
       (do
-        (.putSymbol loop lhs)
+        (.put loop lhs)
         (.endPacket loop)
         (.getExpr loop))
       (let [rhs (.getExpr (convert rhs))]
         (.putFunction loop "Set" 2)
-        (.putSymbol loop lhs)
+        (.put loop lhs)
         (.put loop rhs)
         (.endPacket loop)
         (.getExpr loop)))))
@@ -192,7 +169,7 @@
   (io! "The Clojuratica function you have called has side effects."
     (let [held-s (str "HoldComplete[" s "]")]
       (locking kernel-link
-        ;(println "string-to-expr>" held-s)
+        (if debug (println "string-to-expr>" held-s))
         (.evaluate kernel-link held-s)
         (.waitForAnswer kernel-link)
         (let [result (.. kernel-link getExpr args)]
