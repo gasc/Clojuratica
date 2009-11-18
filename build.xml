@@ -6,13 +6,24 @@
   <property name="src" location="src"/>
   <property name="classes" location="classes"/>
 
+  <property name="clojure.jar" value="c:/Users/Garth/Documents/Libraries/repo/jvm/clojure.jar"/>
+  <property name="jlink.jar" value="c:/Program Files/Wolfram Research/Mathematica/7.0/AddOns/JLink/JLink.jar"/>
+  <property name="clojure-contrib.jar" value="c:/Users/Garth/Documents/Libraries/repo/jvm/clojure-contrib.jar"/>
+  
   <available property="hasclojure" file="${clojure.jar}"/>
+  <available property="hasclojurecontrib" file="${clojure-contrib.jar}"/>
   <available property="hasjlink" file="${jlink.jar}"/>
 
   <target name="check_hasclojure"
           description="Print a warning message if clojure.jar is undefined"
           unless="hasclojure">
     <fail message="You have not defined a path to clojure.jar so I can't compile files. To enable compiling, run 'ant -Dclojure.jar=&lt;...path to clojure.jar..&gt;'"/>
+  </target>
+
+  <target name="check_hasclojurecontrib"
+          description="Print a warning message if clojure-contrib.jar is undefined"
+          unless="hasclojurecontrib">
+    <fail message="You have not defined a path to clojure-contrib.jar so I can't compile files. To enable compiling, run 'ant -Dclojure-contrib.jar=&lt;...path to clojure-contrib.jar..&gt;'"/>
   </target>
 
   <target name="check_hasjlink"
@@ -40,35 +51,40 @@
         description="compile the source " >
   </target>
 
-  <target name="compile_classes" depends="init,check_hasclojure,check_hasjlink"
+  <target name="compile_classes" depends="init,check_hasclojure,check_hasjlink,check_hasclojurecontrib"
           description="Compile the clojure files that have gen-class.">
     <java classname="clojure.lang.Compile">
       <classpath>
         <path location="${classes}"/>
         <path location="${src}"/>
         <path location="${clojure.jar}"/>
+        <path location="${clojure-contrib.jar}"/>
         <path location="${jlink.jar}"/>
+        <path location="jsr166y.jar"/>
       </classpath>
       <sysproperty key="clojure.compile.path" value="${classes}"/>
-      <arg value="clojuratica.Flaggable"/>
+      <arg value="clojuratica.test.Evaluator2"/>
+        <!--
       <arg value="clojuratica.CExpr"/>
       <arg value="clojuratica.CHelper"/>
       <arg value="clojuratica.CLink"/>
-      <arg value="clojuratica.test.SimpleClass"/>
+      <arg value="clojuratica.test.SimpleClass"/> -->
     </java>
   </target>
 
-  <target name="compile_clojure" depends="init,check_hasclojure,check_hasjlink"
+  <target name="compile_clojure" depends="init,check_hasclojure,check_hasjlink,check_hasclojurecontrib"
           description="Compile Clojure sources.">
     <java classname="clojure.lang.Compile">
       <classpath>
         <path location="${classes}"/>
         <path location="${src}"/>
         <path location="${clojure.jar}"/>
+        <path location="${clojure-contrib.jar}"/>
         <path location="${jlink.jar}"/>
+        <path location="jsr166y.jar"/>
       </classpath>
       <sysproperty key="clojure.compile.path" value="${classes}"/>
-      <arg value="clojuratica.clojuratica"/>
+      <arg value="clojuratica"/>
     </java>
   </target>
 

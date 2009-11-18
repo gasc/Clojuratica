@@ -6,13 +6,16 @@
          (. (. #^String % trim) split "\\s+"))
        (read-lines filename)))
 
+(math-intern math-eval [math do])
+
 (defn sparse-eigensystem [indices vals m n]
   "Given 3 vectors and the matrix dimensions, returns the eigenvalues and eigenvectors using mathematica."
-  (math ["vals" vals
-         "indices" indices
-         "m" m
-         "n" n]
-    "Eigensystem[SparseArray[indices->N[vals],{m,n}]]"))
+  (math :seqs (Eigensystem (SparseArray (-> ~indices (N ~vals)) [~m ~n]))))
+  ;(math ["vals" vals
+  ;       "indices" indices
+  ;       "m" m
+  ;       "n" n]
+  ;  "Eigensystem[SparseArray[indices->N[vals],{m,n}]]"))
 
 (def m (read-table "C:\\Users\\Garth\\Downloads\\matrix"))
 (dorun m)
@@ -23,4 +26,5 @@
 (def indices (doall (map list rows cols)))
 
 (time (def es (sparse-eigensystem indices values 2856 2856)))
+
 

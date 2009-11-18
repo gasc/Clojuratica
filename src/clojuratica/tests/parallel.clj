@@ -1,0 +1,12 @@
+ (def output-vector
+     (vec (for [i (range 10000)] (agent nil))))
+
+(do
+  (doseq [i (range (count output-vector))]             ;for each agent in the output vector
+     (send (nth output-vector i)                        ;update the agent with the result of
+           (fn [_] (math :parallel :poll-interval 20 (N (Sqrt ~i))))))
+  (time
+     (while (some #(nil? @%) output-vector)    ;while any of the agents contains a nil,
+       (Thread/sleep 50))))                     ;wait for 50 more msecs
+
+@(nth output-vector 2500)

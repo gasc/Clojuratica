@@ -33,16 +33,25 @@
 ;
 ; ***** END LICENSE BLOCK *****
 
-(ns clojuratica.clojuratica)
-(declare get-evaluator)
+(ns clojuratica
+  (:refer-clojure :exclude [intern])
+  (:use [clojuratica.lib.options]
+        [clojuratica.runtime.dynamic-vars]
+        [clojuratica.runtime.default-options]
+        [clojuratica.base.cep]
+        [clojuratica.base.kernel]
+        [clojuratica.integration.intern]))
 
-(ns clojuratica.global-setter
-  (:use [clojuratica.lib]
-        [clojuratica.core]))
+(defn-let-options math-evaluator [enclosed-options *default-options*] [kernel-link]
+  (let [enclosed-kernel (kernel kernel-link)]
+    (fn-binding-options [*options* enclosed-options] [expr]
+      (binding [*kernel* enclosed-kernel]
+        (cep expr)))))
 
-(defn global-set [lhs rhs evaluate]
-  (let [kernel-link     (evaluate :get-kernel-link)
-        result          (send-read (build-set-expr lhs rhs) kernel-link)]
-    (if (evaluate :parallel?)
-      (send-read (str "DistributeDefinitions[" lhs "]") kernel-link))
-    (convert result)))
+(defmacro math-intern [& args]
+  (let-options [options args {#{:as-function :as-macro} :as-macro}] [math-eval & opspecs]
+    (if (flag? options :as-macro)
+      `(intern :macro '~math-eval ~@(map #(list 'quote %) opspecs))
+      `(intern :fn '~math-eval ~@(map #(list 'quote %) opspecs)))))
+
+
