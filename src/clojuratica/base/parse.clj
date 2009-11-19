@@ -135,11 +135,15 @@
     (/ numer denom)))
 
 (defn parse-symbol [expr]
-  (let [s (.toString expr)]
-  (cond (= "True" s)   true
-        (= "False" s)  false
-        (= "Null" s)   nil
-        'else          (symbol (apply str (replace {\` \/} s))))))
+  (let [aliases (into {} (map (comp vec rseq) (*options* (*options* :alias-list))))
+				s       (.toString expr)
+				sym     (symbol (apply str (replace {\` \/} s)))]
+		(if-let [alias (aliases sym)]
+		  alias
+			(cond (= "True" s)   true
+						(= "False" s)  false
+						(= "Null" s)   nil
+						'else          sym))))
 
 (defn parse-hash-map [expr]
   (with-debug-message (flag? *options* :verbose) "hash-map parse"

@@ -15,7 +15,7 @@
 
   <target name="jar" depends="compile" description="generate the jar file" >
     <!-- Put everything in ${classes} into the jar file -->
-    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${src}"/>
+    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${src}" includes="**/*.clj"/>
     <echo>JAR written to ${basedir}${file.separator}clojuratica.jar</echo>
   </target>
 
