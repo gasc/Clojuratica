@@ -39,19 +39,35 @@
         [clojuratica.runtime.dynamic-vars]
         [clojuratica.runtime.default-options]
         [clojuratica.base.cep]
+        [clojuratica.base.convert]
+        [clojuratica.base.evaluate]
         [clojuratica.base.kernel]
         [clojuratica.integration.intern]))
 
 (defn-let-options math-evaluator [enclosed-options *default-options*] [kernel-link]
   (let [enclosed-kernel (kernel kernel-link)]
+    (binding [*options* enclosed-options
+              *kernel*  enclosed-kernel]
+			(evaluate (convert '(Needs "Parallel`Developer`")))
+			(evaluate (convert '(Needs "Developer`")))
+			(evaluate (convert '(Needs "ClojurianScopes`")))
+			(evaluate (convert '(Needs "HashMaps`"))))
     (fn-binding-options [*options* enclosed-options] [expr]
       (binding [*kernel* enclosed-kernel]
         (cep expr)))))
 
 (defmacro math-intern [& args]
-  (let-options [options args {#{:as-function :as-macro} :as-macro}] [math-eval & opspecs]
-    (if (flag? options :as-macro)
-      `(intern :macro '~math-eval ~@(map #(list 'quote %) opspecs))
-      `(intern :fn '~math-eval ~@(map #(list 'quote %) opspecs)))))
+  (let-options [options args {#{:as-function :as-macro}                 :as-macro
+															#{:clojurian-scopes :no-clojurian-scopes} :no-clojurian-scopes}]
+		[math-eval & opspecs]
+		(let [opspecs (if (flag? options :clojurian-scopes)
+									  (into opspecs (keys (*default-options* :clojure-scope-aliases)))
+										opspecs)]
+			(if (flag? options :as-macro)
+				`(intern :macro '~math-eval ~@(map #(list 'quote %) opspecs))
+				`(intern :fn '~math-eval ~@(map #(list 'quote %) opspecs))))))
+
+(defmacro defmath [v math-eval]
+  `(math-intern :as-macro ~math-eval [~v ~'CompoundExpression]))
 
 

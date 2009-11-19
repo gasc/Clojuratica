@@ -1,0 +1,207 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 7.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[      6728,        198]
+NotebookOptionsPosition[      5572,        157]
+NotebookOutlinePosition[      5952,        173]
+CellTagsIndexPosition[      5909,        170]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Begin", "[", "\"\<ClojurianScopes`\>\"", "]"}], ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591142563515*^9, 3.467591166197867*^9}, 
+   3.467591693066002*^9, {3.46759188727711*^9, 3.4675919233971767`*^9}, {
+   3.4675919691067905`*^9, 3.467591969721826*^9}, {3.4675920729027276`*^9, 
+   3.467592078327038*^9}, {3.4675921130940266`*^9, 3.467592125507736*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Needs", "[", "\"\<FunctionalExtras`\>\"", "]"}], ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591915328715*^9, 3.4675919223181143`*^9}, {
+  3.467592080870183*^9, 3.4675921230475955`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"SetAttributes", "[", 
+  RowBox[{"ClojurianScopes`Function", ",", " ", "HoldAllComplete"}], 
+  "]"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591142563515*^9, 3.467591166197867*^9}, 
+   3.467591693066002*^9, {3.46759188727711*^9, 3.4675919131215887`*^9}, 
+   3.4675919763122025`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ClojurianScopes`Function", "[", 
+    RowBox[{"bindings_", ",", " ", "body__"}], "]"}], " ", ":=", " ", 
+   RowBox[{"Function", "[", 
+    RowBox[{"bindings", ",", " ", 
+     RowBox[{"CompoundExpression", "[", "body", "]"}]}], "]"}]}], 
+  ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.4675907309359713`*^9, 3.4675907317820196`*^9}, {
+   3.467590862605502*^9, 3.4675909434471264`*^9}, 3.4675910449299307`*^9, 
+   3.4675919778642917`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ClojurianScopes`Function", "[", "body__", "]"}], " ", ":=", " ", 
+   RowBox[{"Function", "[", 
+    RowBox[{"CompoundExpression", "[", "body", "]"}], "]"}]}], ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591052445361*^9, 3.467591074543625*^9}, 
+   3.4675919792293696`*^9}],
+
+Cell[BoxData[
+ RowBox[{"SetAttributes", "[", 
+  RowBox[{"ClojurianScopes`Let", ",", " ", "HoldAllComplete"}], 
+  "]"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591142563515*^9, 3.467591187700097*^9}, {
+   3.4675916904018497`*^9, 3.4675916910928893`*^9}, 3.4675919880158725`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ClojurianScopes`Let", "[", 
+   RowBox[{"bindings_", ",", " ", "body__"}], "]"}], " ", ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"Let", "[", 
+   RowBox[{"bindings", ",", " ", 
+    RowBox[{"CompoundExpression", "[", "body", "]"}]}], "]"}]}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591058990735*^9, 3.4675910628759575`*^9}, {
+   3.4675911042463236`*^9, 3.4675911295767727`*^9}, {3.467591189485199*^9, 
+   3.4675911968346195`*^9}, 3.467591625779154*^9, 3.467591989128936*^9}],
+
+Cell[BoxData[
+ RowBox[{"SetAttributes", "[", 
+  RowBox[{"ClojurianScopes`With", ",", " ", "HoldAllComplete"}], 
+  "]"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591693926051*^9, 3.467591700510428*^9}, 
+   3.467591991511072*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ClojurianScopes`With", "[", 
+   RowBox[{"bindings_", ",", " ", "body__"}], "]"}], " ", ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"With", "[", 
+   RowBox[{"bindings", ",", " ", 
+    RowBox[{"CompoundExpression", "[", "body", "]"}]}], "]"}]}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.46759167800014*^9, 3.4675916817743564`*^9}, 
+   3.4675919928611493`*^9}],
+
+Cell[BoxData[
+ RowBox[{"SetAttributes", "[", 
+  RowBox[{"ClojurianScopes`Block", ",", " ", "HoldAllComplete"}], 
+  "]"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591693926051*^9, 3.467591710904022*^9}, 
+   3.4675919949562693`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ClojurianScopes`Block", "[", 
+   RowBox[{"bindings_", ",", " ", "body__"}], "]"}], " ", ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"Block", "[", 
+   RowBox[{"bindings", ",", " ", 
+    RowBox[{"CompoundExpression", "[", "body", "]"}]}], "]"}]}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.46759167800014*^9, 3.4675916817743564`*^9}, 
+   3.4675917133841643`*^9, 3.4675917587247577`*^9, 3.4675919963793507`*^9}],
+
+Cell[BoxData[
+ RowBox[{"SetAttributes", "[", 
+  RowBox[{"ClojurianScopes`Module", ",", " ", "HoldAllComplete"}], 
+  "]"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591693926051*^9, 3.467591710904022*^9}, {
+   3.4675917515903497`*^9, 3.467591752435398*^9}, 3.46759199846747*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"ClojurianScopes`Module", "[", 
+   RowBox[{"bindings_", ",", " ", "body__"}], "]"}], " ", ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"Module", "[", 
+   RowBox[{"bindings", ",", " ", 
+    RowBox[{"CompoundExpression", "[", "body", "]"}]}], "]"}]}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.46759167800014*^9, 3.4675916817743564`*^9}, 
+   3.4675917133841643`*^9, {3.4675917549625425`*^9, 3.4675917568406496`*^9}, 
+   3.4675919996495376`*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"End", "[", "]"}], ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.467591925829315*^9, 3.467591926746368*^9}}]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{607, 643},
+WindowMargins->{{-798, Automatic}, {58, Automatic}},
+FrontEndVersion->"7.0 for Microsoft Windows (32-bit) (February 18, 2009)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[545, 20, 417, 7, 31, "Input",
+ InitializationCell->True],
+Cell[965, 29, 246, 5, 31, "Input",
+ InitializationCell->True],
+Cell[1214, 36, 328, 7, 31, "Input",
+ InitializationCell->True],
+Cell[1545, 45, 501, 12, 52, "Input",
+ InitializationCell->True],
+Cell[2049, 59, 342, 8, 52, "Input",
+ InitializationCell->True],
+Cell[2394, 69, 300, 6, 31, "Input",
+ InitializationCell->True],
+Cell[2697, 77, 530, 11, 52, "Input",
+ InitializationCell->True],
+Cell[3230, 90, 249, 6, 31, "Input",
+ InitializationCell->True],
+Cell[3482, 98, 409, 10, 52, "Input",
+ InitializationCell->True],
+Cell[3894, 110, 252, 6, 31, "Input",
+ InitializationCell->True],
+Cell[4149, 118, 459, 10, 52, "Input",
+ InitializationCell->True],
+Cell[4611, 130, 298, 6, 31, "Input",
+ InitializationCell->True],
+Cell[4912, 138, 491, 11, 52, "Input",
+ InitializationCell->True],
+Cell[5406, 151, 162, 4, 31, "Input",
+ InitializationCell->True]
+}
+]
+*)
+
+(* End of internal cache information *)

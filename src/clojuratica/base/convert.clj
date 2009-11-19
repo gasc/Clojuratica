@@ -45,24 +45,26 @@
     (convert (seq map))))
 
 (defmethod convert :symbol [sym]
-  (if-let [alias (((*options* :alias-list) *options*) sym)]
-    (convert alias)
-    (if-let [[_ n] (re-matches #"%(\d*)" (str sym))]
-      (let [n (Long/valueOf (if (= "" n) "0" n))]
-        (convert (list 'Slot n)))
-      ;(let [s (str-utils/replace (str sym) #"\|(.*?)\|" #(str "\\\\[" (second %) "]"))]
-      (let [s (str sym)]
-        (if (re-find #"[^a-zA-Z0-9$\/]" s)
-          (throw (Exception. "Symbols passed to Mathematica must be alphanumeric (apart from forward slashes and dollar signs)."))
-          (Expr. Expr/SYMBOL (apply str (replace {\/ \`} s))))))))
+	(let [all-aliases (into (*options* (*options* :alias-list))
+										      (*options* :clojure-scope-aliases))]
+		(if-let [alias (all-aliases sym)]
+			(convert alias)
+			(if-let [[_ n] (re-matches #"%(\d*)" (str sym))]
+				(let [n (Long/valueOf (if (= "" n) "0" n))]
+					(convert (list 'Slot n)))
+				;(let [s (str-utils/replace (str sym) #"\|(.*?)\|" #(str "\\\\[" (second %) "]"))]   )
+				(let [s (str sym)]
+					(if (re-find #"[^a-zA-Z0-9$\/]" s)
+						(throw (Exception. "Symbols passed to Mathematica must be alphanumeric (apart from forward slashes and dollar signs)."))
+						(Expr. Expr/SYMBOL (apply str (replace {\/ \`} s)))))))))
 
 (defmethod convert :list [coll]
   (cond (simple-matrix? coll)   (do
                                   (if (flag? *options* :verbose) (println "Converting simple matrix..."))
-                                  (expr-from-parts (list (convert 'Developer/ToPackedArray) (convert (to-array-2d coll)))))
+                                  (convert (to-array-2d coll)))
         (simple-vector? coll)   (do
                                   (if (flag? *options* :verbose) (println "Converting simple vector..."))
-                                  (expr-from-parts (list (convert 'Developer/ToPackedArray) (convert (to-array coll)))))
+                                  (convert (to-array coll)))
         'else                   (do
                                   (if (flag? *options* :verbose) (println "Converting complex list..."))
                                   (convert

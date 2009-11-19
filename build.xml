@@ -4,109 +4,23 @@
     </description>
   <!-- set global properties for this build -->
   <property name="src" location="src"/>
-  <property name="classes" location="classes"/>
-
-  <property name="clojure.jar" value="c:/Users/Garth/Documents/Libraries/repo/jvm/clojure.jar"/>
-  <property name="jlink.jar" value="c:/Program Files/Wolfram Research/Mathematica/7.0/AddOns/JLink/JLink.jar"/>
-  <property name="clojure-contrib.jar" value="c:/Users/Garth/Documents/Libraries/repo/jvm/clojure-contrib.jar"/>
-  
-  <available property="hasclojure" file="${clojure.jar}"/>
-  <available property="hasclojurecontrib" file="${clojure-contrib.jar}"/>
-  <available property="hasjlink" file="${jlink.jar}"/>
-
-  <target name="check_hasclojure"
-          description="Print a warning message if clojure.jar is undefined"
-          unless="hasclojure">
-    <fail message="You have not defined a path to clojure.jar so I can't compile files. To enable compiling, run 'ant -Dclojure.jar=&lt;...path to clojure.jar..&gt;'"/>
-  </target>
-
-  <target name="check_hasclojurecontrib"
-          description="Print a warning message if clojure-contrib.jar is undefined"
-          unless="hasclojurecontrib">
-    <fail message="You have not defined a path to clojure-contrib.jar so I can't compile files. To enable compiling, run 'ant -Dclojure-contrib.jar=&lt;...path to clojure-contrib.jar..&gt;'"/>
-  </target>
-
-  <target name="check_hasjlink"
-          description="Print a warning message if jlink.jar is undefined"
-          unless="hasjlink">
-    <fail message="You have not defined a path to jlink.jar so I can't compile files. To enable compiling, run 'ant -Djlink.jar=&lt;...path to jlink.jar..&gt;'"/>
-  </target>
-
-<!--
-  <target name="check_hasjartarget"
-          description="Print a warning message if jartarget is undefined"
-          unless="jartarget">
-    <fail message="You have not defined a directory to copy the final jar to. Use 'ant -Djartarget=&lt;...directory path..&gt;'"/>
-  </target>
--->
 
   <target name="init">
     <!-- Create the time stamp -->
     <tstamp/>
-    <!-- Create the classes directory structure used by compile -->
-    <mkdir dir="${classes}"/>
   </target>
 
-  <target name="compile" depends="init,compile_classes,compile_clojure"
-        description="compile the source " >
+  <target name="compile" depends="init" description="compile the source" >
   </target>
 
-  <target name="compile_classes" depends="init,check_hasclojure,check_hasjlink,check_hasclojurecontrib"
-          description="Compile the clojure files that have gen-class.">
-    <java classname="clojure.lang.Compile">
-      <classpath>
-        <path location="${classes}"/>
-        <path location="${src}"/>
-        <path location="${clojure.jar}"/>
-        <path location="${clojure-contrib.jar}"/>
-        <path location="${jlink.jar}"/>
-        <path location="jsr166y.jar"/>
-      </classpath>
-      <sysproperty key="clojure.compile.path" value="${classes}"/>
-      <arg value="clojuratica.test.Evaluator2"/>
-        <!--
-      <arg value="clojuratica.CExpr"/>
-      <arg value="clojuratica.CHelper"/>
-      <arg value="clojuratica.CLink"/>
-      <arg value="clojuratica.test.SimpleClass"/> -->
-    </java>
-  </target>
-
-  <target name="compile_clojure" depends="init,check_hasclojure,check_hasjlink,check_hasclojurecontrib"
-          description="Compile Clojure sources.">
-    <java classname="clojure.lang.Compile">
-      <classpath>
-        <path location="${classes}"/>
-        <path location="${src}"/>
-        <path location="${clojure.jar}"/>
-        <path location="${clojure-contrib.jar}"/>
-        <path location="${jlink.jar}"/>
-        <path location="jsr166y.jar"/>
-      </classpath>
-      <sysproperty key="clojure.compile.path" value="${classes}"/>
-      <arg value="clojuratica"/>
-    </java>
-  </target>
-
-  <target name="jar" depends="compile"
-        description="generate the jar file" >
+  <target name="jar" depends="compile" description="generate the jar file" >
     <!-- Put everything in ${classes} into the jar file -->
-    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${classes}"/>
+    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${src}"/>
     <echo>JAR written to ${basedir}${file.separator}clojuratica.jar</echo>
   </target>
 
-<!--
-  <target name="tojardir" depends="check_hasjartarget,jar"
-        description="copy jar to jartarget" >
-    <mkdir dir="${jartarget}"/>
-    <jar jarfile="${jartarget}${file.separator}clojuratica.jar" basedir="${classes}"/>
-    <echo>JAR written to ${jartarget}${file.separator}clojuratica.jar</echo>
-  </target>
--->
-
-  <target name="clean"
-        description="clean up" >
+  <target name="clean" description="clean up" >
     <!-- Delete the ${classes} directory tree -->
-    <delete dir="${classes}"/>
+    <!-- <delete dir="${classes}"/> -->
   </target>
 </project>

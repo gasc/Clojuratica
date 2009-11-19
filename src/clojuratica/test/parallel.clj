@@ -1,4 +1,4 @@
- (def output-vector
+(def output-vector
      (vec (for [i (range 10000)] (agent nil))))
 
 (do

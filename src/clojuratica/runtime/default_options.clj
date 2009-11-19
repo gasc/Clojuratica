@@ -18,14 +18,19 @@
       :no-restore-defaults}     :no-restore-defaults
     :alias-list                 :clojure-aliases
     :poll-interval              20 ;ms
+		:clojure-scope-aliases      {'Function 'ClojurianScopes/Function
+															   'Let      'ClojurianScopes/Let
+															   'With     'ClojurianScopes/With
+															   'Block    'ClojurianScopes/Block
+															   'Module   'ClojurianScopes/Module}
     :clojure-aliases            {'list 'List
                                  'do   'CompoundExpression
                                  '=    'Set
-                                 ':=   'SetDelayed
+                                 '..=  'SetDelayed
                                  '=.   'Unset
                                  '->   'Rule
-                                 ':>   'RuleDelayed
-                                 '==   'Equals
+                                 '..>  'RuleDelayed
+                                 '==   'Equal
                                  '===  'SameQ
                                  '<    'Less
                                  '>    'Greater
@@ -40,5 +45,5 @@
                                  '/    'Divide
                                  '<>   'StringJoin
                                  '&&   'And
-                                 (symbol "||")   'Or  ;'|| annoys IntelliJ's syntax-checking
+                                 '||   'Or
                                  '!    'Not}})

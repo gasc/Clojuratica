@@ -11,14 +11,14 @@
             <properties/>
             <folders>
                 <source-folder>
-                    <label>src</label>
-                    <type>java</type>
-                    <location>src</location>
+                    <label>Clojuratica</label>
+                    <location>.</location>
                     <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
-                    <label>Clojuratica</label>
-                    <location>.</location>
+                    <label>src</label>
+                    <type>java</type>
+                    <location>src</location>
                     <encoding>UTF-8</encoding>
                 </source-folder>
             </folders>
@@ -34,11 +34,6 @@
                     <target>compile</target>
                 </action>
             </ide-actions>
-            <export>
-                <type>folder</type>
-                <location>classes</location>
-                <build-target>compile</build-target>
-            </export>
             <view>
                 <items>
                     <source-folder style="packages">
@@ -55,14 +50,17 @@
                     <ide-action name="clean"/>
                 </context-menu>
             </view>
+            <subprojects/>
         </general-data>
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
             <compilation-unit>
                 <package-root>src</package-root>
                 <classpath mode="compile">jsr166y.jar;C:\Users\Garth\Documents\Libraries\repo\jvm;C:\Program Files\Wolfram Research\Mathematica\7.0\AddOns\JLink\JLink.jar</classpath>
-                <built-to>classes</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
         </java-data>
+        <preferences xmlns="http://www.netbeans.org/ns/auxiliary-configuration-preferences/1">
+            <module name="org-netbeans-modules-editor-indent"/>
+        </preferences>
     </configuration>
 </project>
