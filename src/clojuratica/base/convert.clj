@@ -50,7 +50,7 @@
 		(if-let [alias (all-aliases sym)]
 			(convert alias)
 			(if-let [[_ n] (re-matches #"%(\d*)" (str sym))]
-				(let [n (Long/valueOf (if (= "" n) "0" n))]
+				(let [n (Long/valueOf (if (= "" n) "1" n))]
 					(convert (list 'Slot n)))
 				;(let [s (str-utils/replace (str sym) #"\|(.*?)\|" #(str "\\\\[" (second %) "]"))]   )
 				(let [s (str sym)]

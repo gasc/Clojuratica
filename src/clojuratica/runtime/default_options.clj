@@ -23,8 +23,7 @@
 															   'With     'ClojurianScopes/With
 															   'Block    'ClojurianScopes/Block
 															   'Module   'ClojurianScopes/Module}
-    :clojure-aliases            {'list 'List
-                                 'do   'CompoundExpression
+    :clojure-aliases            {'do   'CompoundExpression
                                  '=    'Set
                                  '..=  'SetDelayed
                                  '=.   'Unset

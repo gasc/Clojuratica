@@ -44,30 +44,34 @@
         [clojuratica.base.kernel]
         [clojuratica.integration.intern]))
 
-(defn-let-options math-evaluator [enclosed-options *default-options*] [kernel-link]
+(defn-let-options math-evaluator [enclosed-options *default-options*] [kernel-link & [init]]
   (let [enclosed-kernel (kernel kernel-link)]
     (binding [*options* enclosed-options
               *kernel*  enclosed-kernel]
+			(evaluate (convert init))
 			(evaluate (convert '(Needs "Parallel`Developer`")))
 			(evaluate (convert '(Needs "Developer`")))
+			(evaluate (convert '(ParallelNeeds "Developer`")))
 			(evaluate (convert '(Needs "ClojurianScopes`")))
-			(evaluate (convert '(Needs "HashMaps`"))))
+			(evaluate (convert '(ParallelNeeds "ClojurianScopes`")))
+			(evaluate (convert '(Needs "HashMaps`")))
+			(evaluate (convert '(ParallelNeeds "HashMaps`"))))
     (fn-binding-options [*options* enclosed-options] [expr]
       (binding [*kernel* enclosed-kernel]
         (cep expr)))))
 
 (defmacro math-intern [& args]
-  (let-options [options args {#{:as-function :as-macro}                 :as-macro
-															#{:clojurian-scopes :no-clojurian-scopes} :no-clojurian-scopes}]
-		[math-eval & opspecs]
-		(let [opspecs (if (flag? options :clojurian-scopes)
+  (let-options [options args {#{:as-function :as-macro} :as-macro
+															#{:no-scopes :scopes}     :no-scopes}]
+							 [math-eval & opspecs]
+		(let [opspecs (if (flag? options :scopes)
 									  (into opspecs (keys (*default-options* :clojure-scope-aliases)))
 										opspecs)]
 			(if (flag? options :as-macro)
-				`(intern :macro '~math-eval ~@(map #(list 'quote %) opspecs))
-				`(intern :fn '~math-eval ~@(map #(list 'quote %) opspecs))))))
+				`(intern :macro '~math-eval ~@(map (fn [opspec#] (list 'quote opspec#)) opspecs))
+				`(intern :fn    '~math-eval ~@(map (fn [opspec#] (list 'quote opspec#)) opspecs))))))
 
-(defmacro defmath [v math-eval]
-  `(math-intern :as-macro ~math-eval [~v ~'CompoundExpression]))
+(defmacro def-math-macro [m math-eval]
+  `(math-intern :as-macro ~math-eval [~m ~'CompoundExpression]))
 
 

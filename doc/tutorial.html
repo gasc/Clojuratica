@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Clojuratica Tutorial</title>
+  <link rel="stylesheet"
+ href="file:///C:/Users/Garth/Documents/Development/jvm/clojuratica/doc/clojure.css"
+ type="text/css">
+</head>
+<body>
+<ul class="readonly" id="mozToc">
+<!--mozToc h2 1--><li><a href="#mozTocId480636">Setup</a></li>
+  <li><a href="#mozTocId600226">Aliases</a></li>
+  <li><a href="#mozTocId57799">Interning</a></li>
+  <li><a href="#mozTocId121698">Flags</a></li>
+  <li><a href="#mozTocId765735">Reader Macros</a></li>
+  <li><a href="#mozTocId838663">Implicit Do</a></li>
+  <li><a href="#mozTocId561502">Data Structure Conversion</a></li>
+  <li><a href="#mozTocId958872">Parallel Evaluation</a></li>
+</ul>
+<br>
+<h2><a class="mozTocH2" name="mozTocId480636"></a>Setup</h2>
+Let's get started by using the package. Be sure you have followed the
+installation directions on the Get page of the Clojuratica web site.<br>
+<br>
+<span class="clojure">=&gt; (use 'clojuratica)</span><br class="clojure">
+<span class="clojure">nil</span><br>
+<br>
+The following three commands initialize the Mathematica kernel and
+create an active KernelLink object. This API is dictated by
+Mathematica's J/Link library. The second command in particular is
+platform-specific. Please read the <a
+ href="http://reference.wolfram.com/mathematica/JLink/tutorial/WritingJavaProgramsThatUseMathematica.html#15574">Mathematica
+J/Link documentation</a> for details on how to initialize the kernel on
+your platform.<br>
+<br>
+<span class="clojure">=&gt; (import '[com.wolfram.jlink
+MathLinkFactory])</span><br class="clojure">
+<span class="clojure">com.wolfram.jlink.MathLinkFactory</span><br
+ class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (def kernel-link</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;
+(MathLinkFactory/createKernelLink</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; "-linkmode
+launch -linkname 'c:/program files/wolfram
+research/mathematica/7.0/mathkernel.exe'"))</span><br class="clojure">
+<span class="clojure">#'user/kernel-link</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (.discardAnswer kernel-link)</span><br
+ class="clojure">
+<span class="clojure">nil</span><br>
+<br>
+Create a math evaluator called math-evaluate. The main purpose of the
+math evaluator is to be handed off to the math-intern and
+def-math-macro macros below.<span class="clojure"></span><span
+ class="clojure"></span><br>
+<br>
+<span class="clojure">=&gt; ;(def math-evaluate (math-evaluator
+kernel-link))<br>
+</span><span class="clojure">#'user/math-evaluate</span><br>
+<br>
+Now we are going to define the math macro. The math macro is a general
+purpose macro that reads and evaluates Mathematica expressions. The
+first argument to def-math-macro is the name of the new math macro. The
+second argument is the math evaluator we created a second ago (we
+called it math-evaluate).<br>
+<br class="clojure">
+<span class="clojure">=&gt; (def-math-macro math math-evaluate)</span><br
+ class="clojure">
+<span class="clojure">(#'user/math)</span><br>
+<br>
+Using the math macro we can do some math!<br>
+<br class="clojure">
+<span class="clojure">=&gt; (math (Plus 1 1))</span><br class="clojure">
+<span class="clojure">2</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math (FactorInteger 12345))</span><br
+ class="clojure">
+<span class="clojure">[[3 1] [5 1] [823 1]]</span><br>
+<br>
+The math macro accepts more than one form. It encloses the forms in an
+implicit CompoundExpression, which is Mathematica's equivalent of
+Clojure's do. (Mathematica programmers will recall that Mathematica's
+syntactic sugar for CompoundExpression is infix semicolons.)<br>
+<br>
+<span class="clojure">=&gt; (math</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (Plus 1 1)</span><br
+ class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (FactorInteger 12345))</span><br
+ class="clojure">
+<span class="clojure">[[3 1] [5 1] [823 1]]</span><br>
+<h2><a class="mozTocH2" name="mozTocId600226"></a>Aliases</h2>
+By default, Clojuratica defines a number of function aliases. Thus,
+even though Plus is the real name of the Mathematica function for
+summing, we can write the first command above in a more familiar form:<br>
+<br class="clojure">
+<span class="clojure">=&gt; (math (+ 1 1))</span><br class="clojure">
+<span class="clojure">2</span><br>
+<br>
+Likewise for other functions. A full list of aliases is reproduced in
+the API documentation. Here are some more examples:<br>
+<br>
+<span class="clojure">=&gt; (math (&amp;&amp; True False))</span><br
+ class="clojure">
+<span class="clojure">false</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math (= f 4))&nbsp;&nbsp;&nbsp; ; this is
+Mathematica's Set function, for assignment</span><br class="clojure">
+<span class="clojure">4</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math f)</span><br class="clojure">
+<span class="clojure">4</span><br>
+<br>
+An important alias is "do" for CompoundExpression. Note the lowercase!
+This is directly analagous to Clojure's do.<br>
+<br>
+<span class="clojure">=&gt; (math</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (Plus 1</span><br
+ class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(do</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(= f 1)</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+f)))</span><br class="clojure">
+<span class="clojure">2</span><br>
+<h2><a class="mozTocH2" name="mozTocId57799"></a>Interning</h2>
+If we will be using certain Mathematica functions frequently, we may
+want to intern them as macros. math-intern does this.<br>
+<br>
+<span class="clojure">=&gt; (math-intern math-evaluate Plus [FI
+FactorInteger])</span><br class="clojure">
+<span class="clojure">(#'user/Plus #'user/FI)</span><br>
+<br>
+The first argument above is the math evaluator we created earlier. The
+remaining arguments are intern specs. Each intern spec may be a single
+symbol, a vector of two symbols, or a string. An intern spec made up of
+a symbol interns the corresponding Mathematica function using that very
+name, as seen by the following:<br>
+<br>
+<span class="clojure">=&gt; (Plus [1 2] [3 4])&nbsp; ; look, Plus does
+element-wise addition of vectors</span><br class="clojure">
+<span class="clojure">[4 6]</span><br>
+<br>
+An intern spec made up of a vector of two symbols interns the second
+function by the first name, as seen by the following:<br>
+<br class="clojure">
+<span class="clojure">=&gt; (FI 12345)</span><br class="clojure">
+<span class="clojure">[[3 1] [5 1] [823 1]]</span><br>
+<br>
+Note that math-intern interns Mathematica functions as Clojure
+**macros**. Therefore, unquoted Mathematica expressions and<br>
+symbols can be passed as arguments:<br>
+<br class="clojure">
+<span class="clojure">=&gt; (Plus (* 4 x) (+ 20 2) (AnyFunction 3))</span><br
+ class="clojure">
+<span class="clojure">(+ 22 (* 4 x) (AnyFunction 3))</span><br>
+<br>
+<span class="clojure">=&gt; Plus</span><br class="clojure">
+<span class="clojure">java.lang.Exception: Can't take value of a macro:
+#'user/Plus (repl-1:48)</span><br>
+<br>
+The intern spec form we haven't discussed yet is the string:<br>
+<br>
+<span class="clojure">=&gt; (math-intern math-evaluate "System`Factor*")</span><br
+ class="clojure">
+<span class="clojure">(#'user/Factor #'user/FactorComplete
+#'user/Factorial #'user/Factorial2 #'user/FactorialPower
+#'user/FactorInteger #'user/FactorList #'user/FactorSquareFree
+#'user/FactorSquareFreeList #'user/FactorTerms #'user/FactorTermsList)</span><br>
+<br>
+This intern spec form uses the Names function of Mathematica to get all
+symbols matching the string, interning them all. Any matching symbols
+that would cause an error are silently ignored (the Integer function,
+for instance, cannot be interned because it conflicts with the Java
+class Integer.) Yes, it's possible to say (math-intern math-evaluate
+"System`*") to intern all of Mathematica. This seems like overkill, but
+you're welcome to it.<br>
+<br>
+If we would like to intern only Mathematica's scoping constructs
+(Function, Module, Block, With, Let, the last added by Clojuratica), we
+can use the :scopes flag:<br>
+<br>
+<span class="clojure">=&gt; (math-intern math-evaluate :scopes)</span><br
+ class="clojure">
+<span class="clojure">(#'user/Module #'user/Block #'user/With
+#'user/Let #'user/Function)</span><br>
+<br>
+It is also possible to intern Mathematica funcions as Clojure
+**functions**. The trade-off is we will need to quote all symbols and
+won't be able to use reader macros (discussed later). On the other hand
+we will be able to use the Mathematica function as a first-class
+Clojure function:<br>
+<br>
+<span class="clojure">=&gt; (math-intern :as-function math-evaluate
+[PlusFn Plus])</span><br class="clojure">
+<span class="clojure">(#'user/PlusFn)</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; PlusFn</span><br class="clojure">
+<span class="clojure">#&lt;parse$parse_fn__375$fn__379
+clojuratica.base.parse$parse_fn__375$fn__379@29ea31&gt;</span><br
+ class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (map #(apply PlusFn %) [[1 2] [3 4 'a] [5
+6]])</span><br class="clojure">
+<span class="clojure">(3 (+ 7 a) 11)</span><br>
+<br>
+As it turns out, if we are willing to quote all our symbols and forgo
+reader macros (discussed later), we can use the math<br>
+evaluator directly the same way we have been using the math macro:<br>
+<br>
+<span class="clojure">=&gt; (math-evaluate (list 'Plus 3 4 'a))</span><br
+ class="clojure">
+<span class="clojure">(+ 7 a)</span><br>
+<h2><a class="mozTocH2" name="mozTocId121698"></a>Flags</h2>
+The math macro and any math-interned operator accept math evaluator
+flags. The following is an illustration of the :no-parse math evaluator
+flag, which stops Clojuratica from parsing the return value back into a
+Clojure expression. Instead, an object of class com.wolfram.JLink.Expr
+is returned.<br>
+<br>
+<span class="clojure">=&gt; (Plus :no-parse (* 4 x) (+ 20 2)
+(AnyFunction 3))</span><br class="clojure">
+<span class="clojure">#&lt;Expr Plus[22,Times[4,x],AnyFunction[3]]&gt;</span><br>
+<br>
+Similarly, the :no-evaluate flag stops the evaluation step:<br>
+<br>
+<span class="clojure">=&gt; (math :no-evaluate (* 4 x) (+ 20 2)
+(AnyFunction 3))</span><br class="clojure">
+<span class="clojure">(do (* 4 x) (+ 20 2) (AnyFunction 3))</span><br>
+<br>
+Any flag may be anywhere in the top level of the form:<br>
+<br>
+<span class="clojure">=&gt; (Plus (* 4 x) (+ 20 2) :no-parse
+(AnyFunction 3))</span><br class="clojure">
+<span class="clojure">#&lt;Expr Plus[22,Times[4,x],AnyFunction[3]]&gt;</span><br>
+<br>
+The math evaluator, which underlies the math macro and the
+math-interned operations, supports around a large number of flags and
+options. These are detailed in the API docs. In fact, you can feed
+flags director to the original call to math-evaluator. The flags will
+be used as defaults:<br>
+<br>
+<span class="clojure">=&gt; (def math-evaluate* (math-evaluator
+:no-parse kernel-link))</span><br class="clojure">
+<span class="clojure">#'user/math-evaluate*</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (def-math-macro math* math-evaluate*)</span><br
+ class="clojure">
+<span class="clojure">(#'user/math*)</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math* 1)</span><br class="clojure">
+<span class="clojure">#&lt;Expr 1&gt;</span><br>
+<h2><a class="mozTocH2" name="mozTocId765735"></a>Reader Macros</h2>
+Within the math macro and any functions math-interned as macros, the
+following reader macros are available.<br>
+<br>
+Postfix calls:<br>
+<br>
+<span class="clojure">=&gt; (math ^(a b c d)) ; same as Mathematica's a
+// b // c // d</span><br class="clojure">
+<span class="clojure">(d (c (b a)))</span><br>
+<br>
+Prefix calls:<br>
+<br>
+<span class="clojure">=&gt; (math @(a b c d)) ; same as Mathematica's a
+@ b @ c @ d</span><br class="clojure">
+<span class="clojure">(a (b (c d)))</span><br>
+<br>
+Anonymous functions with args. Note the apostrophe! This is not #(...)!:<br>
+<br>
+<span class="clojure">=&gt; (math #'(+ % %2)) ; same as Mathematica's
+Plus[#, #2] &amp;</span><br class="clojure">
+<span class="clojure">#&lt;parse$parse_fn__375$fn__379
+clojuratica.base.parse$parse_fn__375$fn__379@1e1ec86&gt;</span><br>
+<br>
+<span class="clojure">=&gt; (*1 1 2)</span><br class="clojure">
+<span class="clojure">3</span><br>
+<br>
+Inline Mathematica syntax:<br>
+<br>
+<span class="clojure">=&gt; (math (+ 1 '"{1, Sqrt[4], 3+4}"))</span><br
+ class="clojure">
+<span class="clojure">[2 3 8]</span><br>
+<h2><a class="mozTocH2" name="mozTocId838663"></a>Implicit Do</h2>
+Mathematica's scoping constructs (Function, Module, Block, With, Let,
+the last added by Clojuratica) do **not** have an implicit do. If
+Clojuratica did not provide a solution, you would have to write
+Mathematica scopes like this:<br>
+<br>
+<span class="clojure">=&gt; (Block [x y z]</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (do</span><br
+ class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Something x)</span><br
+ class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(SomethingElse y)</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (YetMore z)))</span><br
+ class="clojure">
+<span class="clojure">(YetMore z)</span><br>
+<br>
+Instead, Clojuratica ships with versions of the scoping constructs that
+provide an implicit do. These are automatically aliased to Function,
+Module, etc., so you don't have to worry about changing your Clojure
+habits. You can write the above like this:<br>
+<br>
+<span class="clojure">=&gt; (Block [x y z]</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (Something x)</span><br
+ class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (SomethingElse y)</span><br
+ class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (YetMore z))</span><br
+ class="clojure">
+<span class="clojure">(YetMore z)</span><br>
+<h2><a class="mozTocH2" name="mozTocId561502"></a>Data Structure
+Conversion</h2>
+Clojuratica converts Clojure vectors to Mathematica lists and vice
+versa:<br>
+<br>
+<span class="clojure">=&gt; (math (Head [1 2 3]))</span><br
+ class="clojure">
+<span class="clojure">List</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math (List 1 2 3))</span><br
+ class="clojure">
+<span class="clojure">[1 2 3]</span><br>
+<br>
+If you want Clojuratica to parse lists to seqs instead of vectors, use
+the :seqs flag:<br>
+<br>
+<span class="clojure">=&gt; (math :seqs [1 2 3])</span><br
+ class="clojure">
+<span class="clojure">(1 2 3)</span><br>
+<br>
+Mathematica expressions are always parsed to Clojure lists, so when
+using :seqs you can always distinguish expressions from the seqs:<br>
+<br>
+<span class="clojure">=&gt; (math :seqs [[1 2 3] (MyExpression arg1
+arg2 arg3)])</span><br class="clojure">
+<span class="clojure">((1 2 3) (MyExpression arg1 arg2 arg3))</span><br
+ class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; [(type (first *1)) (type (second *1))]</span><br
+ class="clojure">
+<span class="clojure">[clojure.lang.LazySeq clojure.lang.PersistentList]</span><br>
+<br>
+Clojuratica converts hashmaps to a HashMapObject type included with
+Clojuratica. These types can be created with HashMap. They are
+functions of their values. To get all values in a HashMapObject,
+evaluate it as a function of no arguments. Conversion to and parsing
+from HashMapObjects can be turned off with the :no-hash-maps flag.<br>
+<br>
+<span class="clojure">=&gt; (math (Head {a b c d}))</span><br
+ class="clojure">
+<span class="clojure">HashMapObject</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math ({a b c d} c))</span><br
+ class="clojure">
+<span class="clojure">d</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math ({a b c d}))</span><br class="clojure">
+<span class="clojure">[(-&gt; c d) (-&gt; a b)]</span><br
+ class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math (HashMap [(-&gt; a b) (-&gt; c d)]))</span><br
+ class="clojure">
+<span class="clojure">{c d, a b}</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math :no-hash-maps {a b c d})</span><br
+ class="clojure">
+<span class="clojure">[[c d] [a b]]</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math :no-hash-maps (Head {a b c d}))</span><br
+ class="clojure">
+<span class="clojure">List</span><br>
+<h2><a class="mozTocH2" name="mozTocId958872"></a>Parallel Evaluation</h2>
+First, it should be said that Mathematica's built-in parallelization
+functions are excellent for single-threaded applications. Go ahead and
+use them from Clojure.<br>
+<br>
+<span class="clojure">=&gt; (math (LaunchKernels))</span><br
+ class="clojure">
+<span class="clojure">[(Parallel/Kernels/kernel
+(Parallel/Kernels/Private/bk ....&nbsp;truncated</span><span
+ class="clojure"></span><br>
+<br class="clojure">
+<span class="clojure">=&gt; (math (ParallelEvaluate $KernelID))</span><br
+ class="clojure">
+<span class="clojure">[1 2]</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt; (math (ParallelMap #'(Plus % 1) [1 2 3 4]))</span><br
+ class="clojure">
+<span class="clojure">[2 3 4 5]</span><br>
+<br>
+If we have multiple threads making calls to Mathematica, we may want
+these calls to be handled by different parallel Mathematica kernels in
+an asynchronous fashion. Clojuratica provides an easy facility for
+this. Simply execute the call using the :parallel flag:<br>
+<br class="clojure">
+<span class="clojure">=&gt; (math :parallel (+ 1 1))</span><br
+ class="clojure">
+<span class="clojure">2</span><br>
+<br>
+A real example follows. Note that the return value of the let is a list
+of the Mathematica $KernelIDs of the kernels on which each call to f
+executes. This list allows us to see the parallelization explicitly.<br>
+<br>
+<span class="clojure">=&gt; (time</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (let
+[f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (math :parallel (Function [x] (Pause
+0.5) $KernelID))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+agents (take 10 (repeatedly #(agent nil)))]</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (doall (map
+#(send-off % f) agents))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (doall (map
+await agents))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (map deref
+agents)))</span><br class="clojure">
+<span class="clojure">"Elapsed time: 2547.170799 msecs"<br>
+(1 1 2 1 2 2 2 2 1 1)</span><span class="clojure"></span><br>
+<br>
+Note that different calls to f are evaluated by different parallel
+kernels (I have just two cores on my machine).<br>
+<br>
+To get asynchronous parallel execution we must use the :parallel flag
+**and** make the parallel calls concurrently from different threads, as
+above. If we replace our agents with atoms and thereby stay in a single
+thread, we get serial execution:<br>
+<br class="clojure">
+<span class="clojure">=&gt; (time</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (let
+[f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (math :parallel (Function [x] (Pause
+0.5) $KernelID))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+atoms&nbsp; (take 10 (repeatedly #(atom nil)))]</span><br
+ class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (doall (map
+#(swap! % f) atoms))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (map deref
+atoms)))</span><br class="clojure">
+<span class="clojure">"Elapsed time: 5106.790072 msecs"</span><br
+ class="clojure">
+<span class="clojure">(2 2 2 2 2 2 2 2 2 2)</span><br>
+<br>
+Likewise, if return to agents but omit the :parallel flag, we again get
+serial execution:<br>
+<br>
+<span class="clojure">=&gt; (time</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp; (let
+[f&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (math (Function [x] (Pause 0.5)
+$KernelID))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+agents (take 10 (repeatedly #(agent nil)))]</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (doall (map
+#(send-off % f) agents))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (doall (map
+await agents))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (map deref
+agents)))</span><br class="clojure">
+<span class="clojure">"Elapsed time: 5017.412362 msecs"</span><br
+ class="clojure">
+<span class="clojure">(0 0 0 0 0 0 0 0 0 0)</span><br>
+<br>
+Clojuratica is always and everywhere thread-safe. Each call to the math
+evaluator (including via the math macro and math-interned functions) is
+executed atomically.<br>
+</body>
+</html>

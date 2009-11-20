@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Clojure Intro</title>
+  <link rel="stylesheet" href="clojure.css" type="text/css">
+</head>
+<body>
+<br>
+<br>
+Dear Clojurians,<br>
+<br>
+I am very happy to announce Clojuratica version 2. <br>
+<br>
+Clojuratica now
+offers the **syntactic** integration of Clojure and Mathematica.<br>
+<br>
+What does this mean? It means you can now write Clojure code that looks
+like this:<br>
+<br>
+<span class="clojure">=&gt;
+(FactorInteger 12345)</span><br class="clojure">
+<span class="clojure">[[3
+1] [5 1] [823 1]]</span><br>
+<br>
+You guessed it. FactorInteger is a Mathematica function. And that's a
+Clojure
+REPL.<br>
+<br>
+Symbolic math in Clojure? Syntax-unquoting to feed in Clojure data
+structures? Absolutely.<br>
+<br class="clojure">
+<span class="clojure">=&gt;
+(Sqrt (* 9 a))</span><br class="clojure">
+<span class="clojure">(* 3
+(Power a 1/2))</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt;
+(let [x [[2 1]</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[1 2]]]</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;
+(CholeskyDecomposition ~x))</span><br class="clojure">
+<span class="clojure">[[(Power
+2 1/2) (Power 2 -1/2)] [0 (Power 3/2 1/2)]]</span><br>
+<br>
+Note that the Clojure "matrix" (vector of vectors) is converted on the
+fly to a Mathematica matrix, and vice versa. Automatic conversions take
+place for all Clojure and Mathematica data structures.<br>
+<br>
+There's more. Mathematica functions are now Clojure functions. The
+following is a Mathematica function written in Clojure that finds the n
+shortest genes in the human genome. (Yes, Mathematica has cool
+functions like GenomeData to try out.)<br>
+<br>
+<span class="clojure">=&gt;
+(Function [n]</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;
+(Take</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(Sort</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(Map</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Function [gene]
+[(GenomeData gene \"SequenceLength\") gene])</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(GenomeData)))</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+n))</span><br class="clojure">
+<span class="clojure">#&lt;parse$parse_fn__1230$fn__1234
+clojuratica.base.parse$parse_fn__1230$fn__1234@19fa0b5&gt;</span><br>
+<br>
+What's that ugly return value?&nbsp;It's a first-class Clojure
+function. We evaluated a Mathematica function in Clojure and got back a
+Clojure function which, when we call it, hands off the computation
+to Mathematica and returns the result:<br>
+<br>
+<span class="clojure">=&gt;
+(*1 4)</span><br class="clojure">
+<span class="clojure">[[11
+"IGHD727"] [16 "IGHD411"] [16 "IGHD417"] [16 "IGHD44"]]</span><br>
+<br>
+All the power of Mathematica is now seamlessly available in Clojure.
+If you like, you can think of Mathematica as a particularly mature
+Clojure library
+for linear algebra, matrix decomposition, symbolic mathematics,
+optimization, differential equations, symbolic and numerical
+integration, Fourier analysis, 2D and 3D visualization, image and photo
+manipulation, exploratory data analysis, probability and statistics,
+graph theory, number theory, geodesy, and access to the Wolfram
+Research internet data feeds on finance, chemistry, geometry,
+meteorology, astronomy, protein structure, and, as we've seen, the
+human genome.<br>
+<br>
+Let's take a step back and see how it all works.<br>
+<br>
+Observe: Clojure and Mathematica are remarkably similar languages
+despite their different areas of strength.<br>
+<br>
+<h4>Constant-lookup arrays:</h4>
+<span class="clojure">Clj
+vectors:&nbsp; [1 2 3]</span><br class="clojure">
+<span class="clojure">Mma
+lists:&nbsp;&nbsp;&nbsp; {1, 2, 3}<br>
+<br>
+</span>
+<h4>Matrices as nested arrays:</h4>
+<span class="clojure">Clj:&nbsp;
+[[1 0] [0 1]]</span><br class="clojure">
+<span class="clojure">Mma:&nbsp;
+{{1, 0}, {0, 1}}<br>
+<br>
+</span>
+<h4>Function calls *always* use
+prefix notation:</h4>
+<span class="clojure">Clj:&nbsp;
+(func arg1 arg2 arg3)</span><br class="clojure">
+<span class="clojure">Mma:&nbsp;
+Func[arg1, arg2, arg3]<br>
+<br>
+</span>
+<h4>In Mathematica, common
+functions do have syntactic sugar, but it always
+is just syntactic sugar:</h4>
+<span class="clojure">Clj:&nbsp;
+none</span><br class="clojure">
+<span class="clojure">Mma:&nbsp;
+1 + 1&nbsp;&nbsp; is just&nbsp;&nbsp;
+Plus[1, 1]</span><br class="clojure">
+<span class="clojure">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+!foo
+&amp;&amp; (bar &gt; baz)&nbsp;&nbsp; is
+just&nbsp;&nbsp; And[Not[foo], Greater[bar, baz]]<br>
+<br>
+</span>
+<h4>Homoiconicity:</h4>
+<span class="clojure">Clj:&nbsp;
+(nth '(func arg1 arg2) 1)&nbsp;&nbsp;
+==&gt;&nbsp;&nbsp; arg1</span><br class="clojure">
+<span class="clojure">Mma:&nbsp;
+Part[Func[arg1, arg2], 1]&nbsp;&nbsp;
+==&gt;&nbsp;&nbsp; arg1</span><br>
+<br>
+The similarities suggest the core idea: Mathematica expressions can be
+written as Clojure expressions without any loss of information, and
+vice versa. There is perfect correspondence. Happily, Mathematica
+functions are PascalCase by convention. This allows the interning of
+Mathematica functions right into your Clojure namespace without
+conflict.<br>
+<br>
+<span class="clojure">
+Mma:&nbsp; FactorInteger[1091]</span><br class="clojure">
+<span class="clojure">Clj:&nbsp;
+(FactorInteger 1091)</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">Mma:&nbsp;
+Function[{x}, x + 1]</span><br class="clojure">
+<span class="clojure">Clj:&nbsp;
+(Function [x] (Plus x 1))</span><br>
+<br>
+The heart of Clojuratica is simple. Convert Clojure expressions
+to Mathematica expressions, evaluate them in Mathematica, and parse the
+result back into Clojure expressions.<br>
+<br>
+As you will see in the <a
+ href="http://clojuratica.weebly.com/tutorial.html">tutorial</a>
+on the Clojuratica web page, you
+are not forced to intern Mathematica functions directly into your
+namespace. You may, but you do not have to. The generic way to call
+Mathematica code is using the&nbsp;math macro (which you yourself
+define,
+so it need not be called "math"):<br>
+<br>
+<span class="clojure">=&gt;
+(let [x "World"] </span><br class="clojure">
+<span class="clojure">&nbsp;
+&nbsp; &nbsp;(math
+(StringJoin "Hello, " ~x "! This is some Mathematica code's output.")))</span><br
+ class="clojure">
+<span class="clojure">"Hello,
+World! This is some Mathematica code's output."</span><br
+ class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt;
+(def hello <br>
+&nbsp; &nbsp; &nbsp;(math <br>
+&nbsp; &nbsp; &nbsp; &nbsp;(Function [x] <br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;(StringJoin
+"Hello, " x "!
+This is a Mathematica function's output."))))</span><br class="clojure">
+<span class="clojure">#'user/hello</span><br class="clojure">
+<br class="clojure">
+<span class="clojure">=&gt;
+(hello "World")</span><br class="clojure">
+<span class="clojure">"Hello,
+World! This is a Mathematica function's output."</span><br>
+<br>
+There are other features, too:<br>
+<ul>
+  <li>A concurrency framework for
+multithreaded, parallel computation.
+Mathematica is not designed for threads or concurrency. It has
+excellent support for parallel computation, but parallel evaultions are
+initiated from a single-threaded master kernel which blocks until all
+parallel evaluations return. By contrast, Clojuratica includes a
+concurrency framework that lets multiple Clojure threads execute
+Mathematica expressions without blocking others. The computations will
+be farmed out to as many Mathematica kernels as are parallelized on the
+local machine or across a cluster or grid. The computations will return
+asynchronously, and some threads will go about their business while
+others continue to wait. I have worked to make the system as
+high-performance as possible.</li>
+  <li>Hashmap conversion.
+Mathematica has no map data structure, so I
+include a basic one with Clojuratica, along with a few other helpful
+Mathematica funcions and features (e.g. Let, with is akin to With but
+allows later bindings to see earlier bindings, just like Clojure's let).</li>
+</ul>
+Version 2 of Clojuratica is a complete rewrite of version 1. It should
+be considered alpha software for the time being. I would appreciate
+suggestions and bug
+reports.<br>
+<br>
+I plan to make the integration work in the opposite direction when I
+have time. It might be a while! The Clojure-in-Mathematica integration
+that was available in version 1 has been removed for now.<br>
+<br>
+I encourage you to read the <a
+ href="http://clojuratica.weebly.com/tutorial.html">tutorial</a>
+on the <a href="http://clojuratica.weebly.com/">web page</a>.
+You can <a href="http://clojuratica.weebly.coom/get.html">download</a>
+the software there as well.<br>
+<br>
+I hope you enjoy Clojuratica!<br>
+<br>
+Sincerely,<br>
+<br>
+<br>
+Garth Sheldon-Coulson<br>
+Creator, Clojuratica<br>
+<br>
+<br>
+<br>
+</body>
+</html>
