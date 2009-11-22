@@ -1,3 +1,6 @@
+(ns clojuratica.test.init
+ (:use [clojuratica]))
+
 (import '[com.wolfram.jlink MathLinkFactory])
 (def kernel-link (MathLinkFactory/createKernelLink
           "-linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
@@ -9,12 +12,7 @@
 (def *default-options* clojuratica.runtime.default-options/*default-options*)
 
 (def math-eval (math-evaluator kernel-link))
-(math-eval '(Needs "HashMaps`"))
-(math-eval '(Needs "Parallel`Developer`"))
-(math-intern math-eval [math CompoundExpression])
-(math-intern math-eval FactorInteger)
+(math-intern math-eval :scopes)
+(def-math-macro math math-eval)
 
-(comment
-  (math (LaunchKernels))
-  (math :parallel (FactorInteger 1000002201000010000100031000010000100003100051) :verbose))
 
