@@ -214,7 +214,7 @@ evaluator directly the same way we have been using the math macro:<br>
 <span class="clojure">=&gt; (math-evaluate (list 'Plus 3 4 'a))</span><br
  class="clojure">
 <span class="clojure">(+ 7 a)</span><br>
-<h2><a class="mozTocH2" name="mozTocId121698"></a>Flags</h2>
+<h2><a class="mozTocH2" name="mozTocId121698"></a>Flags and Options</h2>
 The math macro and any math-interned operator accept math evaluator
 flags. The following is an illustration of the :no-parse math evaluator
 flag, which stops Clojuratica from parsing the return value back into a
@@ -237,10 +237,37 @@ Any flag may be anywhere in the top level of the form:<br>
 (AnyFunction 3))</span><br class="clojure">
 <span class="clojure">#&lt;Expr Plus[22,Times[4,x],AnyFunction[3]]&gt;</span><br>
 <br>
-The math evaluator, which underlies the math macro and the
-math-interned operations, supports around a large number of flags and
-options. These are detailed in the API docs. In fact, you can feed
-flags director to the original call to math-evaluator. The flags will
+Every flag is part of a flagset, only one of which can be active. The
+:no-parse flag, for instance, is in a flagset containing :parse and
+:no-parse, which turn parsing on and off. :parse is the default, here,
+of course. If more than one flag from a flagset is specified within a
+single form, the last prevails:<br>
+<br>
+<span class="clojure">=&gt; (Plus (* 4 x) (+ 20 2) :no-parse :parse
+(AnyFunction 3))</span><br class="clojure">
+<span class="clojure">(+ 22 (* 4 x) (AnyFunction 3))</span><br>
+<br>
+There are also a few options, which take the form of a keyword followed
+by a value. The :clojure-aliases option, for instance, contains a map
+of all aliases accepted by the reader. If we turn off aliases by
+specifying an empty map as the value of this option, we get an error
+when we try to use +.<br>
+<br>
+<span class="clojure">=&gt; (math :clojure-aliases {} (+ 1 2))</span><br
+ class="clojure">
+<span class="clojure">#&lt;CompilerException
+java.lang.RuntimeException: java.lang.RuntimeException:
+java.lang.Exception: Symbols passed to Mathematica must be alphanumeric
+(apart from forward slashes and dollar signs). (NO_SOURCE_FILE:18)&gt;</span><br>
+<br>
+A&nbsp;large number of flags and
+options are supported by the math evaluator, which underlies the math
+macro and the
+math-interned operations. The flags are detailed in the API docs. <br>
+<br>
+You can feed
+flags and options director to the original call to math-evaluator. The
+flags and options will
 be used as defaults:<br>
 <br>
 <span class="clojure">=&gt; (def math-evaluate* (math-evaluator

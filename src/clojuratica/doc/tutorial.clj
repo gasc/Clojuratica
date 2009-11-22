@@ -1,3 +1,5 @@
+; Read the one on the web site, not this one... the text here is not kept up to date.
+
 (use 'clojure.contrib.repl-ln)
 (repl)
 (set-repl-prompt "\n=> ")
@@ -31,10 +33,10 @@
 (math (= f 4))    ; this is Mathematica's Set function, for assignment
 (math f)
 ; An important alias is "do" for CompoundExpression. Note the lowercase! This is directly analagous to Clojure's do.
-(math 
-     (Plus 1 
+(math
+     (Plus 1
            (do
-             (= f 1) 
+             (= f 1)
              f)))
 ; ----- Interning -----
 ; If we will be using certain Mathematica functions frequently, we may want to intern them as macros. math-intern does this.
@@ -64,7 +66,11 @@ PlusFn
 (math :no-evaluate (* 4 x) (+ 20 2) (AnyFunction 3))
 ; Any flag may be anywhere in the top level of the form:
 (Plus (* 4 x) (+ 20 2) :no-parse (AnyFunction 3))
-; The math evaluator, which underlies the math macro and the math-interned operations, supports around a large number of flags and options. These are detailed in the API docs. In fact, you can feed flags director to the original call to math-evaluator. The flags will be used as defaults:
+;
+(Plus (* 4 x) (+ 20 2) :no-parse :parse (AnyFunction 3))
+;
+(math :clojure-aliases {} (+ 1 1))
+;
 (def math-evaluate* (math-evaluator :no-parse kernel-link))
 (def-math-macro math* math-evaluate*)
 (math* 1)

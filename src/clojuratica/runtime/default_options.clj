@@ -9,6 +9,7 @@
     #{:hash-maps :no-hash-maps} :hash-maps
     #{:functions :no-functions} :functions
     #{:aliases :no-aliases}     :aliases
+		#{:N :no-N}                 :no-N
     #{:verbose :no-verbose}     :no-verbose
     #{:as-function
       :as-expression}           :as-expression

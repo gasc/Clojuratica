@@ -67,8 +67,11 @@
 (defn parse-simple-vector [expr & [type]]
   (with-debug-message (and (flag? *options* :verbose) (nil? type)) "simple vector parse"
     (let [type    (or type (simple-vector-type expr))
-          coll-fn (if (flag? *options* :vectors) vec doall)]
-      (coll-fn (map #(parse-simple-atom % type) (.args expr))))))
+					coll-fn (if (flag? *options* :vectors) vec (comp doall seq))]
+			(if (and (flag? *options* :N)
+							 (some #{Expr/INTEGER Expr/BIGINTEGER Expr/REAL Expr/BIGDECIMAL} #{type}))
+				(coll-fn (.asArray expr Expr/REAL 1))
+				(coll-fn (map #(parse-simple-atom % type) (.args expr)))))))
 
 (defn parse-simple-matrix [expr & [type]]
   (with-debug-message (flag? *options* :verbose) "simple matrix parse"
