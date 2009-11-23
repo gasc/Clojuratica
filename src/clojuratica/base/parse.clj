@@ -97,8 +97,8 @@
     (let [type (or type (simple-vector-type expr))]
 			(if (and (flag? *options* :N)
 							 (some #{Expr/INTEGER Expr/BIGINTEGER Expr/REAL Expr/BIGDECIMAL} #{type}))
-				((if (flag? *options* :vectors) vec seq) (.asArray expr Expr/REAL 1)))
-				(bound-map #(parse-simple-atom % type) (.args expr)))))
+				((if (flag? *options* :vectors) vec seq) (.asArray expr Expr/REAL 1))
+				(bound-map #(parse-simple-atom % type) (.args expr))))))
 
 (defn parse-simple-matrix [expr & [type]]
   (with-debug-message (flag? *options* :verbose) "simple matrix parse"
