@@ -1,7 +1,7 @@
 (ns clojuratica.runtime.default-options)
 
 (def *default-options*
-   {#{:vectors :seqs}           :vectors
+   {#{:vectors :seqs :seq-fn}   :vectors
     #{:parallel :serial}        :serial
     #{:parse :no-parse}         :parse
     #{:evaluate :no-evaluate}   :evaluate

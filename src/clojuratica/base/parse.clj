@@ -64,6 +64,9 @@
         (.matrixQ expr Expr/SYMBOL)      Expr/SYMBOL
         'else                            nil))
 
+(defn vec-bound-map [f coll]
+	(vec (map f coll)))
+
 (defn seq-bound-map [f coll]
 	(let [kernel  *kernel*
 				options *options*]
@@ -74,27 +77,20 @@
 					(cons (f (first s))
 								(seq-bound-map f (rest s))))))))
 
-(comment ;not sure if this is any different from the one above! doesn't seem to be...
-(defn seq-bound-map [func coll]
-	(let [kernel  *kernel*
-				options *options*
-			  step    (fn [f c]
-									(when-let [s (seq coll)]
-										(cons (f (first s))
-													(seq-bound-map f (rest s)))))]
-		(lazy-seq
-			(binding [*kernel*  kernel
-								*options* options]
-				(step func coll)))))
-)
-
-(defn vec-bound-map [f coll]
-	(vec (map f coll)))
+(defn seq-fn-bound-map [f coll]
+	(let [options *options*
+				kernel  *kernel*]
+		(fn seq-fn []
+			(binding [*options* options
+								*kernel*  kernel]
+				(binding-options [*options* [:seqs] *options*] []
+					(seq-bound-map f coll))))))
 
 (defn bound-map [f coll]
-	(if (flag? *options* :vectors)
-		(vec-bound-map f coll)
-		(seq-bound-map f coll)))
+	(cond
+		(flag? *options* :vectors)	(vec-bound-map f coll)
+		(flag? *options* :seqs)			(seq-bound-map f coll)
+		(flag? *options* :seq-fn)		(seq-fn-bound-map f coll)))
 
 (defn parse-simple-vector [expr & [type]]
   (with-debug-message (and (flag? *options* :verbose) (nil? type)) "simple vector parse"
