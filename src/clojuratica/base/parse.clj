@@ -64,33 +64,50 @@
         (.matrixQ expr Expr/SYMBOL)      Expr/SYMBOL
         'else                            nil))
 
-(declare parse-expr-coll-to-lazy-seq)
-
-(defn parse-simple-vector [expr & [type]]
-  (with-debug-message (and (flag? *options* :verbose) (nil? type)) "simple vector parse"
-    (let [type    (or type (simple-vector-type expr))
-					coll-fn (if (flag? *options* :vectors) vec (comp doall seq))]
-			(if (and (flag? *options* :N)
-							 (some #{Expr/INTEGER Expr/BIGINTEGER Expr/REAL Expr/BIGDECIMAL} #{type}))
-				(coll-fn (.asArray expr Expr/REAL 1))
-				(if (flag? *options* :vectors)
-					(vec (map #(parse-simple-atom % type) (.args expr)))
-					(parse-expr-coll-to-lazy-seq (.args expr) type))))))
-
-(defn parse-expr-coll-to-lazy-seq [coll type]
+(defn seq-bound-map [f coll]
 	(let [kernel  *kernel*
 				options *options*]
 		(lazy-seq
 			(binding [*kernel*  kernel
 								*options* options]
 				(when-let [s (seq coll)]
-					(cons (parse-simple-atom (first s) type) (parse-expr-coll-to-lazy-seq (rest s) type)))))))
+					(cons (f (first s))
+								(seq-bound-map f (rest s))))))))
+
+(comment ;not sure if this is any different from the one above! doesn't seem to be...
+(defn seq-bound-map [func coll]
+	(let [kernel  *kernel*
+				options *options*
+			  step    (fn [f c]
+									(when-let [s (seq coll)]
+										(cons (f (first s))
+													(seq-bound-map f (rest s)))))]
+		(lazy-seq
+			(binding [*kernel*  kernel
+								*options* options]
+				(step func coll)))))
+)
+
+(defn vec-bound-map [f coll]
+	(vec (map f coll)))
+
+(defn bound-map [f coll]
+	(if (flag? *options* :vectors)
+		(vec-bound-map f coll)
+		(seq-bound-map f coll)))
+
+(defn parse-simple-vector [expr & [type]]
+  (with-debug-message (and (flag? *options* :verbose) (nil? type)) "simple vector parse"
+    (let [type (or type (simple-vector-type expr))]
+			(if (and (flag? *options* :N)
+							 (some #{Expr/INTEGER Expr/BIGINTEGER Expr/REAL Expr/BIGDECIMAL} #{type}))
+				((if (flag? *options* :vectors) vec seq) (.asArray expr Expr/REAL 1)))
+				(bound-map #(parse-simple-atom % type) (.args expr)))))
 
 (defn parse-simple-matrix [expr & [type]]
   (with-debug-message (flag? *options* :verbose) "simple matrix parse"
-    (let [type    (or type (simple-matrix-type expr))
-          coll-fn (if (flag? *options* :vectors) vec doall)]
-      (coll-fn (map #(parse-simple-vector % type) (.args expr))))))
+    (let [type (or type (simple-matrix-type expr))]
+      (bound-map #(parse-simple-vector % type) (.args expr)))))
 
 (defn parse-simple-atom [expr type]
 	(cond (= type Expr/BIGINTEGER)   (.asBigInteger expr)
@@ -133,7 +150,7 @@
             (let [[elements prior-v] (peek stack)]
               (recur elements (conj prior-v v) (pop stack)))
             v))))
-    (doall (map parse (.args expr)))))
+    (bound-map parse (.args expr))))
 
 (defn parse-integer [expr]
   (let [i (.asLong expr)]
@@ -179,7 +196,7 @@
             (cep (apply list expr args))))))))
 
 (defn parse-generic-expression [expr]
-  (-> '()
+  (-> (list)  ;must start with a real list because the promise is that expressions will be converted to lists
       (into (map parse (rseq (vec (.args expr)))))
       (conj (parse (.head expr)))))
 
