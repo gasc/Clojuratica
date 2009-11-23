@@ -24,10 +24,15 @@
         enclosed-options ((math-eval :get-dynamic-vars) '*options*)]
     (eval
      `(defmacro ~macro-name [& args#]
-        (let [[flags# params# args#] (parse-options '~enclosed-options args#) ; TODO disallow :no-convert flag
-              expr#                  (read (cons (quote ~op) args#))]
-					(if (some #{:no-convert} flags#)
-						(throw (Exception. "The :no-convert flag cannot be used in a math macro.")))
+        (let [[flags# params# args#]	(parse-options '~enclosed-options args#)
+							unread-expr#						(if (nil? (quote ~op))
+																				(if (next args#)
+																					(throw (Exception. "If math macro intern spec is nil, math macro can contain just one form."))
+																					(first args#))
+																				(cons (quote ~op) args#))
+              expr#										(read unread-expr#)]
+					(if (and (some #{:no-convert} flags#) (not (nil? (quote ~op))))
+						(throw (Exception. "The :no-convert flag cannot be used in a math macro unless the intern spec is nil.")))
           (list 'apply '~math-eval-symbol expr# (list 'apply 'concat flags# params#)))))))
 
 (defn defn-op [math-eval fn-name op]
