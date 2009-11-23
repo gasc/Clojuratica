@@ -78,13 +78,25 @@
 								(seq-bound-map f (rest s))))))))
 
 (defn seq-fn-bound-map [f coll]
-	(let [options *options*
-				kernel  *kernel*]
-		(fn seq-fn []
-			(binding [*options* options
-								*kernel*  kernel]
-				(binding-options [*options* [:seqs] *options*] []
-					(seq-bound-map f coll))))))
+	(let [enclosed-kernel *kernel*]
+		(let-options [enclosed-options [:seqs] *options*] []
+			(fn-binding-options [*options* enclosed-options] []
+				(binding [*kernel* enclosed-kernel]
+					(bound-map f coll))))))
+
+;	(let [options *options*
+;				kernel  *kernel*]
+;		(fn seq-fn []
+;			(binding [*options* options
+;								*kernel*  kernel]
+;				(binding-options [*options* [:seqs] *options*] []
+;					(seq-bound-map f coll))))))
+;
+;    (let [enclosed-kernel *kernel*]
+;      (let-options [enclosed-options [:as-expression] *options*] []
+;        (fn-binding-options [*options* enclosed-options] [& args]
+;          (binding [*kernel* enclosed-kernel]
+;            (cep (apply list expr args))))))))
 
 (defn bound-map [f coll]
 	(cond
@@ -132,21 +144,21 @@
           'else                    (parse-generic-expression expr))))
 
 (defn parse-complex-list [expr]
-  (if (flag? *options* :vectors)
-    (with-debug-message (flag? *options* :verbose) "parse of complex list into Clojure vector"
-      (loop [elements (.args expr)
-             v        []
-             stack    nil]
-        (if-let [elements (seq elements)]
-          (let [first-expr (first elements)]
-            (if (simple? first-expr)
-              (recur (next elements) (conj v (parse first-expr)) stack)
-              (recur (.args first-expr) [] (conj stack [(next elements) v]))))
-          (if (seq stack)
-            (let [[elements prior-v] (peek stack)]
-              (recur elements (conj prior-v v) (pop stack)))
-            v))))
-    (bound-map parse (.args expr))))
+  ;(if (flag? *options* :vectors)
+  ;  (with-debug-message (flag? *options* :verbose) "parse of complex list into Clojure vector"
+  ;    (loop [elements (.args expr)
+  ;           v        []
+  ;           stack    nil]
+  ;      (if-let [elements (seq elements)]
+  ;        (let [first-expr (first elements)]
+  ;          (if (simple? first-expr)
+  ;            (recur (next elements) (conj v (parse first-expr)) stack)
+  ;            (recur (.args first-expr) [] (conj stack [(next elements) v]))))
+  ;        (if (seq stack)
+  ;          (let [[elements prior-v] (peek stack)]
+  ;            (recur elements (conj prior-v v) (pop stack)))
+  ;          v))))
+    (bound-map parse (.args expr)));)  ;this now handles vectors well, so the code above is not needed
 
 (defn parse-integer [expr]
   (let [i (.asLong expr)]
