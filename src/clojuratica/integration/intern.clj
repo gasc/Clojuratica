@@ -24,8 +24,10 @@
         enclosed-options ((math-eval :get-dynamic-vars) '*options*)]
     (eval
      `(defmacro ~macro-name [& args#]
-        (let [[flags# params# args#] (parse-options '~enclosed-options args#)
+        (let [[flags# params# args#] (parse-options '~enclosed-options args#) ; TODO disallow :no-convert flag
               expr#                  (read (cons (quote ~op) args#))]
+					(if (some #{:no-convert} flags#)
+						(throw (Exception. "The :no-convert flag cannot be used in a math macro.")))
           (list 'apply '~math-eval-symbol expr# (list 'apply 'concat flags# params#)))))))
 
 (defn defn-op [math-eval fn-name op]

@@ -64,6 +64,8 @@
         (.matrixQ expr Expr/SYMBOL)      Expr/SYMBOL
         'else                            nil))
 
+(declare parse-expr-coll-to-lazy-seq)
+
 (defn parse-simple-vector [expr & [type]]
   (with-debug-message (and (flag? *options* :verbose) (nil? type)) "simple vector parse"
     (let [type    (or type (simple-vector-type expr))
@@ -71,7 +73,18 @@
 			(if (and (flag? *options* :N)
 							 (some #{Expr/INTEGER Expr/BIGINTEGER Expr/REAL Expr/BIGDECIMAL} #{type}))
 				(coll-fn (.asArray expr Expr/REAL 1))
-				(coll-fn (map #(parse-simple-atom % type) (.args expr)))))))
+				(if (flag? *options* :vectors)
+					(vec (map #(parse-simple-atom % type) (.args expr)))
+					(parse-expr-coll-to-lazy-seq (.args expr) type))))))
+
+(defn parse-expr-coll-to-lazy-seq [coll type]
+	(let [kernel  *kernel*
+				options *options*]
+		(lazy-seq
+			(binding [*kernel*  kernel
+								*options* options]
+				(when-let [s (seq coll)]
+					(cons (parse-simple-atom (first s) type) (parse-expr-coll-to-lazy-seq (rest s) type)))))))
 
 (defn parse-simple-matrix [expr & [type]]
   (with-debug-message (flag? *options* :verbose) "simple matrix parse"
@@ -80,16 +93,13 @@
       (coll-fn (map #(parse-simple-vector % type) (.args expr))))))
 
 (defn parse-simple-atom [expr type]
-  (try
-    (cond (= type Expr/BIGINTEGER)   (.asBigInteger expr)
-          (= type Expr/BIGDECIMAL)   (.asBigDecimal expr)
-          (= type Expr/INTEGER)      (parse-integer expr)
-          (= type Expr/REAL)         (.asDouble expr)
-          (= type Expr/STRING)       (.asString expr)
-          (= type Expr/RATIONAL)     (parse-rational expr)
-          (= type Expr/SYMBOL)       (parse-symbol expr))
-    (finally
-      (.dispose expr))))
+	(cond (= type Expr/BIGINTEGER)   (.asBigInteger expr)
+				(= type Expr/BIGDECIMAL)   (.asBigDecimal expr)
+				(= type Expr/INTEGER)      (parse-integer expr)
+				(= type Expr/REAL)         (.asDouble expr)
+				(= type Expr/STRING)       (.asString expr)
+				(= type Expr/RATIONAL)     (parse-rational expr)
+				(= type Expr/SYMBOL)       (parse-symbol expr)))
 
 (defn parse-complex-atom [expr]
   (let [head (head-str expr)]

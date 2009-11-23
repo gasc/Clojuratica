@@ -1,5 +1,6 @@
 (ns clojuratica.test.init
- (:use [clojuratica]))
+ (:use [clojuratica]
+	     [clojuratica.runtime.dynamic-vars]))
 
 (import '[com.wolfram.jlink MathLinkFactory])
 (def kernel-link (MathLinkFactory/createKernelLink
@@ -8,8 +9,8 @@
 
 (use 'clojuratica)
 
-(def *kernel* (clojuratica.base.kernel/kernel kernel-link))
-(def *default-options* clojuratica.runtime.default-options/*default-options*)
+(def kernel (clojuratica.base.kernel/kernel kernel-link))
+(def options clojuratica.runtime.default-options/*default-options*)
 
 (def math-eval (math-evaluator kernel-link))
 (math-intern math-eval :scopes)
