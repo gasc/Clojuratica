@@ -2,10 +2,16 @@
  (:use [clojuratica]
 	     [clojuratica.runtime.dynamic-vars]))
 
+
 (import '[com.wolfram.jlink MathLinkFactory])
 (def kernel-link (MathLinkFactory/createKernelLink
           "-linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
 (.discardAnswer kernel-link)
+
+;(import '[com.wolfram.jlink MathLinkFactory])
+;(def kernel-link (MathLinkFactory/createKernelLink
+;          "-linkmode launch -linkname 'C:\\Program Files\\Wolfram Research\\Mathematica Player\\7.0\\MathKernel.exe'"))
+;(.discardAnswer kernel-link)
 
 (use 'clojuratica)
 

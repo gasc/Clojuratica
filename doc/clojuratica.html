@@ -1,0 +1,327 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Clojuratica</title>
+</head>
+<body>
+<h2 style="text-align: center;">What is Clojuratica?<br>
+</h2>
+<div class="paragraph" style="text-align: left; display: block;">Clojuratica
+brings together two of today's most exciting tools for
+high-performance, parallel computation.<br>
+<br>
+<a href="http://clojuratica.weebly.com/#clojure">Clojure</a>
+is a new dynamic programming language with a compelling approach to
+concurrency and state, exciting facilities for functional programming
+and immutability, and a growing reputation for doing all the right
+things. <a href="http://clojuratica.weebly.com/#mathematica">Wolfram
+Mathematica</a>
+is arguably the world's most powerful tool for numerical computation,
+symbolic mathematics, optimization, and visualization and is built on
+top of its own splendid functional programming language.<br>
+<br>
+By linking the two:<br>
+<ul>
+  <li>Clojuratica lets you <span style="font-weight: bold;">write and
+evaluate Mathematica code in Clojure</span> with full <span
+ style="font-weight: bold;">syntactic integration</span>.
+Now Clojure programs can take advantage of Mathematica's enormous range
+of numerical and symbolic mathematics algorithms and fast matrix
+algebra routines.</li>
+  <li>Clojuratica provides the <span style="font-weight: bold;">seamless
+and transparent translation of native data structures</span>
+between Clojure and Mathematica. This includes high-precision numbers,
+matrices, N-dimensional arrays, and evaluated and unevaluated
+Mathematica expressions and formulae. </li>
+  <li>Clojuratica lets you <span style="font-weight: bold;">call,
+pass, and store Mathematica functions just as if they were first-class
+functions in Clojure</span>.
+This is high-level functional programming at its finest. You can write
+a function in whichever language is more suited to the task and never
+think again about which platform is evaluating calls to that function.</li>
+  <li>Clojuratica facilitates <span style="font-weight: bold;">the
+"Clojurization" of Mathematica's existing parallel-computing
+capabilities</span>.
+Mathematica is not designed for threads or concurrency. It has
+excellent support for parallel computation, but parallel evaluations
+are
+initiated from a single-threaded master kernel which blocks until all
+parallel evaluations return. By contrast, Clojuratica includes a
+concurrency framework that lets multiple Clojure threads execute
+Mathematica expressions without blocking others. Now it is easy to run
+a simulation in Clojure with 1,000 independent threads asynchronously
+evaluating processor-intensive expressions in Mathematica. The
+computations will be farmed out adaptively and transparently to however
+many Mathematica kernels are available on any number of processor
+cores, either locally or across a cluster, grid, or network.</li>
+</ul>
+Clojuratica
+is open-source and targeted at applications in scientific computing,
+computational economics, finance, and other fields that rely on the
+combination of parallelized simulation and high-performance
+number-crunching. Clojuratica gives the programmer access to Clojure's
+most cutting-edge features<span
+ style="font-size: 12pt; font-family: &quot;Times New Roman&quot;,&quot;serif&quot;;">&mdash;</span>easy
+concurrency and multithreading, immutable persistent data structures,
+and software transactional memory (<a
+ href="http://clojuratica.weebly.com/#clojure">more on Clojure</a>)&mdash;alongside
+Mathematica's world-class algorithms for numerics, symbolic
+mathematics, optimization, statistics, visualization, and
+image-processing (<a href="http://clojuratica.weebly.com/#mathematica">more
+on Mathematica</a>).<br>
+<br>
+The canonical pronunciation of <span style="font-style: italic;">Clojuratica
+</span>starts with <span style="font-style: italic;">Clojure </span>and
+rhymes with <span style="font-style: italic;">erotica</span>.</div>
+<div>
+<div style="overflow: hidden; height: 20px; width: 100%;"></div>
+<hr
+ style="border: 0pt none ; margin: 0pt auto; background-color: rgb(119, 119, 119); color: rgb(119, 119, 119); height: 1px; text-align: center; width: 100%;">
+<div style="overflow: hidden; height: 20px; width: 100%;"></div>
+</div>
+<h2 style="text-align: center;">News</h2>
+<div class="paragraph" style="text-align: left; display: block;">11/22/09:
+Version 2 alpha 2 was released today. Added is the evaluator flag :N
+(and corresponding flag :no-N). Like the Mathematica function N, it
+stands for numeric. When enabled, the flag speeds up by a factor of 10
+the Mathematica-to-Clojure parsing of homogeneous numeric lists (and
+multidimensional arrays). The trade-off is that the contents become
+doubles. The flag affects what would otherwise become Clojure
+vectors/seqs of integers, doubles, bigints, and bigdecimals; these are
+all cast to vectors/seqs of doubles. Vectors/seqs of rationals (Clojure
+ratios) are unaffected by the flag and receive neither casting nor
+speedup.<br>
+<br>
+11/20/09: Version 2 alpha 1 was released today! Please see <a
+ href="http://clojuratica.weebly.com/intro.html">Intro</a>
+for more information. Yes, we skipped 1.x. With the new syntactic
+integration and complete rewrite it seemed right to commemorate the
+release with a full increment.<br>
+<br>
+8/22/09: Clojuratica v0.96 was <a
+ href="http://groups.google.com/group/clojuratica/browse_thread/thread/3f158bcc36cf7941">released</a>
+today. The software is now feature-complete for v1.0. Standout
+improvements in this release:<br>
+<ul>
+  <li>Full Mathematica interface to Clojure. Call Clojure from
+Mathematica with seamless data-type translation.<br>
+  </li>
+  <li>First-class
+Mathematica functions in Clojure. Write Mathematica functions and call
+them in Clojure as though they were Clojure functions. The evaluation
+is handled transparently by Mathematica. Parallelization of the
+function calls is automatic and transparent.<br>
+  </li>
+  <li>Greatly
+improved internals. Better data structure handling. Data-type
+translation is many times faster than before. Parallel computation
+queue is lightening fast. <br>
+  </li>
+  <li>Rewritten Tutorial covering all features.<br>
+  </li>
+</ul>
+<br>
+8/02/09:
+Clojuratica v0.91 will be released later this week. The GitHub
+repository already contains most of the new features, for those
+ambitious enough to brave it without documentation.<br>
+<br>
+7/27/09: Clojuratica v0.9 was <a
+ href="http://groups.google.com/group/clojure/browse_thread/thread/0ded6395a679db4c">released</a>
+to the Clojure community. Suggestions are <a
+ href="http://clojuratica.weebly.com/community.html">welcome</a>!</div>
+<div>
+<div style="overflow: hidden; height: 20px; width: 100%;"></div>
+<hr
+ style="border: 0pt none ; margin: 0pt auto; background-color: rgb(119, 119, 119); color: rgb(119, 119, 119); height: 1px; text-align: center; width: 100%;">
+<div style="overflow: hidden; height: 20px; width: 100%;"></div>
+</div>
+<div>
+<div id="857257623974146" style="width: 100%;" align="left"><a
+ name="clojure"></a><a name="mathematica"></a></div>
+</div>
+<div>
+<div id="745946112636527-parent" class="weebly-splitpane-2"
+ style="width: 100%;">
+<div id="745946112636527-lhs" class="column"
+ style="margin: 0pt; padding: 0pt; overflow: visible; width: 49.9178%; float: left;">
+<div style="padding-right: 5px;" class="columnlistp">
+<h2 style="text-align: center;">More On Clojure<br>
+</h2>
+<div class="paragraph" style="text-align: left; display: block;">It has
+been said that <a href="http://clojure.org">Clojure</a> feels like a
+programming language beamed back from the near future. It is well
+suited to "<a href="http://bc.tech.coop/blog/081201.html">concurrency-oriented
+programming</a>," a new paradigm brought on by the proliferation of <a
+ href="http://en.wikipedia.org/wiki/Multi-core">multicore</a> machines
+and high-performance computational clusters. <br>
+<ul>
+  <li>Like Perl, Python, and Ruby, Clojure is a <a
+ href="http://en.wikipedia.org/wiki/Dynamic_programming_language">dynamic
+programming language</a>. It facilitates fast and flexible program
+development.</li>
+  <li>Like Haskell, ML, and Lisp, Clojure is a <a
+ href="http://www.joelonsoftware.com/items/2006/08/01.html">functional
+language</a>. Its rich, immutable <a
+ href="http://clojure.org/data_structures">data structures</a> are <a
+ href="http://blog.higher-order.net/2009/02/01/understanding-clojures-persistentvector-implementation/">persistent</a>,
+allowing for all the <a href="http://clojure.org/state">benefits</a>
+of functional programming without performance bottlenecks.</li>
+  <li>Clojure is a dialect of <a
+ href="http://www.paulgraham.com/rootsoflisp.html">Lisp</a>. It shares
+Lisp's <a href="http://clojure.org/lisp">code-as-data philosophy</a>
+and offers a powerful <a href="http://clojure.org/macros">macro system</a>.
+These features make it <a href="http://www.paulgraham.com/avg.html">especially
+expressive</a>.<br>
+  </li>
+  <li>Like
+JRuby, Jython, and Groovy, Clojure offers seamless interoperability
+with Java. To an even greater extent than those languages, it offers
+the speed of pure Java bytecode. It <a
+ href="http://clojure.org/jvm_hosted">runs on the JVM</a> and is
+therefore inherently cross-platform.<br>
+  </li>
+  <li>Like Erlang, Clojure is designed for <a
+ href="http://clojure.org/concurrent_programming">lockless concurrency</a>,
+making Clojure programs quickly scalable to thousands of CPU cores.
+Clojure's immutable data structures <a href="http://clojure.org/state">discourage
+mutating state</a>, eliminating the need for locking in most cases. For
+cases where mutable state is necessary, Clojure offers <a
+ href="http://clojure.org/concurrent_programming">built-in software
+transactional memory (STM)</a>, the first general-purpose language to
+do so. <br>
+  </li>
+</ul>
+There is a terrific set of <a
+ href="http://clojure.blip.tv/posts?view=archive&amp;nsfw=dc">video
+introductions to Clojure</a>
+by Rich Hickey, Clojure's creator. Another excellent, shorter, less
+philosophical, and more to-the-point set of video introductions is <a
+ href="http://www.youtube.com/watch?v=Aoeav_T1ARU">available on YouTube</a>.
+<span style="font-style: italic;"><a
+ href="http://www.amazon.com/Programming-Clojure-Pragmatic-Programmers-Halloway/dp/1934356336/">Programming
+Clojure</a></span> is Stuart Halloway's excellent book on the language.</div>
+</div>
+</div>
+<div id="745946112636527-rhs" class="column"
+ style="margin: 0pt; padding: 0pt; overflow: visible; width: 49.0822%; left: 49.0822%; float: left;">
+<div style="padding-left: 5px;" class="columnlistp">
+<h2 style="text-align: center;">More On Mathematica<br>
+</h2>
+<div class="paragraph" style="text-align: left; display: block;"><a
+ href="http://www.wolfram.com/products/mathematica/index.html">Wolfram
+Mathematica</a> is perhaps the <a
+ href="http://www.wolfram.com/products/mathematica/analysis/">most
+powerful</a> piece of software available today for numerical and
+symbolic mathematics, optimization, data visualization, and data
+analysis.<br>
+<ul>
+  <li>Like MATLAB &mdash; but to a <a
+ href="http://www.wolfram.com/products/mathematica/analysis/content/NumericalMatrixSystems.html">greater
+extent</a>
+&mdash; Mathematica provides a broad collection of built-in routines
+for
+linear algebra, matrix decomposition, symbolic mathematics,
+optimization, differential equations, symbolic and numerical
+integration, Fourier analysis, 2D and 3D visualization, image and photo
+manipulation, exploratory data analysis, probability and statistics,
+graph theory, number theory, geodesy, and access to the Wolfram
+Research internet data feeds on finance, chemistry, geometry,
+meteorology, astronomy, protein structure, and the human genome.</li>
+  <li>Mathematica is <a
+ href="http://www.wolfram.com/products/mathematica/overview/performance.html">fast</a>.
+The speed of its algorithms across all domains <a
+ href="http://www.wolfram.com/products/mathematica/analysis/content/SubroutineLibraries.html">match</a>
+those of numerical libraries for compiled languages. Meta-algorithms
+for <a
+ href="http://www.wolfram.com/broadcast/videos/algorithmselection/">automatic
+algorithm selection</a>
+increase performance and make it possible to focus on the task at hand
+rather than the algorithm used (the programmer retains the option to <a
+ href="http://www.wolfram.com/technology/guide/SelectiveMethodOverride/">override</a>
+automatic selection).</li>
+  <li>Like Clojure and other Lisps, the Mathematica language is a <a
+ href="http://reference.wolfram.com/mathematica/guide/FunctionalProgramming.html">functional
+language</a>. It supports <a
+ href="http://reference.wolfram.com/mathematica/tutorial/PureFunctions.html">pure
+functions</a>. Like Lisps, Mathematica is <a
+ href="http://en.wikipedia.org/wiki/Homoiconicity">homoiconic</a>
+(compare <a
+ href="http://reference.wolfram.com/mathematica/tutorial/EverythingIsAnExpression.html">Mathematica
+expressions</a> with <a
+ href="http://en.wikipedia.org/wiki/S-expression">Lisp S-expressions</a>).
+The bottom line: thinking in Mathematica is very similar to thinking in
+Clojure.</li>
+  <li>Mathematica has built-in <a
+ href="http://www.wolfram.com/products/mathematica/newin7/content/BuiltInParallelComputing/">parallelization
+capabilities</a>.
+It is easy to build programs that take advantage of multiple
+coordinated kernels running on multiple processor cores. It is equally
+easy to distribute computations across a cluster or grid. The
+Mathematica kernel, however, is designed for single-threaded
+applications. Clojuratica fixes this.<br>
+  </li>
+  <li>Mathematica can produce stunning <a
+ href="http://www.wolfram.com/products/mathematica/newin6/content/HighImpactAdaptiveVisualization/">visualizations</a>
+and <a
+ href="http://www.wolfram.com/products/mathematica/newin7/content/AutomatedChartingGraphics/">charts</a>.
+It supports <a
+ href="http://www.wolfram.com/products/mathematica/newin7/content/BuiltInImageProcessing/">integrated
+image-processing</a> that rivals that of Adobe Photoshop.</li>
+  <li>Mathematica provides free, seamless, over-the-internet access to
+massive databases in areas as diverse as <a
+ href="http://www.wolfram.com/products/mathematica/newin7/content/IntegratedGenomicAndProteinData/">genomics</a>,
+    <a
+ href="http://reference.wolfram.com/mathematica/ref/ChemicalData.html">chemistry</a>,
+    <a
+ href="http://www.wolfram.com/products/mathematica/newin7/content/DynamicAstronomicalComputation/">astronomy</a>,
+    <a
+ href="http://www.wolfram.com/products/mathematica/newin7/content/IntegratedGeodesyAndGIS/">geopolitics
+and geography</a>, and <a
+ href="http://reference.wolfram.com/mathematica/ref/FinancialData.html">finance</a>.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div
+ style="overflow: hidden; clear: both; visibility: hidden; height: 0px;"></div>
+</div>
+<div>
+<div style="overflow: hidden; height: 20px; width: 100%;"></div>
+<hr
+ style="border: 0pt none ; margin: 0pt auto; background-color: rgb(119, 119, 119); color: rgb(119, 119, 119); height: 1px; text-align: center; width: 100%;">
+<div style="overflow: hidden; height: 20px; width: 100%;"></div>
+</div>
+<h2 style="text-align: center;">Author</h2>
+<div class="paragraph" style="text-align: left; display: block;"><span
+ style="font-style: italic;">Clojuratica </span>was created by Garth
+Sheldon-Coulson, a graduate student at the <a href="http://www.mit.edu">Massachusetts
+Institute of Technology</a> and <a
+ href="http://www.law.harvard.edu/index.html">Harvard Law School</a>.
+See the <a href="http://clojuratica.weebly.com/community.html">Community</a>
+page to find out how to contribute to <span style="font-style: italic;">Clojuratica</span>,
+suggest features, report bugs, or ask general questions.<br>
+</div>
+<div>
+<div style="overflow: hidden; height: 20px; width: 100%;"></div>
+<hr
+ style="border: 0pt none ; margin: 0pt auto; background-color: rgb(119, 119, 119); color: rgb(119, 119, 119); height: 1px; text-align: center; width: 100%;">
+<div style="overflow: hidden; height: 20px; width: 100%;"></div>
+</div>
+<h2 style="text-align: center;">Legal</h2>
+<div class="paragraph" style="text-align: left; display: block;">The
+product names used in this web site are for identification purposes
+only. All trademarks and registered trademarks, including "Wolfram
+Mathematica," are the property of their respective owners. Clojuratica
+is not a product of Wolfram Research. The software on this site is
+provided "as-is," without any express or implied warranty.</div>
+<div id="footer">
+<div id="footer-content">Create a <a target="_top"
+ href="http://www.weebly.com/">free website</a> with <a target="_top"
+ href="http://www.weebly.com/" title="free website">Weebly</a></div>
+</div>
+</body>
+</html>
