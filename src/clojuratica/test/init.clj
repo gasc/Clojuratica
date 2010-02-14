@@ -8,9 +8,10 @@
           "-linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
 (.discardAnswer kernel-link)
 
+;math -mathlink -linkmode Listen -linkprotocol TCPIP -linkname 65515@127.0.0.1,65516@127.0.0.1
 ;(import '[com.wolfram.jlink MathLinkFactory])
 ;(def kernel-link (MathLinkFactory/createKernelLink
-;          "-linkmode launch -linkname 'C:\\Program Files\\Wolfram Research\\Mathematica Player\\7.0\\MathKernel.exe'"))
+;          "-linkmode Connect -linkprotocol TCPIP -linkname 65515@127.0.0.1,65516@127.0.0.1"))
 ;(.discardAnswer kernel-link)
 
 (use 'clojuratica)

@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<html lang="en-us">
 <head>
   <meta content="text/html; charset=ISO-8859-1"
  http-equiv="content-type">
@@ -33,7 +33,15 @@ Mathematica's J/Link library. The second command in particular is
 platform-specific. Please read the <a
  href="http://reference.wolfram.com/mathematica/JLink/tutorial/WritingJavaProgramsThatUseMathematica.html#15574">Mathematica
 J/Link documentation</a> for details on how to initialize the kernel on
-your platform.<br>
+your platform. <span style="font-weight: bold;">Please note that
+different platforms require different initialization strings in the
+call to createKernelLink. If on Unix you simply replace the
+mathkernel.exe path below with the path to your mathkernel binary, it
+will not work! Please check&nbsp;the </span><a
+ style="font-weight: bold;"
+ href="http://reference.wolfram.com/mathematica/JLink/tutorial/WritingJavaProgramsThatUseMathematica.html#15574">Mathematica
+J/Link documentation</a><span style="font-weight: bold;"> for the
+correct initialization string for your platform.</span><br>
 <br>
 <span class="clojure">=&gt; (import '[com.wolfram.jlink
 MathLinkFactory])</span><br class="clojure">

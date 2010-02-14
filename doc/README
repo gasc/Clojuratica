@@ -1,0 +1,25 @@
+Installation
+
+All files in this directory must be downloaded. For the M files, right-
+click and choose Save As.
+
+Some have asked how the JAR can be so small. The reason is that Clojure
+allows packages to be distributed as JARs of *.clj files. Ahead-of-time 
+compilation is optional. Nothing is ahead-of-time compiled in Clojuratica,
+so there are no .class files making the JAR large.
+
+The JAR file must be placed in your Java classpath and the M files must 
+be placed in your Mathematica $Path. The latter can be ascertained by 
+evaluating $Path in Mathematica.
+
+To install the JAR file in your system's classpath, download the file 
+and place it in a directory contained in your system's Java classpath. 
+Alternatively, place it in an arbitrary location and edit your system's 
+classpath appropriately. Typically one edits the classpath by changing a 
+system environmental variable. Google if you need more information.
+
+The Mathematica J/Link library, JLink.jar, must also be in your system's 
+classpath. JLink.jar is typically located in the AddOns/JLink subdirectory 
+of the Mathematica installation. Some Mathematica versions will by default 
+not install J/Link. If this is the case with yours, you can download J/Link 
+for free from the J/Link web site.
