@@ -1,3 +1,4 @@
+(comment
 (def output-vector
      (vec (for [i (range 10000)] (agent nil))))
 
@@ -10,3 +11,4 @@
        (Thread/sleep 50))))                     ;wait for 50 more msecs
 
 @(nth output-vector 2500)
+)

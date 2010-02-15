@@ -60,7 +60,7 @@
       (binding [*kernel* enclosed-kernel]
         (cep expr)))))
 
-(defmacro math-intern [& args]
+(defmacro math-intern [& args] 
   (let-options [options args {#{:as-function :as-macro} :as-macro
 															#{:no-scopes :scopes}     :no-scopes}]
 							 [math-eval & opspecs]

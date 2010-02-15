@@ -5,7 +5,7 @@
 
 (import '[com.wolfram.jlink MathLinkFactory])
 (def kernel-link (MathLinkFactory/createKernelLink
-          "-linkmode launch -linkname 'c:\\program files\\wolfram research\\mathematica\\7.0\\mathkernel.exe'"))
+          "-linkmode launch -linkname '/usr/local/bin/MathKernel'"))
 (.discardAnswer kernel-link)
 
 ;math -mathlink -linkmode Listen -linkprotocol TCPIP -linkname 65515@127.0.0.1,65516@127.0.0.1

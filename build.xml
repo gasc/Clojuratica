@@ -3,24 +3,29 @@
         Clojuratica is an Interface Between Clojure and Wolfram Mathematica.
     </description>
   <!-- set global properties for this build -->
-  <property name="src" location="src"/>
+  <property name="src" location="src/clj"/>
+	<property name="build" location="build"/>
 
   <target name="init">
     <!-- Create the time stamp -->
     <tstamp/>
+  </target> 
+
+  <target name="build" depends="init" description="compile the source" >
+    <copy todir="${build}">
+      <fileset dir="${src}"/>
+    </copy>
   </target>
 
-  <target name="compile" depends="init" description="compile the source" >
-  </target>
-
-  <target name="jar" depends="compile" description="generate the jar file" >
+  <target name="jar" depends="build" description="generate the jar file" >
     <!-- Put everything in ${classes} into the jar file -->
-    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${src}" includes="**/*.clj"/>
+    <jar jarfile="${basedir}${file.separator}clojuratica.jar" basedir="${build}" includes="**/*.clj"/>
     <echo>JAR written to ${basedir}${file.separator}clojuratica.jar</echo>
   </target>
 
   <target name="clean" description="clean up" >
     <!-- Delete the ${classes} directory tree -->
-    <!-- <delete dir="${classes}"/> -->
+  	<delete dir="${build}"/>
+    <delete file="${basedir}${file.separator}clojuratica.jar"/>
   </target>
 </project>

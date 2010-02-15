@@ -1,4 +1,4 @@
-(use 'clojure.contrib.duck-streams)
+(comment (use 'clojure.contrib.duck-streams)
 
 (defn read-table [filename]
   "Reads a file with whitespace-delimited, tabular data."
@@ -28,4 +28,4 @@
 	(time (def es (sparse-eigensystem 2856 2856
 																		(map #(list (first %) (second %)) m)
 																		(map #(nth % 2) m)))))
-
+)
