@@ -74,4 +74,5 @@
 (defmacro def-math-macro [m math-eval]
   `(math-intern :as-macro ~math-eval [~m ~'CompoundExpression]))
 
-
+(defn mathematica->clojure [s math-eval]
+  (math-eval :no-evaluate (list 'quote s))) 
