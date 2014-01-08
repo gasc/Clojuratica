@@ -1,6 +1,6 @@
 (ns clojuratica.runtime.default-options)
 
-(def *default-options*
+(def ^:dynamic *default-options*
    {#{:vectors :seqs :seq-fn}   :vectors
     #{:parallel :serial}        :serial
     #{:parse :no-parse}         :parse
