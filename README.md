@@ -6,7 +6,7 @@ An interface between Clojure and Wolfram Mathematica.
 
 Clojuratica brings together two of today's most exciting tools for high-performance, parallel computation.
 
-[Clojure](http://clojure.org) is a new dynamic programming language with a compelling approach to concurrancy and state, exciting facilities for functional programming and immutability, and a growing reputation for doing all the right things. [Wolfram Mathematica](https://www.wolfram.com/mathematica/) is arguably the world's most powerful integrated tool for numerical computation, symbolic mathematics, optimization, and visualization and is build on top of its own splendid functional programming language.
+[Clojure](http://clojure.org) is a new dynamic programming language with a compelling approach to concurrency and state, exciting facilities for functional programming and immutability, and a growing reputation for doing all the right things. [Wolfram Mathematica](https://www.wolfram.com/mathematica/) is arguably the world's most powerful integrated tool for numerical computation, symbolic mathematics, optimization, and visualization and is build on top of its own splendid functional programming language.
 
 By linking the two:
 
